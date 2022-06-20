@@ -29,10 +29,15 @@ source: https://tinyurl.com/bdedjxcy
 
 """
 import tkinter as tk
+import tkinter.font as tkfont
+import tkinter.ttk as ttk
+
 
 class ATM_Application(tk.Tk):
     def __init__(self, *args, **kwargs):
         tk.Tk.__init__(self, *args, **kwargs)
+
+        self.title_font = tkfont.Font(family='Ubuntu', size=18)
 
         # The container will be where we stack the frames on top of
         # The frames will be raised when called
@@ -41,12 +46,48 @@ class ATM_Application(tk.Tk):
         container.grid_rowconfigure(0, weight=1)
         container.grid_rowconfigure(0, weight=1)
 
+
+        self.frames = {}
+        for F in (MainMenu, LoginPage):
+            page_name = F.__name__
+            frame = F(parent=container, controller=self)
+            self.frames[page_name] = frame
+            frame.grid(row=0, column=0, sticky='nsew')
+
+        self.show_frame('LoginPage')
+
+    def show_frame(self, page_name):
+        # Displays frame with given name
+        frame = self.frames[page_name]
+        frame.tkraise()
+
+
 class MainMenu(tk.Frame):
     def __init__(self, parent, controller):
         tk.Frame.__init__(self, parent)
         self.controller = controller
 
-        Header_label = tk.Label(self, text='Hello')
+class LoginPage(tk.Frame):
+    def __init__(self, parent, controller):
+        tk.Frame.__init__(self, parent)
+        self.controller = controller
+
+        # GUI creation old tk :/
+        login_frame = tk.Frame(controller, bg='white')
+        login_frame.pack(expand=False, fill='y', side='top')
+        header_label = tk.Label(login_frame, text='Login to Your Account', font='Ubuntu 24', bg='white')
+        header_label.grid(row=0, column=0, padx=20, pady=(20, 40))
+        entry_username = tk.Entry(login_frame, relief='solid', font=controller.title_font)
+        entry_username.grid(row=1, column=0, pady=10)
+        entry_password = tk.Entry(login_frame, relief='solid', show="*", font=controller.title_font)
+        entry_password.grid(row=2, column=0, pady=10)
+        button_login = tk.Button(login_frame,
+                                 text='SIGN IN',
+                                 font=controller.title_font,
+                                 relief='groove',
+                                 bg='white',
+                                 command=controller.show_frame)
+        button_login.grid(row=3, column=0, pady=(20,50))
 
 
 if __name__ == "__main__":
