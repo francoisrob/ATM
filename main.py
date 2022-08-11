@@ -35,8 +35,8 @@ import tkinter.ttk as ttk
 class ATM_Application(tk.Tk):
     def __init__(self, *args, **kwargs):
         tk.Tk.__init__(self, *args, **kwargs)
-
-        # background image
+        self.geometry('1000x600')
+        # background image (Do not delete)
         # width, height = self.winfo_screenwidth(), self.winfo_screenheight()
         # self.image = Image.open('background_image01.png')
         # self.image = self.image.resize((width, height))
@@ -45,12 +45,12 @@ class ATM_Application(tk.Tk):
 
         # The container will be where we stack the frames on top of
         # The frames will be raised when called
-
         ttk.Style().configure('container.TFrame', background='blue')
         container = ttk.Frame(self)
         # container.pack(fill='both', expand=False, side='top')
         container.place(rely=.5, relx=.5, anchor='center')
 
+        # Place frames and assign
         self.frames = {}
         for F in (MainMenu, LoginPage):
             page_name = F.__name__
@@ -74,12 +74,21 @@ class MainMenu(tk.Frame):
         self.controller = controller
         print('f')
         # Center Widget
-        self.main_frame = ttk.Frame(self)
-        self.main_frame.pack(anchor='center', expand=True, fill='none')
+        ttk.Style().configure('Parent.TFrame', background='blue')
+        self.main_frame = ttk.Frame(self, style='Parent.TFrame')
+        self.main_frame.pack(anchor='center', expand=True, fill='both')
         self.header_label = ttk.Label(self.main_frame,
                                       text='LOREEEyyyyyyyyyvFFFFFFFFFFvEM',
                                       style='Header.TLabel')
         self.header_label.grid(row=0,
+                               column=0,
+                               padx=20,
+                               pady=(20, 40),
+                               columnspan=2)
+        self.back_button = ttk.Button(self.main_frame,
+                                      text='Back',
+                                      command=lambda: controller.show_frame('LoginPage'))
+        self.back_button.grid(row=1,
                                column=0,
                                padx=20,
                                pady=(20, 40),
@@ -97,9 +106,9 @@ class LoginPage(tk.Frame):
 
         # GUI creation
         style.configure('login.TFrame',
-                        background='white')
+                        background='red')
 
-        # Center Widget
+        # Center, Parent Widget
         login_frame = ttk.Frame(self, style='login.TFrame',width=800)
         login_frame.pack(fill='none', expand=True, anchor='center')
         # Header Text
@@ -156,6 +165,7 @@ class LoginPage(tk.Frame):
                             padx=20,
                             sticky='e')
 
+        # Login in button, currently only show the next frame, no verification function yet
         button_login = tk.Button(login_frame,
                                  text='SIGN IN',
                                  font='Ubuntu 14',
@@ -180,5 +190,6 @@ class MainMenu(tk.Frame):
     def __init__(self, parent, controller):
         tk.Frame.__init__(self, parent)
         self.controller = controller
-        
+        # When creating a new form please parent all widgets inside of a parent frame, 
+        # this will make organising the widgets easier in future. Take LoginPage as example
 """
