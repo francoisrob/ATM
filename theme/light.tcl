@@ -69,6 +69,14 @@ namespace eval ttk::theme::azure-light {
                 } 
             }
         }
+		
+		ttk::style layout Panel.TButton {
+            PanelButton.button -children {
+                PanelButton.padding -children {
+                    PanelButton.label -side left -expand true
+                } 
+            }
+        }
 
         ttk::style layout TCheckbutton {
             Checkbutton.button -children {
@@ -264,6 +272,18 @@ namespace eval ttk::theme::azure-light {
                 selected $I(rect-accent) \
                 pressed $I(rect-accent) \
                 active $I(rect-accent-hover) \
+            ] -border 4 -sticky ewns
+		
+		# PanelButton
+        ttk::style configure Panel.TButton -padding {8 4 8 4} -width -10 -anchor center
+
+        ttk::style element create PanelButton.button image \
+            [list $I(rect-panel) \
+            	{selected disabled} $I(rect-panel-hover) \
+                disabled $I(rect-panel-hover) \
+                pressed $I(rect-panel) \
+                selected $I(rect-panel) \
+                active $I(rect-panel-hover) \
             ] -border 4 -sticky ewns
 
         # Checkbutton
