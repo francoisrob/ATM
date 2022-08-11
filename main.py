@@ -29,7 +29,6 @@ source: https://tinyurl.com/bdedjxcy
 
 """
 import tkinter as tk
-import tkinter.font as tkfont
 import tkinter.ttk as ttk
 # from PIL import Image, ImageTk
 
@@ -37,29 +36,28 @@ class ATM_Application(tk.Tk):
     def __init__(self, *args, **kwargs):
         tk.Tk.__init__(self, *args, **kwargs)
 
-        self.title_font = tkfont.Font(family='Ubuntu', size=14)
+        # background image
+        # width, height = self.winfo_screenwidth(), self.winfo_screenheight()
+        # self.image = Image.open('background_image01.png')
+        # self.image = self.image.resize((width, height))
+        # self.bg_image = ImageTk.PhotoImage(self.image)
+        # ttk.Label(self, image=self.bg_image).place(relx=.5, rely=.5, anchor='center')
 
         # The container will be where we stack the frames on top of
         # The frames will be raised when called
-        container = ttk.Frame(self)
-        container.pack(side='top', fill='both', expand=True)
-        container.grid_rowconfigure(0, weight=1)
-        container.grid_rowconfigure(0, weight=1)
-        self.geometry('800x500')
-        self.frames = {}
 
-        # background image
-        '''width, height = self.winfo_screenwidth(), self.winfo_screenheight()
-        self.image = Image.open('background_image01.png')
-        self.image = self.image.resize((width, height))
-        self.bg_image = ImageTk.PhotoImage(self.image)
-        ttk.Label(self, image=self.bg_image).place(relx=.5, rely=.5, anchor='center')
-'''
+        ttk.Style().configure('container.TFrame', background='blue')
+        container = ttk.Frame(self)
+        # container.pack(fill='both', expand=False, side='top')
+        container.place(rely=.5, relx=.5, anchor='center')
+
+        self.frames = {}
         for F in (MainMenu, LoginPage):
             page_name = F.__name__
             frame = F(parent=container, controller=self)
             self.frames[page_name] = frame
             frame.grid(row=0, column=0, sticky='nsew')
+            # frame.pack(fill='both', expand=True, side='top')
 
         self.show_frame('LoginPage')
 
@@ -67,21 +65,25 @@ class ATM_Application(tk.Tk):
         # Displays frame with given name
         frame = self.frames[page_name]
         frame.tkraise()
+        print('Raised ' + page_name)
 
 
 class MainMenu(tk.Frame):
     def __init__(self, parent, controller):
         tk.Frame.__init__(self, parent)
         self.controller = controller
-
+        print('f')
         # Center Widget
-        self.main_frame = ttk.Frame(self.controller,
-                                    style='Custom.TFrame')
-        self.main_frame.place(relx=.5,
-                              rely=.5,
-                              anchor='center')
-        b = ttk.Button(self.main_frame, text='hi')
-        b.grid(column=0, row=0)
+        self.main_frame = ttk.Frame(self)
+        self.main_frame.pack(anchor='center', expand=True, fill='none')
+        self.header_label = ttk.Label(self.main_frame,
+                                      text='LOREEEyyyyyyyyyvFFFFFFFFFFvEM',
+                                      style='Header.TLabel')
+        self.header_label.grid(row=0,
+                               column=0,
+                               padx=20,
+                               pady=(20, 40),
+                               columnspan=2)
 
 class LoginPage(tk.Frame):
     def __init__(self, parent, controller):
@@ -94,21 +96,17 @@ class LoginPage(tk.Frame):
         password = tk.StringVar()
 
         # GUI creation
-        style.configure('Custom.TFrame',
+        style.configure('login.TFrame',
                         background='white')
 
         # Center Widget
-        self.login_frame = ttk.Frame(self.controller,
-                                     style='Custom.TFrame')
-        self.login_frame.place(relx=.5,
-                               rely=.5,
-                               anchor='center')
-
+        login_frame = ttk.Frame(self, style='login.TFrame',width=800)
+        login_frame.pack(fill='none', expand=True, anchor='center')
         # Header Text
         style.configure('Header.TLabel',
                         background='white',
                         font='Ubuntu 24 bold')
-        self.header_label = ttk.Label(self.login_frame,
+        self.header_label = ttk.Label(login_frame,
                                       text='Login to Your Account',
                                       style='Header.TLabel')
         self.header_label.grid(row=0,
@@ -121,16 +119,16 @@ class LoginPage(tk.Frame):
         style.configure('Subheader.TLabel',
                         background='white',
                         font='Ubuntu 14')
-        username_label = ttk.Label(self.login_frame,
+        username_label = ttk.Label(login_frame,
                                    text='Username',
                                    style='Subheader.TLabel')
         username_label.grid(row=1,
                             column=0,
                             padx=(20, 0))
-        entry_username = ttk.Entry(self.login_frame,
+        entry_username = ttk.Entry(login_frame,
                                    textvariable=username,
                                    justify='center',
-                                   font=controller.title_font,
+                                   font='Ubuntu 14',
                                    foreground='black',
                                    width=20)
         entry_username.grid(row=1,
@@ -139,16 +137,16 @@ class LoginPage(tk.Frame):
                             padx=(10, 20),
                             sticky='e')
 
-        password_label = ttk.Label(self.login_frame,
+        password_label = ttk.Label(login_frame,
                                    text='Password',
                                    style='Subheader.TLabel')
         password_label.grid(row=2,
                             column=0,
                             padx=(20, 0))
-        entry_password = ttk.Entry(self.login_frame,
+        entry_password = ttk.Entry(login_frame,
                                    textvariable=password,
                                    justify='center',
-                                   font=controller.title_font,
+                                   font='Ubuntu 14',
                                    foreground='black',
                                    width=20,
                                    show='*')
@@ -158,9 +156,9 @@ class LoginPage(tk.Frame):
                             padx=20,
                             sticky='e')
 
-        button_login = tk.Button(self.login_frame,
+        button_login = tk.Button(login_frame,
                                  text='SIGN IN',
-                                 font=controller.title_font,
+                                 font='Ubuntu 14',
                                  relief='groove',
                                  bg='white',
                                  command=lambda: controller.show_frame('MainMenu'))
