@@ -30,22 +30,43 @@ source: https://tinyurl.com/bdedjxcy
 """
 import tkinter as tk
 import tkinter.ttk as ttk
-# from PIL import Image, ImageTk
+from PIL import Image, ImageTk
 
 class ATM_Application(tk.Tk):
     def __init__(self, *args, **kwargs):
         tk.Tk.__init__(self, *args, **kwargs)
+
+        # Theme
+
+        bg = 'white'
+        style = ttk.Style()
+        style.configure('login.TFrame',
+                        background='white')
+        style.configure('container.TFrame',
+                        background='blue')
+        style.configure('Header.TLabel',
+                        background=bg,
+                        font='Ubuntu 24 bold')
+        style.configure('Parent.TFrame',
+                        background='blue')
+        style.configure('Subheader.TLabel',
+                        background='white',
+                        font='Ubuntu 14')
+        style.configure('Custom.TEntry',
+                        border=0)
+        style.configure('Custom.TButton', border=0)
+
         self.geometry('1000x600')
         # background image (Do not delete)
-        # width, height = self.winfo_screenwidth(), self.winfo_screenheight()
-        # self.image = Image.open('background_image01.png')
-        # self.image = self.image.resize((width, height))
-        # self.bg_image = ImageTk.PhotoImage(self.image)
-        # ttk.Label(self, image=self.bg_image).place(relx=.5, rely=.5, anchor='center')
+        width, height = self.winfo_screenwidth(), self.winfo_screenheight()
+        self.image = Image.open('background_image01.png')
+        self.image = self.image.resize((width, height))
+        self.bg_image = ImageTk.PhotoImage(self.image)
+        ttk.Label(self, image=self.bg_image).place(relx=.5, rely=.5, anchor='center')
 
         # The container will be where we stack the frames on top of
         # The frames will be raised when called
-        ttk.Style().configure('container.TFrame', background='blue')
+
         container = ttk.Frame(self)
         # container.pack(fill='both', expand=False, side='top')
         container.place(rely=.5, relx=.5, anchor='center')
@@ -59,6 +80,12 @@ class ATM_Application(tk.Tk):
             frame.grid(row=0, column=0, sticky='nsew')
             # frame.pack(fill='both', expand=True, side='top')
 
+        # theme button
+        theme_button = ttk.Button(self,
+                                  command=self.set_theme,
+                                  text='Theme')
+        theme_button.place(relx=0.5, rely=0, anchor='n')
+
         self.show_frame('LoginPage')
 
     def show_frame(self, page_name):
@@ -67,54 +94,67 @@ class ATM_Application(tk.Tk):
         frame.tkraise()
         print('Raised ' + page_name)
 
+    def set_theme(self):
+        if self.tk.call("ttk::style", "theme", "use") == "azure-dark":
+            # Set Light theme
+            self.tk.call("set_theme", "light")
+        else:
+            self.tk.call("set_theme", "dark")
+
 
 class MainMenu(tk.Frame):
     def __init__(self, parent, controller):
         tk.Frame.__init__(self, parent)
         self.controller = controller
-        print('f')
+
+        # Gui Creation
         # Center Widget
-        ttk.Style().configure('Parent.TFrame', background='blue')
         self.main_frame = ttk.Frame(self, style='Parent.TFrame')
         self.main_frame.pack(anchor='center', expand=True, fill='both')
         self.header_label = ttk.Label(self.main_frame,
-                                      text='LOREEEyyyyyyyyyvFFFFFFFFFFvEM',
+                                      text='Main Menu',
                                       style='Header.TLabel')
         self.header_label.grid(row=0,
                                column=0,
                                padx=20,
                                pady=(20, 40),
                                columnspan=2)
+
+        self.deposit_button = ttk.Button(self.main_frame,
+                                         text='Deposit',
+                                         command=lambda: print('deposit'))
+        self.deposit_button.grid(row=1,
+                                 column=1,
+                                 padx=20,
+                                 pady=(20, 40),
+                                 columnspan=2)
+
         self.back_button = ttk.Button(self.main_frame,
                                       text='Back',
+                                      style='Custom.TButton',
                                       command=lambda: controller.show_frame('LoginPage'))
         self.back_button.grid(row=1,
-                               column=0,
-                               padx=20,
-                               pady=(20, 40),
-                               columnspan=2)
+                              column=0,
+                              padx=20,
+                              pady=(20, 40),
+                              columnspan=2)
+
 
 class LoginPage(tk.Frame):
     def __init__(self, parent, controller):
         tk.Frame.__init__(self, parent)
         self.controller = controller
-        style = ttk.Style()
 
         # Variables
         username = tk.StringVar()
         password = tk.StringVar()
 
         # GUI creation
-        style.configure('login.TFrame',
-                        background='red')
-
         # Center, Parent Widget
-        login_frame = ttk.Frame(self, style='login.TFrame',width=800)
+        login_frame = ttk.Frame(self, style='login.TFrame', width=800)
         login_frame.pack(fill='none', expand=True, anchor='center')
         # Header Text
-        style.configure('Header.TLabel',
-                        background='white',
-                        font='Ubuntu 24 bold')
+
         self.header_label = ttk.Label(login_frame,
                                       text='Login to Your Account',
                                       style='Header.TLabel')
@@ -125,9 +165,6 @@ class LoginPage(tk.Frame):
                                columnspan=2)
 
         # Input
-        style.configure('Subheader.TLabel',
-                        background='white',
-                        font='Ubuntu 14')
         username_label = ttk.Label(login_frame,
                                    text='Username',
                                    style='Subheader.TLabel')
@@ -139,7 +176,8 @@ class LoginPage(tk.Frame):
                                    justify='center',
                                    font='Ubuntu 14',
                                    foreground='black',
-                                   width=20)
+                                   width=20,
+                                   style='Custom.TEntry')
         entry_username.grid(row=1,
                             column=1,
                             pady=10,
@@ -166,12 +204,10 @@ class LoginPage(tk.Frame):
                             sticky='e')
 
         # Login in button, currently only show the next frame, no verification function yet
-        button_login = tk.Button(login_frame,
-                                 text='SIGN IN',
-                                 font='Ubuntu 14',
-                                 relief='groove',
-                                 bg='white',
-                                 command=lambda: controller.show_frame('MainMenu'))
+        button_login = ttk.Button(login_frame,
+                                  text='SIGN IN',
+                                  width=20,
+                                  command=lambda: controller.show_frame('MainMenu'))
         button_login.grid(row=3,
                           column=0,
                           pady=(20, 50),
@@ -180,9 +216,9 @@ class LoginPage(tk.Frame):
 
 if __name__ == "__main__":
     root = ATM_Application()
+    root.tk.call("source", "azure.tcl")
+    root.tk.call("set_theme", "light")
     root.mainloop()
-
-
 """
 ==Most basic code to create a new frame
 
