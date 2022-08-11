@@ -37,13 +37,14 @@ class ATM_Application(tk.Tk):
     def __init__(self, *args, **kwargs):
         tk.Tk.__init__(self, *args, **kwargs)
         self._frame = None
+        self.geometry('1000x600')
+        self.title('National Bank')
+        self.iconbitmap('favicon.ico')
 
         # Theme
         style = ttk.Style()
         style.configure('Header.TLabel')
         style.configure('Custom.TButton', border=0)
-
-        self.geometry('1000x600')
 
         # background image (Do not delete)
         width, height = self.winfo_screenwidth(), self.winfo_screenheight()
@@ -87,7 +88,7 @@ class MainMenu(ttk.Frame):
 
         # Gui Creation
         # Center Widget
-        self.main_frame = ttk.Frame(self, style='Parent.TFrame')
+        self.main_frame = ttk.Frame(self)
         self.main_frame.pack(anchor='center', expand=True, fill='both')
         self.header_label = ttk.Label(self.main_frame,
                                       text='Welcome _User', font=20)
@@ -96,6 +97,7 @@ class MainMenu(ttk.Frame):
                                padx=20,
                                pady=(20, 40),
                                columnspan=4)
+        self.withdraw_button = ttk.Button(self.main_frame)
 
         self.deposit_button = ttk.Button(self.main_frame,
                                          text='Deposit',
