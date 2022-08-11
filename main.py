@@ -44,51 +44,35 @@ class ATM_Application(tk.Tk):
         style.configure('Custom.TButton', border=0)
 
         self.geometry('1000x600')
+
         # background image (Do not delete)
         width, height = self.winfo_screenwidth(), self.winfo_screenheight()
         self.image = Image.open('background_image01.png')
         self.image = self.image.resize((width, height))
         self.bg_image = ImageTk.PhotoImage(self.image)
-        ttk.Label(self, image=self.bg_image).place(relx=.5, rely=.5, anchor='center')
-
-        # The container will be where we stack the frames on top of
-        # The frames will be raised when called
-
-        # container = ttk.Frame(self)
-        # container.pack(fill='both', expand=False, side='top')
-        # container.place(rely=.5, relx=.5, anchor='center')
-
-        # Place frames and assign
-        # self.frames = {}
-        # for F in (MainMenu, LoginPage):
-        #     page_name = F.__name__
-        #     frame = F(parent=container, controller=self)
-        #     self.frames[page_name] = frame
-        #     frame.grid(row=0, column=0, sticky='nsew')
-        # frame.pack(fill='both', expand=True, side='top')
+        ttk.Label(self, image=self.bg_image).place(relx=.5,
+                                                   rely=.5,
+                                                   anchor='center')
 
         # theme button
         theme_button = ttk.Button(self,
                                   command=self.set_theme,
                                   text='Theme')
-        theme_button.place(relx=0.5, rely=0, anchor='n')
-        # self.show_frame('LoginPage')
+        theme_button.place(relx=0.5,
+                           rely=0,
+                           anchor='n')
+
         self.switch_frame(LoginPage)
-    # def show_frame(self, page_name):
-    #     # Displays frame with given name
-    #     frame = self.frames[page_name]
-    #     frame.tkraise()
-    #     x = frame.winfo_screenmmwidth()
-    #     y = frame.winfo_screenmmheight()
-    #     print(str(x), str(y))
-    #     self.minsize(width=x, height=y)
-    #     print('Raised ' + page_name)
+
     def switch_frame(self, page_name):
+        # This function displays new frames and deletes old ones
         new_frame = page_name(self)
         if self._frame is not None:
             self._frame.destroy()
         self._frame = new_frame
-        self._frame.place(relx=.5, rely=.5, anchor='center')
+        self._frame.place(relx=.5,
+                          rely=.5,
+                          anchor='center')
 
     def set_theme(self):
         if self.tk.call("ttk::style", "theme", "use") == "azure-dark":
@@ -133,19 +117,17 @@ class MainMenu(ttk.Frame):
 class LoginPage(ttk.Frame):
     def __init__(self, master):
         ttk.Frame.__init__(self, master)
-        # self.controller = controller
 
         # Variables
-        super().__init__()
         username = tk.StringVar()
         password = tk.StringVar()
 
         # GUI creation
-        # Center, Parent Widget
-        login_frame = ttk.Frame(self, width=800)
+        # Center Widget
+        login_frame = ttk.Frame(self)
         login_frame.pack(fill='none', expand=True, anchor='center')
-        # Header Text
 
+        # Header Text
         self.header_label = ttk.Label(login_frame,
                                       text='Login to Your Account', font=('Bold', 20))
         self.header_label.grid(row=0,
@@ -209,10 +191,10 @@ if __name__ == "__main__":
 """
 ==Most basic code to create a new frame
 
-class MainMenu(tk.Frame):
-    def __init__(self, parent, controller):
-        tk.Frame.__init__(self, parent)
-        self.controller = controller
+class PageName(ttk.Frame):
+    def __init__(self, master):
+        ttk.Frame.__init__(self, master)
+        
         # When creating a new form please parent all widgets inside of a parent frame, 
         # this will make organising the widgets easier in future. Take LoginPage as example
 """
