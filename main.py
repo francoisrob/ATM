@@ -30,7 +30,7 @@ source: https://tinyurl.com/bdedjxcy
 """
 import tkinter as tk
 import tkinter.ttk as ttk
-# from PIL import Image, ImageTk
+from PIL import Image, ImageTk
 
 
 class ATM_Application(tk.Tk):
@@ -46,13 +46,13 @@ class ATM_Application(tk.Tk):
         style.configure('Header.TLabel')
 
         # background image (Do not delete)
-        # width, height = self.winfo_screenwidth(), self.winfo_screenheight()
-        # self.image = Image.open('background_image01.png')
-        # self.image = self.image.resize((width, height))
-        # self.bg_image = ImageTk.PhotoImage(self.image)
-        # ttk.Label(self, image=self.bg_image).place(relx=.5,
-        #                                            rely=.5,
-        #                                            anchor='center')
+        width, height = self.winfo_screenwidth(), self.winfo_screenheight()
+        self.image = Image.open('background_image01.png')
+        self.image = self.image.resize((width, height))
+        self.bg_image = ImageTk.PhotoImage(self.image)
+        ttk.Label(self, image=self.bg_image).place(relx=.5,
+                                                   rely=.5,
+                                                   anchor='center')
 
         self.switch_frame(LoginPage)
 
@@ -90,9 +90,7 @@ class MainMenu(ttk.Frame):
         self.right_panel = ttk.Frame(self.main_frame, style="Card.TFrame")
         self.right_panel.grid(row=0,
                               column=1,
-                              ipady=5,
-                              ipadx=5,
-                              padx=0)
+                              sticky='news')
 
         self.header_label = ttk.Label(self.left_panel,
                                       text='Welcome \n_User',
@@ -140,27 +138,37 @@ class MainMenu(ttk.Frame):
                                 column=0,
                                 pady=10)
         # Right Panels
-        self.accounts_panel = ttk.Frame(self.right_panel)
+        self.accounts_panel = ttk.Frame(self.right_panel, style="Card.TFrame")
         self.cards_panel = ttk.Frame(self.right_panel)
         self.payments_panel = ttk.Frame(self.right_panel)
         self.show_panel(self.accounts_panel)
         for f in (self.accounts_panel, self.cards_panel, self.payments_panel):
-            f.pack(expand=True, fill='none', side='left')
+            f.pack(expand=True, fill='both', side='right')
 
         # accounts panel
         ttk.Label(self.accounts_panel, text="Your balance").grid(column=0,
                                                                  row=0,
                                                                  sticky='w',
-                                                                 pady=(20,0),
+                                                                 pady=(20, 0),
                                                                  padx=20)
         self.balance_label = ttk.Label(self.accounts_panel,
                                        text='$ 1 568,95',
                                        font=20)
         self.balance_label.grid(column=0,
                                 row=1,
-                                sticky='n',
-                                padx=20,
-                                columnspan=2)
+                                sticky='w',
+                                padx=25,
+                                columnspan=1,
+                                pady=(0, 20))
+        # self.payments_view = ttk.Treeview(self.accounts_panel, height=14)
+        # self.payments_view.column(1, width=50)
+        # self.payments_view.grid(column=0,
+        #                         row=3,
+        #                         columnspan=3,
+        #                         sticky='n',
+        #                         pady=0,
+        #                         padx=20)
+
     def show_panel(self, frame):
         frame.tkraise()
 
