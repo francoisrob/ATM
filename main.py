@@ -28,11 +28,14 @@ The code to switch between different frames,
 source: https://tinyurl.com/bdedjxcy
 
 """
+
+
 import tkinter as tk
 import tkinter.ttk as ttk
 import pyglet
 from PIL import Image, ImageTk
 
+Version = 'v1'
 pyglet.font.add_file('OpenSans.ttf')
 
 class ATM_Application(tk.Tk):
@@ -46,6 +49,8 @@ class ATM_Application(tk.Tk):
         # Theme
         style = ttk.Style()
         style.configure('Header.TLabel')
+        self.tk.call("source", "azure.tcl")
+        self.tk.call("set_theme", "light")
 
         # background image (Do not delete)
         width, height = self.winfo_screenwidth(), self.winfo_screenheight()
@@ -81,7 +86,6 @@ class ATM_Application(tk.Tk):
         self._frame.update()
         width = self._frame.winfo_reqwidth() + 40
         height = self._frame.winfo_height() + 40
-        print(str(height))
         self.minsize(width=width, height=height)
 
 class MainMenu(ttk.Frame):
@@ -91,100 +95,85 @@ class MainMenu(ttk.Frame):
         # Gui Creation
         # Center Widget
         self.main_frame = ttk.Frame(self)
-        self.main_frame.pack(anchor='center', expand=True, fill='both')
+        self.main_frame.pack()
         self.main_frame.columnconfigure(1, weight=3)
 
-        self.left_panel = ttk.Frame(self.main_frame, style="Card.TFrame")
-        self.left_panel.grid(row=0,
-                             column=0)
+        # Left Panel
+        self.left_panel = ttk.Frame(self.main_frame)
+        self.left_panel.pack(side='left', fill='y')
 
+        # Right Panels
         self.right_panel = ttk.Frame(self.main_frame)
-        self.right_panel.grid(row=0,
-                              column=1,
-                              sticky='news')
+        self.right_panel.pack(side='right')
+        self.accounts_panel = ttk.Frame(self.right_panel, width=500, height=500, style="Card.TFrame")
+        self.cards_panel = ttk.Frame(self.right_panel, width=500, height=500)
+        self.payments_panel = ttk.Frame(self.right_panel, width=500, height=500)
+        for f in (self.accounts_panel, self.cards_panel, self.payments_panel):
+            f.grid(row=0, column=0)
+            f.grid_propagate(False)
+        self.show_panel(self.accounts_panel)
 
         self.header_label = ttk.Label(self.left_panel,
                                       text='Welcome',
                                       font=('Open Sans', 30))
-        self.header_label.grid(row=0,
-                               column=0,
-                               pady=20,
-                               sticky='n')
+        self.header_label.pack(side='top',
+                               padx=(20, 30),
+                               pady=(10, 20))
 
         self.accounts_button = ttk.Button(self.left_panel,
                                           text='Accounts',
-                                          width=30,
-                                          style="Panel.TButton")
-        self.accounts_button.grid(row=1,
-                                  column=0,
-                                  pady=(20, 0),
-                                  padx=1)
+                                          style="Panel.TButton",
+                                          command=self.show_panel(self.accounts_panel))
+        self.accounts_button.pack(side='top', fill='x')
         self.cards_button = ttk.Button(self.left_panel,
                                        text='Cards',
-                                       width=30,
                                        style="Panel.TButton")
-        self.cards_button.grid(row=2,
-                               column=0)
+        self.cards_button.pack(side='top', fill='x')
         self.payments_button = ttk.Button(self.left_panel,
                                           text='Payments',
                                           command=lambda: master.switch_frame(LoginPage),
-                                          width=30,
                                           style="Panel.TButton")
-        self.payments_button.grid(row=3,
-                                  column=0)
+        self.payments_button.pack(side='top', fill='x')
+
+        self.version_label = ttk.Label(self.left_panel,font=('Open Sans light', 5))
+        self.version_label.pack(side='bottom', fill='x')
+        self.version_label.configure(text=Version)
+        self.logout_button = ttk.Button(self.left_panel,
+                                        text='Log Out',
+                                        command=lambda: master.switch_frame(LoginPage),
+                                        style="Panel.TButton")
+        self.logout_button.pack(side='bottom', fill='x')
 
         # theme button
         theme_button = ttk.Button(self.left_panel,
                                   command=master.set_theme,
                                   text='Theme',
-                                  width=30,
                                   style="Panel.TButton")
-        theme_button.grid(row=4,
-                          column=0,
-                          pady=(150, 0))
-
-        self.logout_button = ttk.Button(self.left_panel,
-                                        text='Log Out',
-                                        command=lambda: master.switch_frame(LoginPage),
-                                        width=10)
-        self.logout_button.grid(row=5,
-                                column=0,
-                                pady=10)
-        # Right Panels
-        self.accounts_panel = ttk.Frame(self.right_panel)
-        self.cards_panel = ttk.Frame(self.right_panel)
-        self.payments_panel = ttk.Frame(self.right_panel)
-        self.show_panel(self.accounts_panel)
-        for f in (self.accounts_panel, self.cards_panel, self.payments_panel):
-            f.pack(expand=False, fill='none', side='right')
+        theme_button.pack(side='bottom', fill='x')
 
         # accounts panel
         ttk.Label(self.accounts_panel, text="Your balance").grid(column=0,
                                                                  row=0,
-                                                                 sticky='w',
-                                                                 pady=(20, 0),
-                                                                 padx=20)
+                                                                 padx=30,
+                                                                 pady=(30, 0),
+                                                                 sticky='w')
         self.balance_label = ttk.Label(self.accounts_panel,
                                        text='$ 1 568,95',
-                                       font=20)
+                                       font=('Open Sans', 20))
         self.balance_label.grid(column=0,
                                 row=1,
-                                sticky='w',
-                                padx=25,
-                                columnspan=1,
+                                sticky='e',
+                                padx=30,
+                                columnspan=2,
                                 pady=(0, 20))
-        self.payments_view = ttk.Treeview(self.accounts_panel, height=14)
-        self.payments_view.grid(column=0,
-                                row=3,
-                                columnspan=3,
-                                sticky='n',
-                                pady=0,
-                                padx=20)
+
+        self.payments_scroll = ttk.Scrollbar(self.accounts_panel,
+                                             orient='vertical')
+        self.payments_scroll.grid(column=2, row=3, sticky='w', padx=(0, 20))
 
     @staticmethod
     def show_panel(frame):
         frame.tkraise()
-
 
 class LoginPage(ttk.Frame):
     def __init__(self, master):
@@ -255,8 +244,6 @@ class LoginPage(ttk.Frame):
 
 if __name__ == "__main__":
     root = ATM_Application()
-    root.tk.call("source", "azure.tcl")
-    root.tk.call("set_theme", "light")
     root.mainloop()
 """
 ==Most basic code to create a new frame
