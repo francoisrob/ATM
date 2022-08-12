@@ -279,8 +279,40 @@ def db_create():
 
     db = db_connect()  # Method RETURNS the connection we made to the db
     db_cursor = db.cursor()
+    # CREATES DATABASE db_ATM
+    db_cursor.execute("CREATE SCHEMA IF NOT EXISTS `db_ATM` DEFAULT CHARACTER SET utf8 ;")
+    db_cursor.execute("USE `db_ATM` ;")
 
-    # CREATES DATABASE atm_db
+    # CREATE TABLE tbl_users
+    db_cursor.execute("DROP TABLE IF EXISTS `db_ATM`.`tbl_users` ;")
+    sql = "CREATE TABLE IF NOT EXISTS `db_ATM`.`tbl_users` (" \
+          "`user_id` INT NOT NULL AUTO_INCREMENT," \
+          "`fname` VARCHAR(45) NOT NULL," \
+          "`sname` VARCHAR(45) NOT NULL," \
+          "`street` VARCHAR(45) NOT NULL," \
+          "`city` VARCHAR(20) NOT NULL," \
+          "`state` VARCHAR(3) NOT NULL," \
+          "`cell_num` VARCHAR(10) NOT NULL," \
+          "`email` VARCHAR(45) NOT NULL," \
+          "`id_num` VARCHAR(13) NOT NULL," \
+          "`username` VARCHAR(45) NOT NULL," \
+          "`password` VARCHAR(45) NOT NULL," \
+          "PRIMARY KEY (`user_id`))" \
+          "ENGINE = InnoDB;"
+    db_cursor.execute(sql)
+    db.commit()
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
