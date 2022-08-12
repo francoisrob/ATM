@@ -282,6 +282,7 @@ def db_create():
     # CREATES DATABASE db_ATM
     db_cursor.execute("CREATE SCHEMA IF NOT EXISTS `db_ATM` DEFAULT CHARACTER SET utf8 ;")
     db_cursor.execute("USE `db_ATM` ;")
+    db.commit()
 
     # CREATE TABLE tbl_users
     db_cursor.execute("DROP TABLE IF EXISTS `db_ATM`.`tbl_users` ;")
