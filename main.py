@@ -242,7 +242,50 @@ class LoginPage(ttk.Frame):
                           columnspan=2)
 
 
+"""
+Code to create a database with relational tables.
+Populates the tables with values.
+"""
+import mysql.connector
+from mysql.connector import errorcode
+
+def db_connect():
+    # Connecting to the database is set as a method since we need to open and close it for different transactions
+    # Error handling code:
+    # https://docs.oracle.com/cd/E17952_01/connector-python-en/connector-python-example-connecting.html
+    # Start of borrowed code
+    try:
+        db = mysql.connector.connect(
+            host="localhost",
+            user="root",
+            password="12345678",
+            port="3306",
+        )
+        return db
+    except mysql.connector.Error as e:
+        if e.errno == errorcode.ER_ACCESS_DENIED_ERROR:
+            print("Something is wrong with your user name or password")
+            exit()
+        elif e.errno == errorcode.ER_BAD_DB_ERROR:
+            print("Database does not exist")
+            exit()
+        else:
+            print(e)
+            exit()
+    # End of borrowed code
+
+
+def db_create():
+
+    db = db_connect()  # Method RETURNS the connection we made to the db
+    db_cursor = db.cursor()
+
+    # CREATES DATABASE atm_db
+
+
+
 if __name__ == "__main__":
+    db_create()
     root = ATM_Application()
     root.mainloop()
 """
