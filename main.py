@@ -29,14 +29,16 @@ source: https://tinyurl.com/bdedjxcy
 
 """
 
-
 import tkinter as tk
 import tkinter.ttk as ttk
 import pyglet
 from PIL import Image, ImageTk
+import mysql.connector
+from mysql.connector import errorcode
 
 Version = 'v1'
 pyglet.font.add_file('OpenSans.ttf')
+
 
 class ATM_Application(tk.Tk):
     def __init__(self, *args, **kwargs):
@@ -88,6 +90,7 @@ class ATM_Application(tk.Tk):
         height = self._frame.winfo_height() + 40
         self.minsize(width=width, height=height)
 
+
 class MainMenu(ttk.Frame):
     def __init__(self, master):
         ttk.Frame.__init__(self, master)
@@ -135,7 +138,7 @@ class MainMenu(ttk.Frame):
                                           style="Panel.TButton")
         self.payments_button.pack(side='top', fill='x')
 
-        self.version_label = ttk.Label(self.left_panel,font=('Open Sans light', 5))
+        self.version_label = ttk.Label(self.left_panel, font=('Open Sans light', 5))
         self.version_label.pack(side='bottom', fill='x')
         self.version_label.configure(text=Version)
         self.logout_button = ttk.Button(self.left_panel,
@@ -174,6 +177,7 @@ class MainMenu(ttk.Frame):
     @staticmethod
     def show_panel(frame):
         frame.tkraise()
+
 
 class LoginPage(ttk.Frame):
     def __init__(self, master):
@@ -246,8 +250,7 @@ class LoginPage(ttk.Frame):
 Code to create a database with relational tables.
 Populates the tables with values.
 """
-import mysql.connector
-from mysql.connector import errorcode
+
 
 def db_connect():
     # Connecting to the database is set as a method since we need to open and close it for different transactions
@@ -276,10 +279,15 @@ def db_connect():
 
 
 def db_create():
-
     db = db_connect()  # Method RETURNS the connection we made to the db
     db_cursor = db.cursor()
+
     # CREATES DATABASE db_ATM
+    db_cursor.execute("SET @OLD_UNIQUE_CHECKS=@@UNIQUE_CHECKS, UNIQUE_CHECKS=0;")
+    db_cursor.execute("SET @OLD_FOREIGN_KEY_CHECKS=@@FOREIGN_KEY_CHECKS, FOREIGN_KEY_CHECKS=0;")
+    db_cursor.execute("SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='ONLY_FULL_GROUP_BY,STRICT_TRANS_TABLES,"
+                      "NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_ENGINE_SUBSTITUTION';")
+
     db_cursor.execute("CREATE SCHEMA IF NOT EXISTS `db_ATM` DEFAULT CHARACTER SET utf8 ;")
     db_cursor.execute("USE `db_ATM` ;")
     db.commit()
@@ -303,18 +311,48 @@ def db_create():
     db_cursor.execute(sql)
     db.commit()
 
+    # CREATE TABLE tbl_accounts
+    db_cursor.execute("DROP TABLE IF EXISTS `db_ATM`.`tbl_accounts` ;")
+    sql = "CREATE TABLE IF NOT EXISTS `db_ATM`.`tbl_accounts` (" \
+          "`acc_ID` INT NOT NULL AUTO_INCREMENT," \
+          "`acc_balance` DECIMAL(13,2) NOT NULL," \
+          "`date_created` DATE NOT NULL," \
+          "`acc_type` CHAR(1) NOT NULL," \
+          "`tbl_users_user_id` INT NOT NULL," \
+          "`credit_due` DECIMAL(13,2) NOT NULL," \
+          "PRIMARY KEY (`acc_ID`, `tbl_users_user_id`)," \
+          "CONSTRAINT `fk_tbl_accounts_tbl_users`" \
+          " FOREIGN KEY (`tbl_users_user_id`)" \
+          " REFERENCES `db_ATM`.`tbl_users` (`user_id`) ON DELETE NO ACTION ON UPDATE NO ACTION)" \
+          "ENGINE = InnoDB;"
+    db_cursor.execute(sql)
+    db.commit()
 
+    # CREATE TABLE tbl_accounts
+    db_cursor.execute("DROP TABLE IF EXISTS `db_ATM`.`tbl_transactions` ;")
+    sql = "CREATE TABLE IF NOT EXISTS `db_ATM`.`tbl_transactions` (" \
+          "`trans_id` INT NOT NULL AUTO_INCREMENT," \
+          "`trans_type` CHAR(1) NOT NULL," \
+          "`description` VARCHAR(100) NOT NULL," \
+          "`amount` DECIMAL(13,2) NOT NULL," \
+          "`date` DATE NOT NULL," \
+          "`tbl_accounts_acc_ID` INT NOT NULL," \
+          "`tbl_accounts_tbl_users_user_id` INT NOT NULL," \
+          "PRIMARY KEY (`trans_id`, `tbl_accounts_acc_ID`, `tbl_accounts_tbl_users_user_id`)," \
+          "CONSTRAINT `fk_tbl_transactions_tbl_accounts1`" \
+          " FOREIGN KEY (`tbl_accounts_acc_ID` , `tbl_accounts_tbl_users_user_id`)" \
+          "REFERENCES `db_ATM`.`tbl_accounts` (`acc_ID` , `tbl_users_user_id`) ON DELETE NO ACTION ON UPDATE NO " \
+          "ACTION)" \
+          "ENGINE = InnoDB;"
+    db_cursor.execute(sql)
+    db.commit()
 
+    db_cursor.execute("SET SQL_MODE=@OLD_SQL_MODE;")
+    db_cursor.execute("SET FOREIGN_KEY_CHECKS=@OLD_FOREIGN_KEY_CHECKS;")
+    db_cursor.execute("SET UNIQUE_CHECKS=@OLD_UNIQUE_CHECKS;")
+    db.commit()
 
-
-
-
-
-
-
-
-
-
+    # INSERT into tbl_users
 
 
 if __name__ == "__main__":
