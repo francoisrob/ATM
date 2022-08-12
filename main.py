@@ -222,6 +222,7 @@ class LoginPage(ttk.Frame):
         entry_username.grid(row=1,
                             column=1,
                             pady=10,
+                            padx=10,
                             sticky='w')
 
         password_label = ttk.Label(login_frame,
@@ -237,6 +238,7 @@ class LoginPage(ttk.Frame):
         entry_password.grid(row=2,
                             column=1,
                             pady=10,
+                            padx=10,
                             sticky='w')
 
         # Login in button, currently only show the next frame, no verification function yet
