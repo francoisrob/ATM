@@ -542,7 +542,7 @@ namespace eval ttk::theme::azure-light {
             image [list $I(right) \
                 user2 $I(empty) \
                 user1 $I(down) \
-            ] -width 26 -sticky {}
+            ] -width 26 -sticky news
 
         ttk::style configure Treeview -background $colors(-bg)
         ttk::style configure Treeview.Item -padding {2 0 0 0}

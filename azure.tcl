@@ -26,9 +26,9 @@ proc set_theme {mode} {
             -selectbackground $colors(-selectbg) \
             -selectforeground $colors(-selectfg) \
             -insertcolor $colors(-fg) \
-            -insertwidth 1 \
+            -insertwidth 0 \
             -fieldbackground $colors(-selectbg) \
-            -font {"Segoe Ui" 10} \
+            -font {"Open Sans" 10} \
             -borderwidth 1 \
             -relief flat
 
@@ -65,9 +65,9 @@ proc set_theme {mode} {
             -selectbackground $colors(-selectbg) \
             -selectforeground $colors(-selectfg) \
             -insertcolor $colors(-fg) \
-            -insertwidth 1 \
+            -insertwidth 0 \
             -fieldbackground $colors(-selectbg) \
-            -font {"Segoe Ui" 10} \
+            -font {"Open Sans Light" 10} \
             -borderwidth 1 \
             -relief flat
 
