@@ -33,8 +33,10 @@ import tkinter as tk
 import tkinter.ttk as ttk
 import pyglet
 from PIL import Image, ImageTk
+import mysql.connector
+from mysql.connector import errorcode
 
-Version = 'v1.08.12'
+Version = 'v1'
 pyglet.font.add_file('OpenSans.ttf')
 
 
@@ -52,14 +54,15 @@ class ATM_Application(tk.Tk):
         self.tk.call("source", "azure.tcl")
         self.tk.call("set_theme", "light")
 
-        # background image
+        # background image (Do not delete)
         width, height = self.winfo_screenwidth(), self.winfo_screenheight()
         self.image = Image.open('background_image01.png')
         self.image = self.image.resize((width, height))
         self.bg_image = ImageTk.PhotoImage(self.image)
-        ttk.Label(self, image=self.bg_image).place(rely=.5,
-                                                   relx=.5,
+        ttk.Label(self, image=self.bg_image).place(relx=.5,
+                                                   rely=.5,
                                                    anchor='center')
+
         self.switch_frame(LoginPage)
 
     def switch_frame(self, page_name):
@@ -86,6 +89,94 @@ class ATM_Application(tk.Tk):
         width = self._frame.winfo_reqwidth() + 40
         height = self._frame.winfo_height() + 40
         self.minsize(width=width, height=height)
+
+
+class MainMenu(ttk.Frame):
+    def __init__(self, master):
+        ttk.Frame.__init__(self, master)
+
+        # Gui Creation
+        # Center Widget
+        self.main_frame = ttk.Frame(self)
+        self.main_frame.pack()
+        self.main_frame.columnconfigure(1, weight=3)
+
+        # Left Panel
+        self.left_panel = ttk.Frame(self.main_frame)
+        self.left_panel.pack(side='left', fill='y')
+
+        # Right Panels
+        self.right_panel = ttk.Frame(self.main_frame)
+        self.right_panel.pack(side='right')
+        self.accounts_panel = ttk.Frame(self.right_panel, width=500, height=500, style="Card.TFrame")
+        self.cards_panel = ttk.Frame(self.right_panel, width=500, height=500)
+        self.payments_panel = ttk.Frame(self.right_panel, width=500, height=500)
+        for f in (self.accounts_panel, self.cards_panel, self.payments_panel):
+            f.grid(row=0, column=0)
+            f.grid_propagate(False)
+        self.show_panel(self.accounts_panel)
+
+        self.header_label = ttk.Label(self.left_panel,
+                                      text='Welcome',
+                                      font=('Open Sans', 30))
+        self.header_label.pack(side='top',
+                               padx=(20, 30),
+                               pady=(10, 20))
+
+        self.accounts_button = ttk.Button(self.left_panel,
+                                          text='Accounts',
+                                          style="Panel.TButton",
+                                          command=self.show_panel(self.accounts_panel))
+        self.accounts_button.pack(side='top', fill='x')
+        self.cards_button = ttk.Button(self.left_panel,
+                                       text='Cards',
+                                       style="Panel.TButton")
+        self.cards_button.pack(side='top', fill='x')
+        self.payments_button = ttk.Button(self.left_panel,
+                                          text='Payments',
+                                          command=lambda: master.switch_frame(LoginPage),
+                                          style="Panel.TButton")
+        self.payments_button.pack(side='top', fill='x')
+
+        self.version_label = ttk.Label(self.left_panel, font=('Open Sans light', 5))
+        self.version_label.pack(side='bottom', fill='x')
+        self.version_label.configure(text=Version)
+        self.logout_button = ttk.Button(self.left_panel,
+                                        text='Log Out',
+                                        command=lambda: master.switch_frame(LoginPage),
+                                        style="Panel.TButton")
+        self.logout_button.pack(side='bottom', fill='x')
+
+        # theme button
+        theme_button = ttk.Button(self.left_panel,
+                                  command=master.set_theme,
+                                  text='Theme',
+                                  style="Panel.TButton")
+        theme_button.pack(side='bottom', fill='x')
+
+        # accounts panel
+        ttk.Label(self.accounts_panel, text="Your balance").grid(column=0,
+                                                                 row=0,
+                                                                 padx=30,
+                                                                 pady=(30, 0),
+                                                                 sticky='w')
+        self.balance_label = ttk.Label(self.accounts_panel,
+                                       text='$ 1 568,95',
+                                       font=('Open Sans', 20))
+        self.balance_label.grid(column=0,
+                                row=1,
+                                sticky='e',
+                                padx=30,
+                                columnspan=2,
+                                pady=(0, 20))
+
+        self.payments_scroll = ttk.Scrollbar(self.accounts_panel,
+                                             orient='vertical')
+        self.payments_scroll.grid(column=2, row=3, sticky='w', padx=(0, 20))
+
+    @staticmethod
+    def show_panel(frame):
+        frame.tkraise()
 
 
 class LoginPage(ttk.Frame):
@@ -155,126 +246,36 @@ class LoginPage(ttk.Frame):
                           columnspan=2)
 
 
-class MainMenu(ttk.Frame):
-    def __init__(self, master):
-        ttk.Frame.__init__(self, master)
-        # Gui Creation, Main Page
-        self.main_frame = ttk.Frame(self)
-        self.main_frame.pack()
-        self.main_frame.columnconfigure(1, weight=3)
-        # Left Panel
-        self.left_panel = ttk.Frame(self.main_frame)
-        self.left_panel.pack(side='left', fill='y')
-        # Right Panels
-        self.right_panel = ttk.Frame(self.main_frame)
-        self.right_panel.pack(side='right')
-        self._panel = None
-
-        self.header_label = ttk.Label(self.left_panel,
-                                      text='Welcome',
-                                      font=('Open Sans', 30))
-        self.header_label.pack(side='top',
-                               padx=(20, 30),
-                               pady=(10, 20))
-
-        self.accounts_button = ttk.Button(self.left_panel,
-                                          text='Accounts',
-                                          style="Panel.TButton",
-                                          command=lambda: self.new_panel(AccountsPanel))
-        self.accounts_button.pack(side='top', fill='x')
-        self.cards_button = ttk.Button(self.left_panel,
-                                       text='Cards',
-                                       style="Panel.TButton",
-                                       command=lambda: self.new_panel(CardsPanel))
-        self.cards_button.pack(side='top', fill='x')
-        self.payments_button = ttk.Button(self.left_panel,
-                                          text='Payments',
-                                          style="Panel.TButton",
-                                          command=lambda: self.new_panel(PaymentsPanel))
-        self.payments_button.pack(side='top', fill='x')
-
-        self.version_label = ttk.Label(self.left_panel, font=('Open Sans light', 5))
-        self.version_label.pack(side='bottom', fill='x')
-        self.version_label.configure(text=Version)
-        # theme button
-        theme_button = ttk.Checkbutton(self.left_panel,
-                                       text='Dark Mode',
-                                       style="Switch.TCheckbutton",
-                                       command=master.set_theme)
-        theme_button.pack(side='bottom')
-        if self.tk.call("ttk::style", "theme", "use") == "azure-dark":
-            theme_button.state(['selected'])
-
-        self.logout_button = ttk.Button(self.left_panel,
-                                        text='Log Out',
-                                        command=lambda: master.switch_frame(LoginPage),
-                                        style="Panel.TButton")
-        self.logout_button.pack(side='bottom', fill='x')
-
-        self.new_panel(AccountsPanel)
-
-    def new_panel(self, panel):
-        # This function displays new panels and deletes old ones
-        new_panel = panel(self.right_panel)
-        if self._panel is not None:
-            self._panel.destroy()
-        self._panel = new_panel
-        self._panel.pack()
+"""
+Code to create a database with relational tables.
+Populates the tables with values.
+"""
 
 
-class PaymentsPanel(ttk.Frame):
-    def __init__(self, master):
-        ttk.Frame.__init__(self, master)
-        # Gui Creation, Payments panel
-        self.payments_panel = ttk.Frame(self, width=500, height=500, style="Card.TFrame")
-        self.payments_panel.grid()
-        self.payments_panel.grid_propagate(False)
-        ttk.Label(self.payments_panel, text="Payments").grid(column=0,
-                                                             row=0,
-                                                             padx=30,
-                                                             pady=(30, 0),
-                                                             sticky='w')
-
-
-class CardsPanel(ttk.Frame):
-    def __init__(self, master):
-        ttk.Frame.__init__(self, master)
-        # Gui Creation, Cards Panel
-        self.cards_panel = ttk.Frame(self, width=500, height=500, style="Card.TFrame")
-        self.cards_panel.grid()
-        self.cards_panel.grid_propagate(False)
-        ttk.Label(self.cards_panel, text="Cards").grid(column=0,
-                                                       row=0,
-                                                       padx=30,
-                                                       pady=(30, 0),
-                                                       sticky='w')
-
-
-class AccountsPanel(ttk.Frame):
-    def __init__(self, master):
-        ttk.Frame.__init__(self, master)
-        # Gui Creation, Accounts Panel
-        self.accounts_panel = ttk.Frame(self, width=500, height=500, style="Card.TFrame")
-        self.accounts_panel.grid()
-        self.accounts_panel.grid_propagate(False)
-        ttk.Label(self.accounts_panel, text="Your balance").grid(column=0,
-                                                                 row=0,
-                                                                 padx=30,
-                                                                 pady=(30, 0),
-                                                                 sticky='w')
-        self.balance_label = ttk.Label(self.accounts_panel,
-                                       text='$ 1 568,95',
-                                       font=('Open Sans', 20))
-        self.balance_label.grid(column=0,
-                                row=1,
-                                sticky='e',
-                                padx=30,
-                                columnspan=2,
-                                pady=(0, 20))
-
-        self.payments_scroll = ttk.Scrollbar(self.accounts_panel,
-                                             orient='vertical')
-        self.payments_scroll.grid(column=2, row=3, sticky='w', padx=(0, 20))
+def db_connect():
+    # Connecting to the database is set as a method since we need to open and close it for different transactions
+    # Error handling code:
+    # https://docs.oracle.com/cd/E17952_01/connector-python-en/connector-python-example-connecting.html
+    # Start of borrowed code
+    try:
+        db = mysql.connector.connect(
+            host="localhost",
+            user="root",
+            password="12345678",
+            port="3306",
+        )
+        return db
+    except mysql.connector.Error as e:
+        if e.errno == errorcode.ER_ACCESS_DENIED_ERROR:
+            print("Something is wrong with your user name or password")
+            exit()
+        elif e.errno == errorcode.ER_BAD_DB_ERROR:
+            print("Database does not exist")
+            exit()
+        else:
+            print(e)
+            exit()
+    # End of borrowed code
 
 
 if __name__ == "__main__":
