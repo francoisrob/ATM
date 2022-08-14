@@ -7,7 +7,7 @@
 Objectives:
     * This program should have a gui with different frames/pages to access different parts of the program.
     * There must be a login page for the user to log in with a Username and password.
-    * There must be a withdraw option.
+    * There must be a with-draw option.
     * User should be able to view their funds.
     * Should be secure, the program should take extra measures in encryption preventing any
     unauthorized manipulation of data.
@@ -40,7 +40,7 @@ Version = 'v0.813'
 pyglet.font.add_file('OpenSans.ttf')
 
 
-class ATM_Application(tk.Tk):
+class Application(tk.Tk):
     def __init__(self, *args, **kwargs):
         tk.Tk.__init__(self, *args, **kwargs)
         self._frame = None
@@ -348,5 +348,5 @@ def db_connect():
 
 
 if __name__ == "__main__":
-    root = ATM_Application()
+    root = Application()
     root.mainloop()
