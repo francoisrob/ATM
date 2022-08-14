@@ -36,7 +36,7 @@ from PIL import Image, ImageTk
 import mysql.connector
 from mysql.connector import errorcode
 
-Version = 'v2-0813'
+Version = 'v0.813'
 pyglet.font.add_file('OpenSans.ttf')
 
 
@@ -54,7 +54,7 @@ class ATM_Application(tk.Tk):
         self.tk.call("source", "azure.tcl")
         self.tk.call("set_theme", "light")
 
-        # background image (Do not delete)
+        # background image
         width, height = self.winfo_screenwidth(), self.winfo_screenheight()
         self.image = Image.open('background_image01.png')
         self.image = self.image.resize((width, height))
@@ -102,60 +102,82 @@ class LoginPage(ttk.Frame):
         # GUI creation
         # Center Widget
         login_frame = ttk.Frame(self)
-        login_frame.pack(fill='none', expand=True, anchor='center')
+        login_frame.grid()
+
+        self.image = Image.open('bank_logo.png')
+        self.image = self.image.resize((100, 50))
+        self.bg_image = ImageTk.PhotoImage(self.image)
+        ttk.Label(login_frame, image=self.bg_image).grid(row=0,
+                                                         column=0,
+                                                         pady=(20, 10),
+                                                         padx=20,
+                                                         sticky='n')
 
         # Header Text
         self.header_label = ttk.Label(login_frame,
-                                      text='Login to Your Account', font=('Open Sans', 20))
-        self.header_label.grid(row=0,
+                                      text='Log In', font=('Open Sans', 24))
+        self.header_label.grid(row=1,
                                column=0,
                                padx=20,
-                               pady=20,
-                               columnspan=2)
+                               pady=(0, 15),
+                               sticky='w')
 
         # Input
         username_label = ttk.Label(login_frame,
                                    text='Username')
-        username_label.grid(row=1,
+        username_label.grid(row=2,
                             column=0,
-                            sticky='e')
+                            sticky='w',
+                            padx=20)
         entry_username = ttk.Entry(login_frame,
                                    textvariable=username,
                                    justify='center',
-                                   width=20,
+                                   width=30,
                                    style='Custom.TEntry')
-        entry_username.grid(row=1,
-                            column=1,
-                            pady=10,
-                            padx=10,
+        entry_username.grid(row=3,
+                            column=0,
+                            padx=20,
+                            pady=(0, 10),
                             sticky='w')
 
         password_label = ttk.Label(login_frame,
                                    text='Password')
-        password_label.grid(row=2,
+        password_label.grid(row=4,
                             column=0,
-                            sticky='e')
+                            sticky='w',
+                            padx=20)
         entry_password = ttk.Entry(login_frame,
                                    textvariable=password,
                                    justify='center',
-                                   width=20,
+                                   width=30,
                                    show='*')
-        entry_password.grid(row=2,
-                            column=1,
-                            pady=10,
-                            padx=10,
+        entry_password.grid(row=5,
+                            column=0,
+                            padx=20,
+                            pady=(0, 20),
                             sticky='w')
 
         # Login in button, currently only show the next frame, no verification function yet
         button_login = ttk.Button(login_frame,
                                   text='SIGN IN',
-                                  width=35,
+                                  width=29,
                                   style='Accent.TButton',
                                   command=lambda: master.switch_frame(MainMenu))
-        button_login.grid(row=3,
+        button_login.grid(row=6,
                           column=0,
-                          pady=(50, 20),
+                          padx=20,
+                          pady=10,
                           columnspan=2)
+
+        button_register = ttk.Button(login_frame,
+                                     text='Register',
+                                     width=29,
+                                     style='Panel.TButton',
+                                     command=lambda: master.switch_frame(MainMenu))
+        button_register.grid(row=7,
+                             padx=20,
+                             pady=(0, 10),
+                             columnspan=2)
 
 
 class MainMenu(ttk.Frame):
@@ -176,11 +198,10 @@ class MainMenu(ttk.Frame):
         self._panel = None
         self.show_panel(AccountsPanel)
 
-        self.header_label = ttk.Label(self.left_panel,
-                                      text='Welcome',
-                                      font=('Open Sans', 30))
+        self.header_panel = ttk.Panedwindow(self.left_panel, style='Card.TFrame')
+        self.header_panel.pack(side='top', fill='x')
+        self.header_label = ttk.Label(self.header_panel, text='Welcome', font=('Open Sans', 20))
         self.header_label.pack(side='top',
-                               padx=(20, 30),
                                pady=(10, 20))
         self.accounts_button = ttk.Button(self.left_panel,
                                           text='Accounts',
@@ -208,11 +229,11 @@ class MainMenu(ttk.Frame):
         self.logout_button.pack(side='bottom', fill='x')
 
         # theme button
-        theme_button = ttk.Button(self.left_panel,
-                                  command=master.set_theme,
-                                  text='Theme',
-                                  style="Panel.TButton")
-        theme_button.pack(side='bottom', fill='x')
+        theme_button = ttk.Checkbutton(self.left_panel,
+                                       command=master.set_theme,
+                                       text='Theme',
+                                       style="Switch.TCheckbutton")
+        theme_button.pack(side='bottom', fill='x', padx=60)
 
     def show_panel(self, panel):
         # This function displays new panels on the right
@@ -220,13 +241,14 @@ class MainMenu(ttk.Frame):
         if self._panel is not None:
             self._panel.destroy()
         self._panel = new_panel
-        self._panel.grid()
+        self._panel.pack()
+
 
 class AccountsPanel(ttk.Frame):
     def __init__(self, master):
         ttk.Frame.__init__(self, master)
         # Gui Creation
-        self.accounts_panel = ttk.Frame(self, width=500, height=500, style="Card.TFrame")
+        self.accounts_panel = ttk.Frame(self, width=600, height=600, style="Card.TFrame")
         self.accounts_panel.grid()
         self.accounts_panel.grid_propagate(False)
 
@@ -245,11 +267,12 @@ class AccountsPanel(ttk.Frame):
                                 columnspan=2,
                                 pady=(0, 20))
 
+
 class CardsPanel(ttk.Frame):
     def __init__(self, master):
         ttk.Frame.__init__(self, master)
         # Gui Creation
-        self.cards_panel = ttk.Frame(self, width=500, height=500, style="Card.TFrame")
+        self.cards_panel = ttk.Frame(self, width=600, height=600, style="Card.TFrame")
         self.cards_panel.grid()
         self.cards_panel.grid_propagate(False)
 
@@ -259,11 +282,12 @@ class CardsPanel(ttk.Frame):
                                                        pady=(30, 0),
                                                        sticky='w')
 
+
 class PaymentsPanel(ttk.Frame):
     def __init__(self, master):
         ttk.Frame.__init__(self, master)
         # Gui Creation
-        self.payments_panel = ttk.Frame(self, width=500, height=500, style="Card.TFrame")
+        self.payments_panel = ttk.Frame(self, width=600, height=600, style="Card.TFrame")
         self.payments_panel.grid()
         self.payments_panel.grid_propagate(False)
 
