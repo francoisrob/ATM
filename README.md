@@ -1,3 +1,4 @@
+![Bank logo](https://github.com/francoisrob/ATM/blob/master/bank_logo.png)
 
 # Desktop Banking Application
 
