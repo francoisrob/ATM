@@ -44,7 +44,7 @@ class ATM_Application(tk.Tk):
     def __init__(self, *args, **kwargs):
         tk.Tk.__init__(self, *args, **kwargs)
         self._frame = None
-        self.geometry('1000x600')
+        self.geometry('1000x700')
         self.title('National Bank')
         self.iconbitmap('favicon.ico')
 
@@ -234,6 +234,8 @@ class MainMenu(ttk.Frame):
                                        text='Theme',
                                        style="Switch.TCheckbutton")
         theme_button.pack(side='bottom', fill='x', padx=60)
+        if self.tk.call("ttk::style", "theme", "use") == "azure-dark":
+            theme_button.state(['selected'])
 
     def show_panel(self, panel):
         # This function displays new panels on the right
@@ -276,11 +278,26 @@ class CardsPanel(ttk.Frame):
         self.cards_panel.grid()
         self.cards_panel.grid_propagate(False)
 
-        ttk.Label(self.cards_panel, text="Cards").grid(column=0,
-                                                       row=0,
-                                                       padx=30,
-                                                       pady=(30, 0),
-                                                       sticky='w')
+        # ttk.Label(self.cards_panel, text="Cards").grid(column=0,
+        #                                                row=0,
+        #                                                padx=30,
+        #                                                pady=(30, 0),
+        #                                                sticky='w')
+        self.credit_panel = ttk.Frame(self.cards_panel,
+                                      width=600,
+                                      height=200,
+                                      style='Card.TFrame')
+        self.credit_panel.grid(row=0, column=0, padx=1)
+        self.debit_panel = ttk.Frame(self.cards_panel,
+                                     width=600,
+                                     height=200,
+                                     style='Card.TFrame')
+        self.debit_panel.grid(row=1, column=0, padx=1)
+        self.savings_panel = ttk.Frame(self.cards_panel,
+                                       width=600,
+                                       height=200,
+                                       style='Card.TFrame')
+        self.savings_panel.grid(row=2, column=0, padx=1)
 
 
 class PaymentsPanel(ttk.Frame):
