@@ -31,7 +31,9 @@ source: https://tinyurl.com/bdedjxcy
 
 import tkinter as tk
 import tkinter.ttk as ttk
+import tkinter.messagebox as messagebox
 import pyglet
+import requests
 from PIL import Image, ImageTk
 import mysql.connector
 from mysql.connector import errorcode
@@ -44,13 +46,11 @@ class Application(tk.Tk):
     def __init__(self, *args, **kwargs):
         tk.Tk.__init__(self, *args, **kwargs)
         self._frame = None
-        self.geometry('1000x700')
+        self.geometry('1100x700')
         self.title('National Bank')
         self.iconbitmap('favicon.ico')
 
         # Theme
-        style = ttk.Style()
-        style.configure('Header.TLabel')
         self.tk.call("source", "azure.tcl")
         self.tk.call("set_theme", "light")
 
@@ -82,7 +82,6 @@ class Application(tk.Tk):
             self.tk.call("set_theme", "light")
         else:
             self.tk.call("set_theme", "dark")
-        self.update_size()
 
     def update_size(self):
         self._frame.update()
@@ -154,16 +153,24 @@ class LoginPage(ttk.Frame):
         entry_password.grid(row=5,
                             column=0,
                             padx=20,
-                            pady=(0, 20),
                             sticky='w')
+        forgot_label = ttk.Label(login_frame,
+                                 text="Forgot your Password?",
+                                 font=('Open Sans light', 8))
+        forgot_label.grid(row=6,
+                          column=0,
+                          sticky='e',
+                          pady=(0, 15),
+                          padx=20)
+        forgot_label.bind("<Button-1>", lambda e: messagebox.showwarning(title='Warning', message='Tough Shit'))
 
         # Login in button, currently only show the next frame, no verification function yet
         button_login = ttk.Button(login_frame,
                                   text='SIGN IN',
                                   width=29,
                                   style='Accent.TButton',
-                                  command=lambda: master.switch_frame(MainMenu))
-        button_login.grid(row=6,
+                                  command=lambda: Login(master, entry_username.get(), entry_password.get()))
+        button_login.grid(row=7,
                           column=0,
                           padx=20,
                           pady=10,
@@ -172,12 +179,19 @@ class LoginPage(ttk.Frame):
         button_register = ttk.Button(login_frame,
                                      text='Register',
                                      width=29,
-                                     style='Panel.TButton',
-                                     command=lambda: master.switch_frame(MainMenu))
-        button_register.grid(row=7,
+                                     style='Panel.TButton')
+        button_register.grid(row=8,
                              padx=20,
                              pady=(0, 10),
                              columnspan=2)
+
+
+def Login(master, username, password):
+    print(username, password)
+    db_connect()
+    exchangeapi('usd')
+    if True:
+        master.switch_frame(MainMenu)
 
 
 class MainMenu(ttk.Frame):
@@ -198,8 +212,11 @@ class MainMenu(ttk.Frame):
         self._panel = None
         self.show_panel(AccountsPanel)
 
-        self.header_panel = ttk.Panedwindow(self.left_panel, style='Card.TFrame')
+        self.header_panel = ttk.Panedwindow(self.left_panel,
+                                            style='Card.TFrame',
+                                            height=100)
         self.header_panel.pack(side='top', fill='x')
+        self.header_panel.pack_propagate(False)
         self.header_label = ttk.Label(self.header_panel, text='Welcome', font=('Open Sans', 20))
         self.header_label.pack(side='top',
                                pady=(10, 20))
@@ -250,24 +267,29 @@ class AccountsPanel(ttk.Frame):
     def __init__(self, master):
         ttk.Frame.__init__(self, master)
         # Gui Creation
-        self.accounts_panel = ttk.Frame(self, width=600, height=600, style="Card.TFrame")
+        self.accounts_panel = ttk.Frame(self, width=800, height=600, style="Card.TFrame")
         self.accounts_panel.grid()
         self.accounts_panel.grid_propagate(False)
+        self.left_panel = ttk.Frame(self.accounts_panel, width=500, height=600, style="Card.TFrame")
+        self.left_panel.grid(row=0, column=0)
+        self.left_panel.grid_propagate(False)
 
-        ttk.Label(self.accounts_panel, text="Your balance").grid(column=0,
-                                                                 row=0,
-                                                                 padx=30,
-                                                                 pady=(30, 0),
-                                                                 sticky='w')
-        self.balance_label = ttk.Label(self.accounts_panel,
+        ttk.Label(self.left_panel, text="Your balance").grid(column=0,
+                                                             row=0,
+                                                             padx=30,
+                                                             pady=(30, 0),
+                                                             sticky='w')
+        self.balance_label = ttk.Label(self.left_panel,
                                        text='$ 1 568,95',
                                        font=('Open Sans', 20))
         self.balance_label.grid(column=0,
                                 row=1,
                                 sticky='e',
                                 padx=30,
-                                columnspan=2,
+                                columnspan=1,
                                 pady=(0, 20))
+        self.transactions = ttk.Treeview(self.left_panel)
+        self.transactions.grid(column=0, row=2)
 
 
 class CardsPanel(ttk.Frame):
@@ -315,12 +337,6 @@ class PaymentsPanel(ttk.Frame):
                                                              sticky='w')
 
 
-"""
-Code to create a database with relational tables.
-Populates the tables with values.
-"""
-
-
 def db_connect():
     # Connecting to the database is set as a method since we need to open and close it for different transactions
     # Error handling code:
@@ -330,7 +346,8 @@ def db_connect():
         db = mysql.connector.connect(
             host="localhost",
             user="root",
-            password="12345678",
+            # password="12345678",
+            password='toor',
             port="3306",
         )
         return db
@@ -345,6 +362,13 @@ def db_connect():
             print(e)
             exit()
     # End of borrowed code
+
+
+def exchangeapi(currency):
+    url = 'https://cdn.jsdelivr.net/gh/fawazahmed0/currency-api@1/latest/currencies/' + currency + '.json'
+    r = requests.get(url=url)
+    data = r.json()
+    print(data[currency]['zar'])
 
 
 if __name__ == "__main__":
