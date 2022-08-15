@@ -39,6 +39,7 @@ import mysql.connector
 from mysql.connector import errorcode
 
 Version = 'v0.813'
+exchange_data = None
 pyglet.font.add_file('OpenSans.ttf')
 
 
@@ -288,8 +289,20 @@ class AccountsPanel(ttk.Frame):
                                 padx=30,
                                 columnspan=1,
                                 pady=(0, 20))
-        self.transactions = ttk.Treeview(self.left_panel)
-        self.transactions.grid(column=0, row=2)
+        # self.transactions = ttk.Treeview(self.left_panel)
+        # self.transactions.grid(column=0, row=2)
+        self.list = tk.Listbox(self.accounts_panel, borderwidth=0)
+        self.list.grid(column=1, row=0)
+        self.list.insert(1, 'China')
+        self.list.insert(2, 'Japan')
+        self.list.insert(3, 'Switzerland')
+        self.list.insert(4, 'Russia')
+        self.list.insert(5, 'India')
+        self.list.insert(6, 'Taiwan')
+        self.list.insert(7, 'Hong Kong')
+        self.list.insert(8, 'Saudi Arabia')
+        self.list.insert(9, 'South Korea')
+        self.list.insert(10, 'Singapore')
 
 
 class CardsPanel(ttk.Frame):
@@ -367,8 +380,8 @@ def db_connect():
 def exchangeapi(currency):
     url = 'https://cdn.jsdelivr.net/gh/fawazahmed0/currency-api@1/latest/currencies/' + currency + '.json'
     r = requests.get(url=url)
-    data = r.json()
-    print(data[currency]['zar'])
+    currency_data = r.json()
+    print(currency_data[currency]['zar'])
 
 
 if __name__ == "__main__":
