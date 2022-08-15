@@ -8,7 +8,7 @@ SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='ONLY_FULL_GROUP_BY,STRICT_TRANS_TABLES,N
 -- -----------------------------------------------------
 -- Schema db_ATM
 -- -----------------------------------------------------
-CREATE SCHEMA IF NOT EXISTS `db_ATM` DEFAULT CHARACTER SET utf8 ;
+CREATE SCHEMA IF NOT EXISTS `db_ATM` DEFAULT CHARACTER SET utf8mb4 ;
 USE `db_ATM` ;
 
 -- -----------------------------------------------------
