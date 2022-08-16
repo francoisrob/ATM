@@ -94,11 +94,6 @@ class Application(tk.Tk):
 class LoginPage(ttk.Frame):
     def __init__(self, master):
         ttk.Frame.__init__(self, master)
-
-        # Variables
-        username = tk.StringVar()
-        password = tk.StringVar()
-
         # GUI creation
         # Center Widget
         login_frame = ttk.Frame(self)
@@ -130,7 +125,6 @@ class LoginPage(ttk.Frame):
                             sticky='w',
                             padx=20)
         entry_username = ttk.Entry(login_frame,
-                                   textvariable=username,
                                    justify='center',
                                    width=30,
                                    style='Custom.TEntry')
@@ -139,7 +133,6 @@ class LoginPage(ttk.Frame):
                             padx=20,
                             pady=(0, 10),
                             sticky='w')
-
         password_label = ttk.Label(login_frame,
                                    text='Password')
         password_label.grid(row=4,
@@ -147,7 +140,6 @@ class LoginPage(ttk.Frame):
                             sticky='w',
                             padx=20)
         entry_password = ttk.Entry(login_frame,
-                                   textvariable=password,
                                    justify='center',
                                    width=30,
                                    show='*')
@@ -188,7 +180,8 @@ class LoginPage(ttk.Frame):
 
 
 def Login(master, username, password):
-
+    username = 'js'
+    password = '1234'
     # No username and password entered
     if not username:
         messagebox.showerror("Invalid entry", "Username cannot be left blank.\nPlease enter a Username.")
@@ -322,24 +315,46 @@ class AccountsPanel(ttk.Frame):
                                 padx=30,
                                 columnspan=1,
                                 pady=(0, 20))
-
-        # self.transactions = tk.Treeview(self.left_panel)
-        # self.transactions.grid(column=0, row=2)
-
-        self.list = tk.Listbox(self.accounts_panel,
+        self.exchange_frame = ttk.Frame(self.accounts_panel, style='Card.TFrame', width=300, height=600)
+        self.exchange_frame.grid(column=1, row=1, sticky='n', pady=20, padx=50)
+        self.list = tk.Listbox(self.exchange_frame,
                                font=('Open Sans', 10),
-                               borderwidth=0)
-        self.list.grid(column=1, row=0, padx=20, pady=20, sticky='n')
-        self.list.insert(1, f'China\t {exchange_data[0]}')
-        self.list.insert(2, f'Japan\t {exchange_data[1]}')
-        self.list.insert(3, f'Switzerland\t {exchange_data[2]}')
-        self.list.insert(4, f'Russia\t {exchange_data[3]}')
-        self.list.insert(5, f'India\t {exchange_data[4]}')
-        self.list.insert(6, f'Taiwan\t {exchange_data[5]}')
-        self.list.insert(7, f'Hong Kong\t {exchange_data[6]}')
-        self.list.insert(8, f'Saudi Arabia\t {exchange_data[7]}')
-        self.list.insert(9, f'South Korea\t {exchange_data[8]}')
-        self.list.insert(10, f'Singapore\t {exchange_data[9]}')
+                               borderwidth=0,
+                               width=15, justify='right')
+        self.list.grid(column=0,
+                       row=0,
+                       sticky='n',
+                       padx=5,
+                       pady=10)
+        self.list.insert(1, f'China')
+        self.list.insert(2, f'Japan')
+        self.list.insert(3, f'Switzerland')
+        self.list.insert(4, f'Russia')
+        self.list.insert(5, f'India')
+        self.list.insert(6, f'Taiwan')
+        self.list.insert(7, f'Hong Kong')
+        self.list.insert(8, f'Saudi Arabia')
+        self.list.insert(9, f'South Korea')
+        self.list.insert(10, f'Singapore')
+        self.exchange_list = tk.Listbox(self.exchange_frame,
+                                        font=('Open Sans', 10),
+                                        borderwidth=0,
+                                        width=10)
+        self.exchange_list.grid(column=1,
+                                row=0,
+                                sticky='n',
+                                padx=5,
+                                pady=10)
+        self.exchange_list.insert(1, exchange_data[0])
+        self.exchange_list.insert(2, exchange_data[1])
+        self.exchange_list.insert(3, exchange_data[2])
+        self.exchange_list.insert(4, exchange_data[3])
+        self.exchange_list.insert(5, exchange_data[4])
+        self.exchange_list.insert(6, exchange_data[5])
+        self.exchange_list.insert(7, exchange_data[6])
+        self.exchange_list.insert(8, exchange_data[7])
+        self.exchange_list.insert(9, exchange_data[8])
+        self.exchange_list.insert(10, exchange_data[9])
 
 
 class CardsPanel(ttk.Frame):
@@ -428,7 +443,6 @@ def exchangeapi(currency):
     exchange_data.append("{:.3f}".format(data['sar']))
     exchange_data.append("{:.3f}".format(data['krw']))
     exchange_data.append("{:.3f}".format(data['sgd']))
-    print(exchange_data)
 
 
 if __name__ == "__main__":
