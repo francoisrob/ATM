@@ -170,7 +170,7 @@ class LoginPage(ttk.Frame):
                                   text='SIGN IN',
                                   width=29,
                                   style='Accent.TButton',
-                                  command=lambda: Login(master, entry_username.get(), entry_password.get()))
+                                  command=lambda: Login(master,entry_username.get(), entry_password.get()))
         button_login.grid(row=7,
                           column=0,
                           padx=20,
@@ -188,11 +188,46 @@ class LoginPage(ttk.Frame):
 
 
 def Login(master, username, password):
-    print(username, password)
-    db_connect()
-    exchangeapi('usd')
-    if True:
-        master.switch_frame(MainMenu)
+
+    # No username and password entered
+    if not username:
+        messagebox.showerror("Invalid entry", "Username cannot be left blank.\nPlease enter a Username.")
+    elif not password:
+        messagebox.showerror("Invalid entry", "Password cannot be left blank.\nPlease enter a Password.")
+
+    # Username and password entered
+    else:
+        db = db_connect()
+        db_cursor = db.cursor()
+        db_cursor.execute("SELECT username, password FROM db_atm.tbl_users")
+        users = db_cursor.fetchall()
+        user_input = password
+        user_password = ""
+
+        for user in users:
+            if user[0] == username:
+                user_input = password  # Fetches the typed password
+                user_password = user[1]  # Fetches the correct password
+                # Reason for this is because I do not want an error message running on each unmatched entry
+
+        if user_password == "":
+            # Warning message displayed for unmatched entry form db
+            messagebox.showerror("Invalid entry", "Username or password is incorrect")
+        elif user_input == user_password:
+            # Correct input which takes you to the MainMenu frame
+            master.switch_frame(MainMenu)
+            exchangeapi('usd')
+            print("user:", username, "pass:", password)
+        else:
+            # Password is incorrect and does not match username
+            messagebox.showerror("Invalid entry", "Username or password is incorrect")
+
+        # You can be specific and tell the user what is wrong with their inputs.
+        # The reason I want to leave it ambiguous is, because anybody can guess a username and in the instance
+        # where they guess correctly they can attempt to crack the password.
+        # (Discuss which approach to follow)
+
+        
 
 
 class MainMenu(ttk.Frame):
@@ -359,9 +394,8 @@ def db_connect():
         db = mysql.connector.connect(
             host="localhost",
             user="root",
-            # password="12345678",
-            password='toor',
-            port="3306",
+            password='12345678',
+            port="3306"
         )
         return db
     except mysql.connector.Error as e:
