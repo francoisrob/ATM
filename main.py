@@ -47,6 +47,8 @@ TransactionData = []
 AccountsData = []
 
 pyglet.font.add_file('OpenSans.ttf')
+
+
 class Application(tk.Tk):
     def __init__(self, *args, **kwargs):
         tk.Tk.__init__(self, *args, **kwargs)
@@ -176,7 +178,8 @@ class LoginPage(ttk.Frame):
         button_register = ttk.Button(login_frame,
                                      text='Register',
                                      width=29,
-                                     style='Panel.TButton')
+                                     style='Panel.TButton',
+                                     command=lambda: master.switch_frame(RegisterPageStart))
         button_register.grid(row=8,
                              padx=20,
                              pady=(0, 10),
@@ -228,6 +231,625 @@ def Login(master, username, password):
         # The reason I want to leave it ambiguous is, because anybody can guess a username and in the instance
         # where they guess correctly they can attempt to crack the password.
         # (Discuss which approach to follow)
+
+
+class RegisterPageStart(ttk.Frame):
+    def __init__(self, master):
+        ttk.Frame.__init__(self, master)
+
+        # Variables
+        username = tk.StringVar()
+        password = tk.StringVar()
+
+        # GUI creation
+        # Center Widget
+        register_frame = ttk.Frame(self)
+        register_frame.grid()
+        self.image = Image.open('bank_logo.png')
+        self.image = self.image.resize((100, 50))
+        self.bg_image = ImageTk.PhotoImage(self.image)
+        ttk.Label(register_frame, image=self.bg_image).grid(row=0,
+                                                            column=0,
+                                                            pady=(20, 10),
+                                                            padx=20,
+                                                            sticky='n')
+
+        # Header Text
+        self.header_label = ttk.Label(register_frame,
+                                      text='Requirements:', font=('Open Sans', 24))
+        self.header_label.grid(row=1,
+                               column=0,
+                               padx=20,
+                               pady=(0, 15),
+                               sticky='w')
+
+        # Requirements labels
+        req1_label = ttk.Label(register_frame,
+                               text='* First name and Last name')
+        req1_label.grid(row=2,
+                        column=0,
+                        sticky='w',
+                        padx=20)
+
+        req2_label = ttk.Label(register_frame,
+                               text='* Email and Cellphone number')
+        req2_label.grid(row=3,
+                        column=0,
+                        sticky='w',
+                        padx=20)
+
+        req3_label = ttk.Label(register_frame,
+                               text='* ZA Identification number')
+        req3_label.grid(row=4,
+                        column=0,
+                        sticky='w',
+                        padx=20)
+
+        req4_label = ttk.Label(register_frame,
+                               text='* Billing address')
+        req4_label.grid(row=5,
+                        column=0,
+                        sticky='w',
+                        padx=20)
+
+        req5_label = ttk.Label(register_frame,
+                               text='* Strong Username and Password')
+        req5_label.grid(row=6,
+                        column=0,
+                        sticky='w',
+                        padx=20)
+
+        # Register button
+        button_register = ttk.Button(register_frame,
+                                     text='Ok, I Understand',
+                                     width=29,
+                                     style='Accent.TButton',
+                                     command=lambda: master.switch_frame(RegisterPageDetails))
+        button_register.grid(row=7,
+                             column=0,
+                             padx=20,
+                             pady=10,
+                             columnspan=1)
+        # Return button
+        button_return = ttk.Button(register_frame,
+                                   text='Return to login',
+                                   width=29,
+                                   style='Panel.TButton',
+                                   command=lambda: master.switch_frame(LoginPage))
+        button_return.grid(row=8,
+                           padx=20,
+                           column=0,
+                           pady=(0, 10),
+                           columnspan=1)
+
+
+# Register page for name, email, cell
+class RegisterPageDetails(ttk.Frame):
+    def __init__(self, master):
+        ttk.Frame.__init__(self, master)
+
+        # GUI creation
+        # Center Widget
+        register_frame = ttk.Frame(self)
+        register_frame.grid()
+        self.image = Image.open('bank_logo.png')
+        self.image = self.image.resize((100, 50))
+        self.bg_image = ImageTk.PhotoImage(self.image)
+        ttk.Label(register_frame, image=self.bg_image).grid(row=0,
+                                                            column=0,
+                                                            pady=(20, 10),
+                                                            padx=20,
+                                                            sticky='n')
+
+        # Header Text
+        self.header_label = ttk.Label(register_frame,
+                                      text='Input your details', font=('Open Sans', 24))
+        self.header_label.grid(row=1,
+                               column=0,
+                               padx=20,
+                               pady=(0, 15),
+                               sticky='w',
+                               columnspan=2)
+
+        self.step_label = ttk.Label(register_frame,
+                                    text='Step 1 of 4', font=('Open Sans', 24))
+        self.step_label.grid(row=1,
+                             column=2,
+                             padx=20,
+                             pady=(0, 15),
+                             sticky='w', )
+
+        # Input labels and entries
+        # First name
+        fname_label = ttk.Label(register_frame,
+                                text='First name')
+        fname_label.grid(row=2,
+                         column=0,
+                         sticky='w',
+                         padx=20)
+        entry_fname = ttk.Entry(register_frame,
+                                justify='left',
+                                width=22,
+                                style='Custom.TEntry')
+        entry_fname.grid(row=3,
+                         column=0,
+                         padx=20,
+                         pady=(0, 10),
+                         sticky='w')
+
+        # Surname
+        sname_label = ttk.Label(register_frame,
+                                text='Last name')
+        sname_label.grid(row=2,
+                         column=1,
+                         sticky='w',
+                         padx=20)
+        entry_sname = ttk.Entry(register_frame,
+                                justify='left',
+                                width=22,
+                                style='Custom.TEntry')
+        entry_sname.grid(row=3,
+                         column=1,
+                         padx=20,
+                         pady=(0, 10),
+                         sticky='w')
+
+        # Email
+        email_label = ttk.Label(register_frame,
+                                text='E-mail')
+        email_label.grid(row=4,
+                         column=0,
+                         sticky='w',
+                         padx=20)
+        entry_email = ttk.Entry(register_frame,
+                                justify='left',
+                                width=22)
+        entry_email.grid(row=5,
+                         column=0,
+                         padx=20,
+                         sticky='w',
+                         pady=(0, 10))
+
+        # Cell num
+        cellnum_label = ttk.Label(register_frame,
+                                  text='Contact Number')
+        cellnum_label.grid(row=4,
+                           column=1,
+                           sticky='w',
+                           padx=20)
+        entry_cellnum = ttk.Entry(register_frame,
+                                  justify='left',
+                                  width=15)
+        entry_cellnum.grid(row=5,
+                           column=1,
+                           padx=20,
+                           sticky='w',
+                           pady=(0, 10))
+
+        # Register button
+        button_register = ttk.Button(register_frame,
+                                     text='Confirm details',
+                                     width=20,
+                                     style='Accent.TButton',
+                                     command=lambda: master.switch_frame(RegisterPageID))
+        button_register.grid(row=6,
+                             column=2,
+                             padx=20,
+                             pady=(20, 20),
+                             )
+        # Return button
+        button_return = ttk.Button(register_frame,
+                                   text='Previous Page',
+                                   width=17,
+                                   style='Panel.TButton',
+                                   command=lambda: master.switch_frame(RegisterPageStart))
+        button_return.grid(row=6,
+                           padx=20,
+                           column=0,
+                           pady=(20, 20),
+                           )
+        # Cancel button
+        button_cancel_register = ttk.Button(register_frame,
+                                            text='Cancel Registration',
+                                            width=17,
+                                            style='Panel.TButton',
+                                            command=lambda: master.switch_frame(LoginPage))
+        button_cancel_register.grid(row=6,
+                                    padx=20,
+                                    column=1,
+                                    pady=(20, 20),
+                                    )
+
+
+# Register page for id num
+class RegisterPageID(ttk.Frame):
+    def __init__(self, master):
+        ttk.Frame.__init__(self, master)
+
+        # GUI creation
+        # Center Widget
+        register_frame = ttk.Frame(self)
+        register_frame.grid()
+        self.image = Image.open('bank_logo.png')
+        self.image = self.image.resize((100, 50))
+        self.bg_image = ImageTk.PhotoImage(self.image)
+        ttk.Label(register_frame, image=self.bg_image).grid(row=0,
+                                                            column=0,
+                                                            pady=(20, 10),
+                                                            padx=20,
+                                                            sticky='n')
+
+        # Header Text
+        self.header_label = ttk.Label(register_frame,
+                                      text='Identification number', font=('Open Sans', 24))
+        self.header_label.grid(row=1,
+                               column=0,
+                               padx=20,
+                               pady=(0, 15),
+                               sticky='w',
+                               columnspan=2)
+
+        self.step_label = ttk.Label(register_frame,
+                                    text='Step 2 of 4', font=('Open Sans', 24))
+        self.step_label.grid(row=1,
+                             column=2,
+                             padx=20,
+                             pady=(0, 15),
+                             sticky='w', )
+
+        # Input labels and entries
+        # ID num
+        id_label = ttk.Label(register_frame,
+                             text='Identification number')
+        id_label.grid(row=2,
+                      column=0,
+                      sticky='w',
+                      padx=20)
+        entry_id = ttk.Entry(register_frame,
+                             justify='left',
+                             width=22,
+                             style='Custom.TEntry')
+        entry_id.grid(row=3,
+                      column=0,
+                      padx=20,
+                      pady=(0, 10),
+                      sticky='w')
+
+        # Register button
+        button_register = ttk.Button(register_frame,
+                                     text='Confirm ID Number',
+                                     width=20,
+                                     style='Accent.TButton',
+                                     command=lambda: master.switch_frame(RegisterPageAddress))
+        button_register.grid(row=6,
+                             column=2,
+                             padx=20,
+                             pady=(20, 20),
+                             )
+        # Return button
+        button_return = ttk.Button(register_frame,
+                                   text='Previous Page',
+                                   width=17,
+                                   style='Panel.TButton',
+                                   command=lambda: master.switch_frame(RegisterPageDetails))
+        button_return.grid(row=6,
+                           padx=20,
+                           column=0,
+                           pady=(20, 20),
+                           )
+        # Cancel button
+        button_cancel_register = ttk.Button(register_frame,
+                                            text='Cancel Registration',
+                                            width=17,
+                                            style='Panel.TButton',
+                                            command=lambda: master.switch_frame(LoginPage))
+        button_cancel_register.grid(row=6,
+                                    padx=20,
+                                    column=1,
+                                    pady=(20, 20),
+                                    )
+
+
+# Register page for billing address
+class RegisterPageAddress(ttk.Frame):
+    def __init__(self, master):
+        ttk.Frame.__init__(self, master)
+
+        # GUI creation
+        # Center Widget
+        register_frame = ttk.Frame(self)
+        register_frame.grid()
+        self.image = Image.open('bank_logo.png')
+        self.image = self.image.resize((100, 50))
+        self.bg_image = ImageTk.PhotoImage(self.image)
+        ttk.Label(register_frame, image=self.bg_image).grid(row=0,
+                                                            column=0,
+                                                            pady=(20, 10),
+                                                            padx=20,
+                                                            sticky='n')
+
+        # Header Text
+        self.header_label = ttk.Label(register_frame,
+                                      text='Billing Address', font=('Open Sans', 24))
+        self.header_label.grid(row=1,
+                               column=0,
+                               padx=20,
+                               pady=(0, 15),
+                               sticky='w',
+                               columnspan=2)
+
+        self.step_label = ttk.Label(register_frame,
+                                    text='Step 3 of 4', font=('Open Sans', 24))
+        self.step_label.grid(row=1,
+                             column=2,
+                             padx=20,
+                             pady=(0, 15),
+                             sticky='w', )
+
+        # Input labels and entries
+        # Street
+        street_label = ttk.Label(register_frame,
+                                 text='Address')
+        street_label.grid(row=2,
+                          column=0,
+                          sticky='w',
+                          padx=20)
+        entry_street = ttk.Entry(register_frame,
+                                 justify='left',
+                                 width=25,
+                                 style='Custom.TEntry')
+        entry_street.grid(row=3,
+                          column=0,
+                          padx=20,
+                          pady=(0, 10),
+                          sticky='w')
+
+        # City
+        city_label = ttk.Label(register_frame,
+                               text='City')
+        city_label.grid(row=2,
+                        column=1,
+                        sticky='w',
+                        padx=20)
+        entry_city = ttk.Entry(register_frame,
+                               justify='left',
+                               width=15,
+                               style='Custom.TEntry')
+        entry_city.grid(row=3,
+                        column=1,
+                        padx=20,
+                        pady=(0, 10),
+                        sticky='w')
+
+        # Post
+        post_label = ttk.Label(register_frame,
+                               text='Postal Code')
+        post_label.grid(row=4,
+                        column=1,
+                        sticky='w',
+                        padx=20)
+        entry_post = ttk.Entry(register_frame,
+                               justify='left',
+                               width=22,
+                               style='Custom.TEntry')
+        entry_post.grid(row=5,
+                        column=1,
+                        padx=20,
+                        pady=(0, 10),
+                        sticky='w')
+
+        # State
+        state_label = ttk.Label(register_frame,
+                                text='Province')
+        state_label.grid(row=4,
+                         column=0,
+                         sticky='w',
+                         padx=20)
+
+        defualt_state = tk.StringVar()
+        defualt_state.set("")
+        ddl_state = ttk.OptionMenu(register_frame, defualt_state,
+                                   "WC",
+                                   "WC",
+                                   "EC",
+                                   "FS",
+                                   "GP",
+                                   "KZN",
+                                   "NC",
+                                   "NW",
+                                   "LP",
+                                   "MP")
+        ddl_state.grid(row=5,
+                       column=0,
+                       sticky='w',
+                       padx=20)
+
+        # Register button
+        button_register = ttk.Button(register_frame,
+                                     text='Confirm Billing Address',
+                                     width=20,
+                                     style='Accent.TButton',
+                                     command=lambda: master.switch_frame(RegisterPageAuth))
+        button_register.grid(row=8,
+                             column=2,
+                             padx=20,
+                             pady=(20, 20),
+                             )
+        # Return button
+        button_return = ttk.Button(register_frame,
+                                   text='Previous Page',
+                                   width=17,
+                                   style='Panel.TButton',
+                                   command=lambda: master.switch_frame(RegisterPageID))
+        button_return.grid(row=8,
+                           padx=20,
+                           column=0,
+                           pady=(20, 20),
+                           )
+        # Cancel button
+        button_cancel_register = ttk.Button(register_frame,
+                                            text='Cancel Registration',
+                                            width=17,
+                                            style='Panel.TButton',
+                                            command=lambda: master.switch_frame(LoginPage))
+        button_cancel_register.grid(row=8,
+                                    padx=20,
+                                    column=1,
+                                    pady=(20, 20),
+                                    )
+
+
+# Register page for username and password
+class RegisterPageAuth(ttk.Frame):
+    def __init__(self, master):
+        ttk.Frame.__init__(self, master)
+
+        # GUI creation
+        # Center Widget
+        register_frame = ttk.Frame(self)
+        register_frame.grid()
+        self.image = Image.open('bank_logo.png')
+        self.image = self.image.resize((100, 50))
+        self.bg_image = ImageTk.PhotoImage(self.image)
+        ttk.Label(register_frame, image=self.bg_image).grid(row=0,
+                                                            column=0,
+                                                            pady=(20, 10),
+                                                            padx=20,
+                                                            sticky='n')
+
+        # Header Text
+        self.header_label = ttk.Label(register_frame,
+                                      text='Authentication details', font=('Open Sans', 24))
+        self.header_label.grid(row=1,
+                               column=0,
+                               padx=20,
+                               pady=(0, 15),
+                               sticky='w',
+                               columnspan=2)
+
+        self.step_label = ttk.Label(register_frame,
+                                    text='Step 4 of 4', font=('Open Sans', 24))
+        self.step_label.grid(row=1,
+                             column=2,
+                             padx=20,
+                             pady=(0, 15),
+                             sticky='w', )
+
+        # Input labels and entries
+        # Username
+        uname_label = ttk.Label(register_frame,
+                                text='Username')
+        uname_label.grid(row=2,
+                         column=0,
+                         sticky='w',
+                         padx=20)
+        entry_username = ttk.Entry(register_frame,
+                                   justify='left',
+                                   width=22,
+                                   style='Custom.TEntry')
+        entry_username.grid(row=3,
+                            column=0,
+                            padx=20,
+                            pady=(0, 10),
+                            sticky='w')
+        #  Password
+        pass_label = ttk.Label(register_frame,
+                               text='Password')
+        pass_label.grid(row=2,
+                        column=1,
+                        sticky='w',
+                        padx=20)
+        entry_password = ttk.Entry(register_frame,
+                                   justify='left',
+                                   width=22,
+                                   style='Custom.TEntry',
+                                   show="*")
+        entry_password.grid(row=3,
+                            column=1,
+                            padx=20,
+                            pady=(0, 10),
+                            sticky='w')
+        # Register button
+        button_register = ttk.Button(register_frame,
+                                     text='Confirm Authentication details',
+                                     width=30,
+                                     style='Accent.TButton',
+                                     command=lambda: master.switch_frame(RegisterPageFinal))
+        button_register.grid(row=4,
+                             column=2,
+                             padx=20,
+                             pady=(20, 20),
+                             )
+        # Return button
+        button_return = ttk.Button(register_frame,
+                                   text='Previous Page',
+                                   width=17,
+                                   style='Panel.TButton',
+                                   command=lambda: master.switch_frame(RegisterPageAddress))
+        button_return.grid(row=4,
+                           padx=20,
+                           column=0,
+                           pady=(20, 20),
+                           )
+        # Cancel button
+        button_cancel_register = ttk.Button(register_frame,
+                                            text='Cancel Registration',
+                                            width=17,
+                                            style='Panel.TButton',
+                                            command=lambda: master.switch_frame(LoginPage))
+        button_cancel_register.grid(row=4,
+                                    padx=20,
+                                    column=1,
+                                    pady=(20, 20),
+                                    )
+
+
+# Registration successful page
+class RegisterPageFinal(ttk.Frame):
+    def __init__(self, master):
+        ttk.Frame.__init__(self, master)
+
+        # GUI creation
+        # Center Widget
+        register_frame = ttk.Frame(self)
+        register_frame.grid()
+        self.image = Image.open('bank_logo.png')
+        self.image = self.image.resize((100, 50))
+        self.bg_image = ImageTk.PhotoImage(self.image)
+        ttk.Label(register_frame, image=self.bg_image).grid(row=0,
+                                                            column=0,
+                                                            pady=(20, 10),
+                                                            padx=20,
+                                                            sticky='n')
+
+        # Header Text
+        self.header_label = ttk.Label(register_frame,
+                                      text='Your Registration was successful.\n \nPlease use your Username\nand '
+                                           'Password to login', font=('Open Sans', 18))
+        self.header_label.grid(row=1,
+                               column=0,
+                               padx=20,
+                               pady=(0, 15),
+                               sticky='w',
+                               columnspan=2)
+
+        # Register button
+        button_register = ttk.Button(register_frame,
+                                     text='Return to Login Page',
+                                     width=40,
+                                     style='Accent.TButton',
+                                     command=lambda: master.switch_frame(LoginPage))
+        button_register.grid(row=6,
+                             column=0,
+                             padx=20,
+                             pady=(20, 20),)
+
+
+
+def Register(master):
+    print("register")
+
+    """Error handling for registration input values"""
 
 
 class MainMenu(ttk.Frame):
@@ -401,6 +1023,7 @@ class AccountsPanel(ttk.Frame):
             value.grid(row=0, column=2, sticky='e', padx=10, pady=10)
             pass
 
+
 class CardsPanel(ttk.Frame):
     def __init__(self, master):
         ttk.Frame.__init__(self, master)
@@ -455,8 +1078,8 @@ def db_connect():
         db = mysql.connector.connect(
             host="localhost",
             user="root",
-            # password='12345678',
-            password="toor",
+            password='12345678',
+            # password="toor",
             port="3306"
         )
         return db
@@ -490,30 +1113,33 @@ def exchangeapi(currency):
     exchange_data.append("{:.3f}".format(data['usd']))
     exchange_data.append("{:.3f}".format(data['gbp']))
 
+
 def fetchUser():
     global UserData
     db = db_connect()
     db_cursor = db.cursor()
     sql = "SELECT * FROM db_atm.tbl_users WHERE user_id = %s"
-    adr = (UserID, )
+    adr = (UserID,)
     db_cursor.execute(sql, adr)
     UserData = db_cursor.fetchall()
+
 
 def fetchTransactions():
     global TransactionData
     db = db_connect()
     db_cursor = db.cursor()
     sql = "SELECT * FROM db_atm.tbl_transactions WHERE tbl_accounts_tbl_users_user_id = %s"
-    adr = (UserID, )
+    adr = (UserID,)
     db_cursor.execute(sql, adr)
     TransactionData = db_cursor.fetchall()
+
 
 def fetchAccounts():
     global AccountsData
     db = db_connect()
     db_cursor = db.cursor()
     sql = "SELECT * FROM db_atm.tbl_accounts WHERE tbl_users_user_id = %s"
-    adr = (UserID, )
+    adr = (UserID,)
     db_cursor.execute(sql, adr)
     AccountsData = db_cursor.fetchall()
 
