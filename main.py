@@ -39,7 +39,7 @@ import mysql.connector
 from mysql.connector import errorcode
 
 Version = 'v0.813'
-exchange_data = None
+exchange_data = []
 pyglet.font.add_file('OpenSans.ttf')
 
 
@@ -170,7 +170,7 @@ class LoginPage(ttk.Frame):
                                   text='SIGN IN',
                                   width=29,
                                   style='Accent.TButton',
-                                  command=lambda: Login(master,entry_username.get(), entry_password.get()))
+                                  command=lambda: Login(master, entry_username.get(), entry_password.get()))
         button_login.grid(row=7,
                           column=0,
                           padx=20,
@@ -215,9 +215,9 @@ def Login(master, username, password):
             messagebox.showerror("Invalid entry", "Username or password is incorrect")
         elif user_input == user_password:
             # Correct input which takes you to the MainMenu frame
-            master.switch_frame(MainMenu)
-            exchangeapi('usd')
+            exchangeapi('zar')
             print("user:", username, "pass:", password)
+            master.switch_frame(MainMenu)
         else:
             # Password is incorrect and does not match username
             messagebox.showerror("Invalid entry", "Username or password is incorrect")
@@ -226,8 +226,6 @@ def Login(master, username, password):
         # The reason I want to leave it ambiguous is, because anybody can guess a username and in the instance
         # where they guess correctly they can attempt to crack the password.
         # (Discuss which approach to follow)
-
-        
 
 
 class MainMenu(ttk.Frame):
@@ -324,20 +322,24 @@ class AccountsPanel(ttk.Frame):
                                 padx=30,
                                 columnspan=1,
                                 pady=(0, 20))
-        # self.transactions = ttk.Treeview(self.left_panel)
+
+        # self.transactions = tk.Treeview(self.left_panel)
         # self.transactions.grid(column=0, row=2)
-        self.list = tk.Listbox(self.accounts_panel, borderwidth=0)
-        self.list.grid(column=1, row=0)
-        self.list.insert(1, 'China')
-        self.list.insert(2, 'Japan')
-        self.list.insert(3, 'Switzerland')
-        self.list.insert(4, 'Russia')
-        self.list.insert(5, 'India')
-        self.list.insert(6, 'Taiwan')
-        self.list.insert(7, 'Hong Kong')
-        self.list.insert(8, 'Saudi Arabia')
-        self.list.insert(9, 'South Korea')
-        self.list.insert(10, 'Singapore')
+
+        self.list = tk.Listbox(self.accounts_panel,
+                               font=('Open Sans', 10),
+                               borderwidth=0)
+        self.list.grid(column=1, row=0, padx=20, pady=20, sticky='n')
+        self.list.insert(1, f'China\t {exchange_data[0]}')
+        self.list.insert(2, f'Japan\t {exchange_data[1]}')
+        self.list.insert(3, f'Switzerland\t {exchange_data[2]}')
+        self.list.insert(4, f'Russia\t {exchange_data[3]}')
+        self.list.insert(5, f'India\t {exchange_data[4]}')
+        self.list.insert(6, f'Taiwan\t {exchange_data[5]}')
+        self.list.insert(7, f'Hong Kong\t {exchange_data[6]}')
+        self.list.insert(8, f'Saudi Arabia\t {exchange_data[7]}')
+        self.list.insert(9, f'South Korea\t {exchange_data[8]}')
+        self.list.insert(10, f'Singapore\t {exchange_data[9]}')
 
 
 class CardsPanel(ttk.Frame):
@@ -394,8 +396,8 @@ def db_connect():
         db = mysql.connector.connect(
             host="localhost",
             user="root",
-            password='12345678',
-        #   password="toor",
+            # password='12345678',
+            password="toor",
             port="3306"
         )
         return db
@@ -415,8 +417,18 @@ def db_connect():
 def exchangeapi(currency):
     url = 'https://cdn.jsdelivr.net/gh/fawazahmed0/currency-api@1/latest/currencies/' + currency + '.json'
     r = requests.get(url=url)
-    currency_data = r.json()
-    print(currency_data[currency]['zar'])
+    data = r.json()[currency]
+    exchange_data.append("{:.3f}".format(data['cny']))
+    exchange_data.append("{:.3f}".format(data['jpy']))
+    exchange_data.append("{:.3f}".format(data['chf']))
+    exchange_data.append("{:.3f}".format(data['rub']))
+    exchange_data.append("{:.3f}".format(data['inr']))
+    exchange_data.append("{:.3f}".format(data['twd']))
+    exchange_data.append("{:.3f}".format(data['hkd']))
+    exchange_data.append("{:.3f}".format(data['sar']))
+    exchange_data.append("{:.3f}".format(data['krw']))
+    exchange_data.append("{:.3f}".format(data['sgd']))
+    print(exchange_data)
 
 
 if __name__ == "__main__":
