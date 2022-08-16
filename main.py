@@ -38,11 +38,15 @@ from PIL import Image, ImageTk
 import mysql.connector
 from mysql.connector import errorcode
 
-Version = 'v0.813'
+Version = 'v0.816'
 exchange_data = []
+# Username = ''
+UserID = ''
+UserData = []
+TransactionData = []
+AccountsData = []
+
 pyglet.font.add_file('OpenSans.ttf')
-
-
 class Application(tk.Tk):
     def __init__(self, *args, **kwargs):
         tk.Tk.__init__(self, *args, **kwargs)
@@ -182,6 +186,7 @@ class LoginPage(ttk.Frame):
 def Login(master, username, password):
     username = 'js'
     password = '1234'
+    global UserID
     # No username and password entered
     if not username:
         messagebox.showerror("Invalid entry", "Username cannot be left blank.\nPlease enter a Username.")
@@ -192,7 +197,7 @@ def Login(master, username, password):
     else:
         db = db_connect()
         db_cursor = db.cursor()
-        db_cursor.execute("SELECT username, password FROM db_atm.tbl_users")
+        db_cursor.execute("SELECT username, password, user_id FROM db_atm.tbl_users")
         users = db_cursor.fetchall()
         user_input = password
         user_password = ""
@@ -201,6 +206,7 @@ def Login(master, username, password):
             if user[0] == username:
                 user_input = password  # Fetches the typed password
                 user_password = user[1]  # Fetches the correct password
+                UserID = user[2]
                 # Reason for this is because I do not want an error message running on each unmatched entry
 
         if user_password == "":
@@ -209,7 +215,10 @@ def Login(master, username, password):
         elif user_input == user_password:
             # Correct input which takes you to the MainMenu frame
             exchangeapi('zar')
-            print("user:", username, "pass:", password)
+            print("user:", username, "pass:", password, 'userID:', UserID)
+            fetchUser()
+            fetchAccounts()
+            fetchTransactions()
             master.switch_frame(MainMenu)
         else:
             # Password is incorrect and does not match username
@@ -294,6 +303,7 @@ class AccountsPanel(ttk.Frame):
     def __init__(self, master):
         ttk.Frame.__init__(self, master)
         # Gui Creation
+        print(TransactionData)
         self.accounts_panel = ttk.Frame(self, width=800, height=600, style="Card.TFrame")
         self.accounts_panel.grid()
         self.accounts_panel.grid_propagate(False)
@@ -315,17 +325,26 @@ class AccountsPanel(ttk.Frame):
                                 padx=30,
                                 columnspan=1,
                                 pady=(0, 20))
-        self.exchange_frame = ttk.Frame(self.accounts_panel, style='Card.TFrame', width=300, height=600)
-        self.exchange_frame.grid(column=1, row=1, sticky='n', pady=20, padx=50)
+        self.exchange_frame = ttk.Frame(self.accounts_panel, width=300, height=600)
+        self.exchange_frame.grid(column=1, row=0, sticky='e')
+        self.exchange_frame.grid_propagate(False)
+        ttk.Label(self.exchange_frame,
+                  text='Foreign Exchange',
+                  font=('Open Sans', 14),
+                  justify='center').grid(column=0,
+                                         columnspan=2,
+                                         row=0,
+                                         padx=(70, 0),
+                                         pady=(20, 10),
+                                         sticky='news')
         self.list = tk.Listbox(self.exchange_frame,
                                font=('Open Sans', 10),
                                borderwidth=0,
                                width=15, justify='right')
         self.list.grid(column=0,
-                       row=0,
+                       row=1,
                        sticky='n',
-                       padx=5,
-                       pady=10)
+                       padx=(50, 5))
         self.list.insert(1, f'China')
         self.list.insert(2, f'Japan')
         self.list.insert(3, f'Switzerland')
@@ -341,10 +360,9 @@ class AccountsPanel(ttk.Frame):
                                         borderwidth=0,
                                         width=10)
         self.exchange_list.grid(column=1,
-                                row=0,
+                                row=1,
                                 sticky='n',
-                                padx=5,
-                                pady=10)
+                                padx=5)
         self.exchange_list.insert(1, exchange_data[0])
         self.exchange_list.insert(2, exchange_data[1])
         self.exchange_list.insert(3, exchange_data[2])
@@ -355,6 +373,8 @@ class AccountsPanel(ttk.Frame):
         self.exchange_list.insert(8, exchange_data[7])
         self.exchange_list.insert(9, exchange_data[8])
         self.exchange_list.insert(10, exchange_data[9])
+        self.exchange_list.bindtags(('', 'all'))
+        self.list.bindtags(('', 'all'))
 
 
 class CardsPanel(ttk.Frame):
@@ -443,6 +463,33 @@ def exchangeapi(currency):
     exchange_data.append("{:.3f}".format(data['sar']))
     exchange_data.append("{:.3f}".format(data['krw']))
     exchange_data.append("{:.3f}".format(data['sgd']))
+
+def fetchUser():
+    global UserData
+    db = db_connect()
+    db_cursor = db.cursor()
+    sql = "SELECT * FROM db_atm.tbl_users WHERE user_id = %s"
+    adr = (UserID, )
+    db_cursor.execute(sql, adr)
+    UserData = db_cursor.fetchall()
+
+def fetchTransactions():
+    global TransactionData
+    db = db_connect()
+    db_cursor = db.cursor()
+    sql = "SELECT * FROM db_atm.tbl_transactions WHERE tbl_accounts_tbl_users_user_id = %s"
+    adr = (UserID, )
+    db_cursor.execute(sql, adr)
+    TransactionData = db_cursor.fetchall()
+
+def fetchAccounts():
+    global AccountsData
+    db = db_connect()
+    db_cursor = db.cursor()
+    sql = "SELECT * FROM db_atm.tbl_accounts WHERE tbl_users_user_id = %s"
+    adr = (UserID, )
+    db_cursor.execute(sql, adr)
+    AccountsData = db_cursor.fetchall()
 
 
 if __name__ == "__main__":
