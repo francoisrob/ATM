@@ -303,14 +303,12 @@ class AccountsPanel(ttk.Frame):
     def __init__(self, master):
         ttk.Frame.__init__(self, master)
         # Gui Creation
-        print(TransactionData)
         self.accounts_panel = ttk.Frame(self, width=800, height=600, style="Card.TFrame")
         self.accounts_panel.grid()
         self.accounts_panel.grid_propagate(False)
         self.left_panel = ttk.Frame(self.accounts_panel, width=500, height=600, style="Card.TFrame")
         self.left_panel.grid(row=0, column=0)
         self.left_panel.grid_propagate(False)
-
         ttk.Label(self.left_panel, text="Your balance").grid(column=0,
                                                              row=0,
                                                              padx=30,
@@ -325,7 +323,10 @@ class AccountsPanel(ttk.Frame):
                                 padx=30,
                                 columnspan=1,
                                 pady=(0, 20))
-        self.exchange_frame = ttk.Frame(self.accounts_panel, width=300, height=600)
+        self.exchange_frame = ttk.Frame(self.accounts_panel,
+                                        width=280,
+                                        height=600,
+                                        style='Card.TFrame')
         self.exchange_frame.grid(column=1, row=0, sticky='e')
         self.exchange_frame.grid_propagate(False)
         ttk.Label(self.exchange_frame,
@@ -344,7 +345,7 @@ class AccountsPanel(ttk.Frame):
         self.list.grid(column=0,
                        row=1,
                        sticky='n',
-                       padx=(50, 5))
+                       padx=(50, 10))
         self.list.insert(1, f'China')
         self.list.insert(2, f'Japan')
         self.list.insert(3, f'Switzerland')
@@ -362,7 +363,7 @@ class AccountsPanel(ttk.Frame):
         self.exchange_list.grid(column=1,
                                 row=1,
                                 sticky='n',
-                                padx=5)
+                                ipadx=5)
         self.exchange_list.insert(1, exchange_data[0])
         self.exchange_list.insert(2, exchange_data[1])
         self.exchange_list.insert(3, exchange_data[2])
@@ -376,6 +377,29 @@ class AccountsPanel(ttk.Frame):
         self.exchange_list.bindtags(('', 'all'))
         self.list.bindtags(('', 'all'))
 
+        self.tag_panel = ttk.Frame(self.left_panel, style="Card.TFrame")
+        self.tag_panel.grid(row=2, column=0, padx=20, pady=20)
+        tags = len(TransactionData)
+        if tags > 10:
+            tags = 10
+        for a in range(0, tags):
+            frame = ttk.Frame(self.tag_panel, style='Card.TFrame', width=700, height=30)
+            frame.pack(side='top',
+                       fill='x', pady=40)
+            frame.pack_propagate(False)
+            title = ttk.Label(frame, text=TransactionData[a][1], font=('Open Sans', 10), width=25)
+            title.grid(row=0, column=0, sticky='news', padx=10, pady=10)
+            date = ttk.Label(frame,
+                             text=TransactionData[a][3],
+                             width=20,
+                             font=('Open Sans Light', 8))
+            date.grid(row=0, column=1, sticky='e', padx=10, pady=10)
+            value = ttk.Label(frame,
+                              text="R {:,.2f}".format((TransactionData[a][2])),
+                              width=10,
+                              font=('Open Sans', 10))
+            value.grid(row=0, column=2, sticky='e', padx=10, pady=10)
+            pass
 
 class CardsPanel(ttk.Frame):
     def __init__(self, master):
@@ -463,6 +487,8 @@ def exchangeapi(currency):
     exchange_data.append("{:.3f}".format(data['sar']))
     exchange_data.append("{:.3f}".format(data['krw']))
     exchange_data.append("{:.3f}".format(data['sgd']))
+    exchange_data.append("{:.3f}".format(data['usd']))
+    exchange_data.append("{:.3f}".format(data['gbp']))
 
 def fetchUser():
     global UserData
