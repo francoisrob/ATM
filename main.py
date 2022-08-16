@@ -804,7 +804,7 @@ class RegisterPageAuth(ttk.Frame):
                                     )
 
 
-# Registration successful page
+# Registration successful pag
 class RegisterPageFinal(ttk.Frame):
     def __init__(self, master):
         ttk.Frame.__init__(self, master)
