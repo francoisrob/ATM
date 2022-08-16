@@ -187,8 +187,8 @@ class LoginPage(ttk.Frame):
 
 
 def Login(master, username, password):
-    username = 'js'
-    password = '1234'
+    # username = 'js'
+    # password = '1234'
     global UserID
     # No username and password entered
     if not username:
@@ -925,10 +925,16 @@ class AccountsPanel(ttk.Frame):
     def __init__(self, master):
         ttk.Frame.__init__(self, master)
         # Gui Creation
-        self.accounts_panel = ttk.Frame(self, width=800, height=600, style="Card.TFrame")
+        self.accounts_panel = ttk.Frame(self,
+                                        width=800,
+                                        height=600,
+                                        style="Card.TFrame")
         self.accounts_panel.grid()
         self.accounts_panel.grid_propagate(False)
-        self.left_panel = ttk.Frame(self.accounts_panel, width=500, height=600, style="Card.TFrame")
+        self.left_panel = ttk.Frame(self.accounts_panel,
+                                    style='Card.TFrame',
+                                    width=500,
+                                    height=600)
         self.left_panel.grid(row=0, column=0)
         self.left_panel.grid_propagate(False)
         ttk.Label(self.left_panel, text="Your balance").grid(column=0,
@@ -941,15 +947,16 @@ class AccountsPanel(ttk.Frame):
                                        font=('Open Sans', 20))
         self.balance_label.grid(column=0,
                                 row=1,
-                                sticky='e',
+                                sticky='w',
                                 padx=30,
                                 columnspan=1,
-                                pady=(0, 20))
+                                pady=(0, 10))
         self.exchange_frame = ttk.Frame(self.accounts_panel,
-                                        width=280,
-                                        height=600,
-                                        style='Card.TFrame')
-        self.exchange_frame.grid(column=1, row=0, sticky='e')
+                                        width=300,
+                                        height=600)
+        self.exchange_frame.grid(column=2,
+                                 row=0,
+                                 sticky='e')
         self.exchange_frame.grid_propagate(False)
         ttk.Label(self.exchange_frame,
                   text='Foreign Exchange',
@@ -998,30 +1005,50 @@ class AccountsPanel(ttk.Frame):
         self.exchange_list.insert(10, exchange_data[9])
         self.exchange_list.bindtags(('', 'all'))
         self.list.bindtags(('', 'all'))
-
+        ttk.Label(self.left_panel,
+                  text='Recent Transactions',
+                  font=('Open Sans', 14)).grid(row=2,
+                                               columnspan=2)
         self.tag_panel = ttk.Frame(self.left_panel, style="Card.TFrame")
-        self.tag_panel.grid(row=2, column=0, padx=20, pady=20)
+        self.tag_panel.grid(row=3, column=0, padx=30, pady=(0, 20))
         tags = len(TransactionData)
         if tags > 10:
             tags = 10
         for a in range(0, tags):
-            frame = ttk.Frame(self.tag_panel, style='Card.TFrame', width=700, height=30)
+            frame = ttk.Frame(self.tag_panel,
+                              # style='Card.TFrame',
+                              width=700,
+                              height=30)
             frame.pack(side='top',
-                       fill='x', pady=40)
+                       fill='x',
+                       padx=1,
+                       pady=1)
             frame.pack_propagate(False)
             title = ttk.Label(frame, text=TransactionData[a][1], font=('Open Sans', 10), width=25)
-            title.grid(row=0, column=0, sticky='news', padx=10, pady=10)
+            title.grid(row=0,
+                       column=0,
+                       sticky='news',
+                       padx=10,
+                       pady=10)
             date = ttk.Label(frame,
                              text=TransactionData[a][3],
                              width=20,
                              font=('Open Sans Light', 8))
-            date.grid(row=0, column=1, sticky='e', padx=10, pady=10)
+            date.grid(row=0,
+                      column=1,
+                      sticky='e',
+                      padx=10,
+                      pady=10)
             value = ttk.Label(frame,
                               text="R {:,.2f}".format((TransactionData[a][2])),
                               width=10,
                               font=('Open Sans', 10))
-            value.grid(row=0, column=2, sticky='e', padx=10, pady=10)
-            pass
+            value.grid(row=0,
+                       column=2,
+                       sticky='e',
+                       padx=10,
+                       pady=10)
+
 
 
 class CardsPanel(ttk.Frame):
