@@ -44,7 +44,7 @@ UserID = ''
 UserData = []
 TransactionData = []
 AccountsData = []
-
+CardType = ['', '', '']
 pyglet.font.add_file('OpenSans.ttf')
 
 
@@ -59,6 +59,7 @@ class Application(tk.Tk):
         # Theme
         self.tk.call("source", "azure.tcl")
         self.tk.call("set_theme", "light")
+        self.style = ttk.Style(self)
 
         # background image
         width, height = self.winfo_screenwidth(), self.winfo_screenheight()
@@ -926,8 +927,8 @@ class MainMenu(ttk.Frame):
             self._panel.destroy()
         self._panel = new_panel
         self._panel.pack()
-        MainMenu.update(self)
-        print(self.winfo_reqwidth(), self.winfo_reqheight())
+        # MainMenu.update(self)
+        # print(self.winfo_reqwidth(), self.winfo_reqheight())
 
 
 class AccountsPanel(ttk.Frame):
@@ -1009,16 +1010,19 @@ class AccountsPanel(ttk.Frame):
                                 row=1,
                                 sticky='n',
                                 ipadx=5)
-        self.exchange_list.insert(1, exchange_data[0])
-        self.exchange_list.insert(2, exchange_data[1])
-        self.exchange_list.insert(3, exchange_data[2])
-        self.exchange_list.insert(4, exchange_data[3])
-        self.exchange_list.insert(5, exchange_data[4])
-        self.exchange_list.insert(6, exchange_data[5])
-        self.exchange_list.insert(7, exchange_data[6])
-        self.exchange_list.insert(8, exchange_data[7])
-        self.exchange_list.insert(9, exchange_data[8])
-        self.exchange_list.insert(10, exchange_data[9])
+        if len(exchange_data) > 0:
+            self.exchange_list.insert(1, exchange_data[0])
+            self.exchange_list.insert(2, exchange_data[1])
+            self.exchange_list.insert(3, exchange_data[2])
+            self.exchange_list.insert(4, exchange_data[3])
+            self.exchange_list.insert(5, exchange_data[4])
+            self.exchange_list.insert(6, exchange_data[5])
+            self.exchange_list.insert(7, exchange_data[6])
+            self.exchange_list.insert(8, exchange_data[7])
+            self.exchange_list.insert(9, exchange_data[8])
+            self.exchange_list.insert(10, exchange_data[9])
+        else:
+            raise SystemExit
         self.exchange_list.bindtags(('', 'all'))
         self.list.bindtags(('', 'all'))
 
@@ -1122,7 +1126,7 @@ class PaymentsPanel(ttk.Frame):
         self.right_panel.pack(side='right')
         self.scrollbard.pack(side='right',
                              fill='y',
-                             pady=5)
+                             pady=2)
         self.canvas.pack(side='left',
                          fill='both',
                          expand=True,
@@ -1160,13 +1164,22 @@ class PaymentsPanel(ttk.Frame):
 
     def populate(self):
         tags = len(TransactionData)
+        if tags > 30:
+            tags = 30
         for a in range(0, tags):
             receipt = ttk.Frame(self.frame, width=100, height=20)
-            receipt.pack(side='top', fill='x', expand=True)
-            title = ttk.Label(receipt, text=TransactionData[a][1], font=('Open Sans', 10), width=25)
+            receipt.pack(side='top',
+                         fill='x',
+                         expand=True,
+                         padx=20,
+                         pady=10)
+            title = ttk.Label(receipt,
+                              text=TransactionData[a][1],
+                              font=('Open Sans', 10),
+                              width=25)
             title.grid(row=0,
                        column=0,
-                       sticky='news',
+                       sticky='w',
                        padx=10,
                        pady=10)
             date = ttk.Label(receipt,
@@ -1176,7 +1189,7 @@ class PaymentsPanel(ttk.Frame):
             date.grid(row=0,
                       column=1,
                       sticky='e',
-                      padx=10,
+                      padx=20,
                       pady=10)
             value = ttk.Label(receipt,
                               text="R {:,.2f}".format(TransactionData[a][2]),
@@ -1185,7 +1198,7 @@ class PaymentsPanel(ttk.Frame):
             value.grid(row=0,
                        column=2,
                        sticky='e',
-                       padx=10,
+                       padx=20,
                        pady=10)
 
     def onFrameConfigure(self, x):
@@ -1221,20 +1234,25 @@ def db_connect():
 
 def exchangeapi(currency):
     url = 'https://cdn.jsdelivr.net/gh/fawazahmed0/currency-api@1/latest/currencies/' + currency + '.json'
-    r = requests.get(url=url)
-    data = r.json()[currency]
-    exchange_data.append("{:.3f}".format(data['cny']))
-    exchange_data.append("{:.3f}".format(data['jpy']))
-    exchange_data.append("{:.3f}".format(data['chf']))
-    exchange_data.append("{:.3f}".format(data['rub']))
-    exchange_data.append("{:.3f}".format(data['inr']))
-    exchange_data.append("{:.3f}".format(data['twd']))
-    exchange_data.append("{:.3f}".format(data['hkd']))
-    exchange_data.append("{:.3f}".format(data['sar']))
-    exchange_data.append("{:.3f}".format(data['krw']))
-    exchange_data.append("{:.3f}".format(data['sgd']))
-    exchange_data.append("{:.3f}".format(data['usd']))
-    exchange_data.append("{:.3f}".format(data['gbp']))
+    try:
+        r = requests.get(url=url, timeout=1)
+        data = r.json()[currency]
+        exchange_data.append("{:.3f}".format(data['cny']))
+        exchange_data.append("{:.3f}".format(data['jpy']))
+        exchange_data.append("{:.3f}".format(data['chf']))
+        exchange_data.append("{:.3f}".format(data['rub']))
+        exchange_data.append("{:.3f}".format(data['inr']))
+        exchange_data.append("{:.3f}".format(data['twd']))
+        exchange_data.append("{:.3f}".format(data['hkd']))
+        exchange_data.append("{:.3f}".format(data['sar']))
+        exchange_data.append("{:.3f}".format(data['krw']))
+        exchange_data.append("{:.3f}".format(data['sgd']))
+        exchange_data.append("{:.3f}".format(data['usd']))
+        exchange_data.append("{:.3f}".format(data['gbp']))
+    except requests.exceptions.ConnectionError:
+        messagebox.showerror('No Connection', 'Make sure you have a stable internet connection then try again')
+    except requests.exceptions.ReadTimeout:
+        messagebox.showerror('Connection Timeout', 'Connection timed out\nPlease try again later.')
 
 
 def fetchUser():
@@ -1254,7 +1272,7 @@ def fetchTransactions():
     sql = "SELECT * FROM db_atm.tbl_transactions WHERE tbl_accounts_tbl_users_user_id = %s"
     adr = (UserID,)
     db_cursor.execute(sql, adr)
-    TransactionData = db_cursor.fetchall()
+    TransactionData = sorted(db_cursor.fetchall(), key=lambda x: x[3], reverse=True)
 
 
 def fetchAccounts():
@@ -1265,6 +1283,16 @@ def fetchAccounts():
     adr = (UserID,)
     db_cursor.execute(sql, adr)
     AccountsData = db_cursor.fetchall()
+    x = len(AccountsData)
+    # dcs
+    # 012
+    for y in range(0, x):
+        if AccountsData[y][3] == 'd':
+            CardType[0] = AccountsData[y][0]
+        elif AccountsData[y][3] == 'c':
+            CardType[1] = AccountsData[y][0]
+        else:
+            CardType[2] = AccountsData[y][0]
 
 
 if __name__ == "__main__":
