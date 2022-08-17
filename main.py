@@ -38,9 +38,8 @@ from PIL import Image, ImageTk
 import mysql.connector
 from mysql.connector import errorcode
 
-Version = 'v0.816'
+Version = 'v0.817'
 exchange_data = []
-# Username = ''
 UserID = ''
 UserData = []
 TransactionData = []
@@ -161,14 +160,18 @@ class LoginPage(ttk.Frame):
                           sticky='e',
                           pady=(0, 15),
                           padx=20)
-        forgot_label.bind("<Button-1>", lambda e: messagebox.showwarning(title='Warning', message='Tough Shit'))
+        forgot_label.bind("<Button-1>",
+                          lambda e: messagebox.showwarning(title='Warning',
+                                                           message='Tough Shit'))
 
-        # Login in button, currently only show the next frame, no verification function yet
+        # Login in
         button_login = ttk.Button(login_frame,
                                   text='SIGN IN',
                                   width=29,
                                   style='Accent.TButton',
-                                  command=lambda: Login(master, entry_username.get(), entry_password.get()))
+                                  command=lambda: Login(master,
+                                                        entry_username.get(),
+                                                        entry_password.get()))
         button_login.grid(row=7,
                           column=0,
                           padx=20,
@@ -187,8 +190,8 @@ class LoginPage(ttk.Frame):
 
 
 def Login(master, username, password):
-    # username = 'js'
-    # password = '1234'
+    username = 'js'
+    password = '1234'
     global UserID
     # No username and password entered
     if not username:
@@ -842,8 +845,7 @@ class RegisterPageFinal(ttk.Frame):
         button_register.grid(row=6,
                              column=0,
                              padx=20,
-                             pady=(20, 20),)
-
+                             pady=(20, 20), )
 
 
 def Register(master):
@@ -871,10 +873,15 @@ class MainMenu(ttk.Frame):
         self.show_panel(AccountsPanel)
 
         self.header_panel = ttk.Panedwindow(self.left_panel,
-                                            style='Card.TFrame',
-                                            height=100)
+                                            height=150)
         self.header_panel.pack(side='top', fill='x')
         self.header_panel.pack_propagate(False)
+        self.image = Image.open('bank_logo.png')
+        self.image = self.image.resize((100, 50))
+        self.bg_image = ImageTk.PhotoImage(self.image)
+        ttk.Label(self.header_panel, image=self.bg_image).pack(side='top',
+                                                               padx=20,
+                                                               pady=(10, 0))
         self.header_label = ttk.Label(self.header_panel, text='Welcome', font=('Open Sans', 20))
         self.header_label.pack(side='top',
                                pady=(10, 20))
@@ -919,6 +926,8 @@ class MainMenu(ttk.Frame):
             self._panel.destroy()
         self._panel = new_panel
         self._panel.pack()
+        MainMenu.update(self)
+        print(self.winfo_reqwidth(), self.winfo_reqheight())
 
 
 class AccountsPanel(ttk.Frame):
@@ -942,18 +951,25 @@ class AccountsPanel(ttk.Frame):
                                                              padx=30,
                                                              pady=(30, 0),
                                                              sticky='w')
+
+        # Total account balance
+        total = 0
+        for a in AccountsData:
+            total += a[1]
         self.balance_label = ttk.Label(self.left_panel,
-                                       text='$ 1 568,95',
+                                       text="R {:,.2f}".format(total),
                                        font=('Open Sans', 20))
         self.balance_label.grid(column=0,
                                 row=1,
                                 sticky='w',
-                                padx=30,
+                                padx=35,
                                 columnspan=1,
                                 pady=(0, 10))
+
+        # Foregin exchange frame
         self.exchange_frame = ttk.Frame(self.accounts_panel,
                                         width=300,
-                                        height=600)
+                                        height=600, )
         self.exchange_frame.grid(column=2,
                                  row=0,
                                  sticky='e')
@@ -1005,6 +1021,8 @@ class AccountsPanel(ttk.Frame):
         self.exchange_list.insert(10, exchange_data[9])
         self.exchange_list.bindtags(('', 'all'))
         self.list.bindtags(('', 'all'))
+
+        # Recent transactions
         ttk.Label(self.left_panel,
                   text='Recent Transactions',
                   font=('Open Sans', 14)).grid(row=2,
@@ -1050,7 +1068,6 @@ class AccountsPanel(ttk.Frame):
                        pady=10)
 
 
-
 class CardsPanel(ttk.Frame):
     def __init__(self, master):
         ttk.Frame.__init__(self, master)
@@ -1084,16 +1101,95 @@ class CardsPanel(ttk.Frame):
 class PaymentsPanel(ttk.Frame):
     def __init__(self, master):
         ttk.Frame.__init__(self, master)
-        # Gui Creation
-        self.payments_panel = ttk.Frame(self, width=600, height=600, style="Card.TFrame")
-        self.payments_panel.grid()
-        self.payments_panel.grid_propagate(False)
 
-        ttk.Label(self.payments_panel, text="Payments").grid(column=0,
-                                                             row=0,
-                                                             padx=30,
-                                                             pady=(30, 0),
-                                                             sticky='w')
+        # Gui Creation
+        self.payments_panel = ttk.Frame(self,
+                                        style='Card.TFrame')
+        self.payments_panel.grid()
+        self.canvas = tk.Canvas(self.payments_panel,
+                                width=500,
+                                height=590,
+                                borderwidth=0)
+        self.frame = ttk.Frame(self.canvas)
+        self.scrollbard = ttk.Scrollbar(self.payments_panel,
+                                        orient='vertical',
+                                        command=self.canvas.yview)
+        self.canvas.config(yscrollcommand=self.scrollbard.set)
+        self.right_panel = ttk.Frame(self.payments_panel,
+                                     style='Card.TFrame',
+                                     width=284,
+                                     height=600)
+        self.right_panel.pack(side='right')
+        self.scrollbard.pack(side='right',
+                             fill='y',
+                             pady=5)
+        self.canvas.pack(side='left',
+                         fill='both',
+                         expand=True,
+                         pady=1,
+                         padx=1)
+        self.canvas.create_window((1, 1),
+                                  window=self.frame,
+                                  anchor='nw',
+                                  tags='self.frame')
+        self.frame.bind('<Configure>',
+                        self.onFrameConfigure)
+        self.header = ttk.Frame(self.frame)
+        self.header.pack(side='top')
+        self.pay_button = ttk.Button(self.header,
+                                     text='Pay')
+        self.pay_button.grid(row=0,
+                             column=0,
+                             padx=10,
+                             pady=40,
+                             sticky='e')
+        self.transfer_button = ttk.Button(self.header,
+                                          text='Transfer')
+        self.transfer_button.grid(row=0,
+                                  column=1,
+                                  padx=10,
+                                  pady=40,
+                                  sticky='w')
+        ttk.Label(self.header,
+                  text='Transactions',
+                  font=('Open Sans Bold', 14)).grid(row=1,
+                                                    column=0,
+                                                    columnspan=2,
+                                                    padx=188)
+        self.populate()
+
+    def populate(self):
+        tags = len(TransactionData)
+        for a in range(0, tags):
+            receipt = ttk.Frame(self.frame, width=100, height=20)
+            receipt.pack(side='top', fill='x', expand=True)
+            title = ttk.Label(receipt, text=TransactionData[a][1], font=('Open Sans', 10), width=25)
+            title.grid(row=0,
+                       column=0,
+                       sticky='news',
+                       padx=10,
+                       pady=10)
+            date = ttk.Label(receipt,
+                             text=TransactionData[a][3],
+                             width=20,
+                             font=('Open Sans Light', 8))
+            date.grid(row=0,
+                      column=1,
+                      sticky='e',
+                      padx=10,
+                      pady=10)
+            value = ttk.Label(receipt,
+                              text="R {:,.2f}".format(TransactionData[a][2]),
+                              width=10,
+                              font=('Open Sans', 10))
+            value.grid(row=0,
+                       column=2,
+                       sticky='e',
+                       padx=10,
+                       pady=10)
+
+    def onFrameConfigure(self, x):
+        self.canvas.configure(scrollregion=self.canvas.bbox('all'))
 
 
 def db_connect():
@@ -1105,8 +1201,8 @@ def db_connect():
         db = mysql.connector.connect(
             host="localhost",
             user="root",
-            password='12345678',
-            # password="toor",
+            # password='12345678',
+            password="toor",
             port="3306"
         )
         return db
