@@ -1043,7 +1043,7 @@ class MainMenu(ttk.Frame):
         # theme button
         theme_button = ttk.Checkbutton(self.left_panel,
                                        command=master.set_theme,
-                                       text='Theme',
+                                       text='Dark Mode',
                                        style="Switch.TCheckbutton")
         theme_button.pack(side='bottom', fill='x', padx=60)
         if self.tk.call("ttk::style", "theme", "use") == "azure-dark":
