@@ -45,7 +45,7 @@ UserData = []
 TransactionData = []
 AccountsData = []
 CardType = ['', '', '']
-pyglet.font.add_file('OpenSans.ttf')
+pyglet.font.add_file('theme/OpenSans.ttf')
 
 
 class Application(tk.Tk):
@@ -54,7 +54,7 @@ class Application(tk.Tk):
         self._frame = None
         self.geometry('1100x700')
         self.title('National Bank')
-        self.iconbitmap('favicon.ico')
+        self.iconbitmap('theme/favicon.ico')
 
         # Theme
         self.tk.call("source", "azure.tcl")
@@ -63,7 +63,7 @@ class Application(tk.Tk):
 
         # background image
         width, height = self.winfo_screenwidth(), self.winfo_screenheight()
-        self.image = Image.open('background.jpg')
+        self.image = Image.open('theme/background.jpg')
         self.image = self.image.resize((width, height))
         self.bg_image = ImageTk.PhotoImage(self.image)
         ttk.Label(self, image=self.bg_image).place(relx=.5,
