@@ -63,7 +63,7 @@ class Application(tk.Tk):
 
         # background image
         width, height = self.winfo_screenwidth(), self.winfo_screenheight()
-        self.image = Image.open('background_image01.png')
+        self.image = Image.open('background.jpg')
         self.image = self.image.resize((width, height))
         self.bg_image = ImageTk.PhotoImage(self.image)
         ttk.Label(self, image=self.bg_image).place(relx=.5,
@@ -1056,8 +1056,8 @@ class MainMenu(ttk.Frame):
             self._panel.destroy()
         self._panel = new_panel
         self._panel.pack()
-        # MainMenu.update(self)
-        # print(self.winfo_reqwidth(), self.winfo_reqheight())
+        MainMenu.update(self)
+        print(self.winfo_reqwidth(), self.winfo_reqheight())
 
 
 class AccountsPanel(ttk.Frame):
@@ -1205,7 +1205,7 @@ class CardsPanel(ttk.Frame):
     def __init__(self, master):
         ttk.Frame.__init__(self, master)
         # Gui Creation
-        self.cards_panel = ttk.Frame(self, width=600, height=600, style="Card.TFrame")
+        self.cards_panel = ttk.Frame(self, width=800, height=600, style="Card.TFrame")
         self.cards_panel.grid()
         self.cards_panel.grid_propagate(False)
 
