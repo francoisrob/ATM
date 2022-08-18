@@ -38,6 +38,14 @@
   <component name="DBNavigator.Project.DatabaseSessionManager">
     <connection id="1ff08fad-2c8c-4a54-949d-1cc5e2f7ba01" />
   </component>
+  <component name="DBNavigator.Project.DatasetFilterManager">
+    <filter-actions connection-id="1ff08fad-2c8c-4a54-949d-1cc5e2f7ba01" dataset="db_atm.tbl_users" active-filter-id="EMPTY_FILTER">
+      <filter id="f6a95a0c-ca51-41fd-9248-b81f21c6cdfb" name="1" temporary="false" custom-name="false" type="basic" join-type="AND">
+        <condition column="user_id" operator="=" value="1" active="true" />
+      </filter>
+    </filter-actions>
+    <filter-actions connection-id="1ff08fad-2c8c-4a54-949d-1cc5e2f7ba01" dataset="db_atm.tbl_accounts" active-filter-id="" />
+  </component>
   <component name="DBNavigator.Project.EditorStateManager">
     <last-used-providers />
   </component>
