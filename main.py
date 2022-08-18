@@ -1332,6 +1332,7 @@ class PaymentsPanel(ttk.Frame):
 
     def onFrameConfigure(self, x):
         self.canvas.configure(scrollregion=self.canvas.bbox('all'))
+        return x
 
 
 def db_connect():
