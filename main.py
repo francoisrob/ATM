@@ -962,19 +962,17 @@ class ForgotPage(ttk.Frame):
         self.bg_image = ImageTk.PhotoImage(self.image)
         ttk.Label(forgot_page, image=self.bg_image).grid(row=0,
                                                          column=0,
-                                                         pady=(20, 10),
-                                                         padx=20,
-                                                         sticky='n')
-
+                                                         pady=20,
+                                                         padx=20)
         # Header Text
         self.header_label = ttk.Label(forgot_page,
-                                      text='Forgot Password', font=('Open Sans', 20))
+                                      text='Forgot Password',
+                                      font=('Open Sans', 20))
         self.header_label.grid(row=1,
                                column=0,
                                padx=20,
-                               pady=(0, 15),
+                               pady=10,
                                sticky='w')
-
         # Input
         username_label = ttk.Label(forgot_page,
                                    text='Username')
@@ -991,10 +989,25 @@ class ForgotPage(ttk.Frame):
                             padx=20,
                             pady=(0, 10),
                             sticky='w')
+        email_label = ttk.Label(forgot_page,
+                                text='Email')
+        email_label.grid(row=4,
+                         column=0,
+                         sticky='w',
+                         padx=20)
+        entry_email = ttk.Entry(forgot_page,
+                                justify='center',
+                                width=30,
+                                style='Custom.TEntry')
+        entry_email.grid(row=5,
+                         column=0,
+                         padx=20,
+                         pady=(0, 10),
+                         sticky='w')
         password_label = ttk.Label(forgot_page,
-                                   text='Password')
-        password_label.grid(row=4,
-                            column=0,
+                                   text='New Password')
+        password_label.grid(row=2,
+                            column=1,
                             sticky='w',
                             padx=20,
                             pady=(10, 0))
@@ -1002,14 +1015,14 @@ class ForgotPage(ttk.Frame):
                                    justify='center',
                                    width=30,
                                    show='*')
-        entry_password.grid(row=5,
-                            column=0,
+        entry_password.grid(row=3,
+                            column=1,
                             padx=20,
                             sticky='w')
         vpassword_label = ttk.Label(forgot_page,
                                     text='Re-enter Password')
-        vpassword_label.grid(row=6,
-                             column=0,
+        vpassword_label.grid(row=4,
+                             column=1,
                              sticky='w',
                              padx=20,
                              pady=(10, 0))
@@ -1017,8 +1030,8 @@ class ForgotPage(ttk.Frame):
                                     justify='center',
                                     width=30,
                                     show='*')
-        vpassword_entry.grid(row=7,
-                             column=0,
+        vpassword_entry.grid(row=5,
+                             column=1,
                              padx=20,
                              pady=(0, 10),
                              sticky='w')
@@ -1031,57 +1044,50 @@ class ForgotPage(ttk.Frame):
                                  command=lambda: ForgotPass(master,
                                                             entry_username.get(),
                                                             entry_password.get(),
-                                                            vpassword_entry.get()))
-        button_save.grid(row=8,
-                         column=0,
+                                                            vpassword_entry.get(),
+                                                            entry_email.get()))
+        button_save.grid(row=6,
+                         column=1,
                          padx=20,
-                         pady=10,
-                         columnspan=2)
+                         pady=10)
         button_back = ttk.Button(forgot_page,
                                  text='Back',
                                  width=29,
-                                 style='Panel.TButton',
                                  command=lambda: master.switch_frame(LoginPage))
-        button_back.grid(row=9,
+        button_back.grid(row=6,
                          column=0,
                          padx=20,
-                         pady=(0, 10),
-                         columnspan=2)
+                         pady=10)
 
 
-def ForgotPass(master, username, password, vpassword):
+def ForgotPass(master, username, password, vpassword, email):
     if not username:
         messagebox.showerror("Invalid entry", "Username cannot be left blank.\nPlease enter a Username.")
     elif not (password == vpassword):
         messagebox.showerror("Invalid entry", "Passwords do not match.\nPlease enter a Password.")
+    elif not password:
+        messagebox.showerror('Invalid Entry', 'Password cannot be left blank\nPlease enter a password')
+    elif not email:
+        messagebox.showerror('Invalid Entry', 'Email cannot be left blank.\nPlease enter an email')
     else:
         db = db_connect()
         db_cursor = db.cursor()
-        sql = "SELECT username, password, user_id FROM db_atm.tbl_users WHERE username = %s"
+        sql = "SELECT username, password, user_id, email FROM db_atm.tbl_users WHERE username = %s"
         val = (username,)
         db_cursor.execute(sql, val)
-        user = db_cursor.fetchall()
-        print(user)
+        user = db_cursor.fetchone()
         if not user:
-            messagebox.showerror('', '')
-        # for user in users:
-        #     if user[0] == username:
-        #         user_input = password  # Fetches the typed password
-        #         user_password = user[1]  # Fetches the correct password
-        # if user_password == "":
-        #     # Warning message displayed for unmatched entry form db
-        #     messagebox.showerror("Invalid entry", "Username or password is incorrect")
-        # elif user_input == user_password:
-        #     # Correct input which takes you to the MainMenu frame
-        #     exchangeapi('zar')
-        #     print("user:", username, "pass:", password, 'userID:', UserID)
-        #     fetchUser()
-        #     fetchAccounts()
-        #     fetchTransactions()
-        #     master.switch_frame(MainMenu)
-        # else:
-        #     # Password is incorrect and does not match username
-        #     messagebox.showerror("Invalid entry", "Username or password is incorrect")
+            messagebox.showerror('Invalid Entry', 'The input does not appear to be associated with an account')
+        else:
+            if (user[0] == username) and (user[3] == email):
+                sql = 'UPDATE db_atm.tbl_users SET password = %s WHERE user_id = %s'
+                val = (password, user[2])
+                db_cursor.execute(sql, val)
+                db.commit()
+                messagebox.showinfo('Succesfull', 'Password updated succesfully!')
+                master.switch_frame(LoginPage)
+            else:
+                messagebox.showerror('Invalid Entry', 'The input does not appear to be associated with an account')
 
 
 class MainMenu(ttk.Frame):
@@ -1111,10 +1117,11 @@ class MainMenu(ttk.Frame):
         self.bg_image = ImageTk.PhotoImage(self.image)
         ttk.Label(self.header_panel, image=self.bg_image).pack(side='top',
                                                                padx=20,
-                                                               pady=(10, 0))
-        self.header_label = ttk.Label(self.header_panel, text='Welcome', font=('Open Sans', 20))
-        self.header_label.pack(side='top',
-                               pady=(10, 20))
+                                                               pady=10)
+        self.header_label = ttk.Label(self.header_panel, text='Welcome back', font=('Open Sans', 18))
+        self.header_label.pack(side='top')
+        self.header_name = ttk.Label(self.header_panel, text=UserData[1], font=('Open Sans', 18))
+        self.header_name.pack(side='top')
         self.accounts_button = ttk.Button(self.left_panel,
                                           text='Accounts',
                                           style="Panel.TButton",
@@ -1157,7 +1164,7 @@ class MainMenu(ttk.Frame):
         self._panel = new_panel
         self._panel.pack()
         MainMenu.update(self)
-        print(self.winfo_reqwidth(), self.winfo_reqheight())
+        # print(self.winfo_reqwidth(), self.winfo_reqheight())
 
 
 class AccountsPanel(ttk.Frame):
@@ -1388,7 +1395,11 @@ class PaymentsPanel(ttk.Frame):
                   font=('Open Sans Bold', 14)).grid(row=1,
                                                     column=0,
                                                     columnspan=2,
-                                                    padx=188)
+                                                    padx=190,
+                                                    pady=1)
+        self.receipt_frame = ttk.Frame(self.frame,
+                                       style='Card.TFrame')
+        self.receipt_frame.pack(side='top')
         self.populate()
 
     def populate(self):
@@ -1396,30 +1407,42 @@ class PaymentsPanel(ttk.Frame):
         if tags > 30:
             tags = 30
         for a in range(0, tags):
-            receipt = ttk.Frame(self.frame, width=100, height=20)
+            receipt = ttk.Frame(self.receipt_frame)
             receipt.pack(side='top',
                          fill='x',
-                         expand=True,
-                         padx=20,
-                         pady=10)
+                         padx=1,
+                         pady=5,
+                         expand=True)
             title = ttk.Label(receipt,
                               text=TransactionData[a][1],
                               font=('Open Sans', 10),
                               width=25)
             title.grid(row=0,
                        column=0,
-                       sticky='w',
-                       padx=10,
-                       pady=10)
+                       sticky='news',
+                       padx=10)
+            if TransactionData[a][4] == CardType[0]:
+                text = 'Debit'
+            elif TransactionData[a][4] == CardType[1]:
+                text = 'Credit'
+            else:
+                text = 'Savings'
+            card = ttk.Label(receipt,
+                             text=text,
+                             font=('Open Sans Light', 8),
+                             width=25)
+            card.grid(row=1,
+                      column=0,
+                      sticky='n',
+                      padx=10)
             date = ttk.Label(receipt,
                              text=TransactionData[a][3],
-                             width=20,
-                             font=('Open Sans Light', 8))
+                             font=('Open Sans Light', 8),
+                             width=20)
             date.grid(row=0,
                       column=1,
                       sticky='e',
-                      padx=20,
-                      pady=10)
+                      padx=10)
             value = ttk.Label(receipt,
                               text="R {:,.2f}".format(TransactionData[a][2]),
                               width=10,
@@ -1427,8 +1450,7 @@ class PaymentsPanel(ttk.Frame):
             value.grid(row=0,
                        column=2,
                        sticky='e',
-                       padx=20,
-                       pady=10)
+                       padx=10)
 
     def onFrameConfigure(self, x):
         self.canvas.configure(scrollregion=self.canvas.bbox('all'))
@@ -1492,7 +1514,7 @@ def fetchUser():
     sql = "SELECT * FROM db_atm.tbl_users WHERE user_id = %s"
     adr = (UserID,)
     db_cursor.execute(sql, adr)
-    UserData = db_cursor.fetchall()
+    UserData = db_cursor.fetchone()
 
 
 def fetchTransactions():
