@@ -38,6 +38,9 @@ from PIL import Image, ImageTk
 import mysql.connector
 from mysql.connector import errorcode
 import re
+import datetime
+from datetime import date
+import luhn_validator
 
 Version = 'v0.818'
 exchange_data = []
@@ -49,7 +52,7 @@ CardType = ['', '', '']
 pyglet.font.add_file('theme/OpenSans.ttf')
 Reg_details = ["", "", "", ""]
 Reg_id = ""
-Reg_address = ["", "", "", ""]
+Reg_address = ["", "", "WC", ""]  # Leave WC as the default value || Used to populate a listbox
 Reg_auth = ["", ""]
 
 
@@ -174,7 +177,7 @@ class LoginPage(ttk.Frame):
                                   text='SIGN IN',
                                   width=29,
                                   style='Accent.TButton',
-                                  command=lambda: Login(master,
+                                  command=lambda: Login_check(master,
                                                         entry_username.get(),
                                                         entry_password.get()))
         button_login.grid(row=7,
@@ -187,14 +190,14 @@ class LoginPage(ttk.Frame):
                                      text='Register',
                                      width=29,
                                      style='Panel.TButton',
-                                     command=lambda: master.switch_frame(RegisterPageID))
+                                     command=lambda: master.switch_frame(RegisterPageAuth))
         button_register.grid(row=8,
                              padx=20,
                              pady=(0, 10),
                              columnspan=2)
 
 
-def Login(master, username, password):
+def Login_check(master, username, password):
     username = 'js'
     password = '1234'
     global UserID
@@ -282,7 +285,7 @@ class RegisterPageStart(ttk.Frame):
                         padx=20)
 
         req3_label = ttk.Label(register_frame,
-                               text='* ZA Identification number')
+                               text='* ZA Identification number (18 years or older)')
         req3_label.grid(row=4,
                         column=0,
                         sticky='w',
@@ -532,7 +535,7 @@ class RegisterPageID(ttk.Frame):
                       sticky='w')
 
         entry_id.insert(0, Reg_id)
-
+        entry_id.focus_set()
         # Register button
         button_register = ttk.Button(register_frame,
                                      text='Confirm ID Number',
@@ -621,7 +624,8 @@ class RegisterPageAddress(ttk.Frame):
                           padx=20,
                           pady=(0, 10),
                           sticky='w')
-
+        entry_street.insert(0, Reg_address[0])
+        entry_street.focus_set()
         # City
         city_label = ttk.Label(register_frame,
                                text='City')
@@ -638,6 +642,7 @@ class RegisterPageAddress(ttk.Frame):
                         padx=20,
                         pady=(0, 10),
                         sticky='w')
+        entry_city.insert(0, Reg_address[1])
 
         # Post
         post_label = ttk.Label(register_frame,
@@ -655,6 +660,7 @@ class RegisterPageAddress(ttk.Frame):
                         padx=20,
                         pady=(0, 10),
                         sticky='w')
+        entry_post.insert(0, Reg_address[3])
 
         # State
         state_label = ttk.Label(register_frame,
@@ -664,19 +670,10 @@ class RegisterPageAddress(ttk.Frame):
                          sticky='w',
                          padx=20)
 
-        defualt_state = tk.StringVar()
-        defualt_state.set("")
-        ddl_state = ttk.OptionMenu(register_frame, defualt_state,
-                                   "WC",
-                                   "WC",
-                                   "EC",
-                                   "FS",
-                                   "GP",
-                                   "KZN",
-                                   "NC",
-                                   "NW",
-                                   "LP",
-                                   "MP")
+        default_state = tk.StringVar()
+        default_state.set("Select an option")
+        provinces_list = ["WC", "EC", "FS", "GP", "KZN", "NC", "NW", "LP", "MP"]
+        ddl_state = tk.OptionMenu(register_frame, default_state, *provinces_list)
         ddl_state.grid(row=5,
                        column=0,
                        sticky='w',
@@ -687,7 +684,9 @@ class RegisterPageAddress(ttk.Frame):
                                      text='Confirm Billing Address',
                                      width=20,
                                      style='Accent.TButton',
-                                     command=lambda: master.switch_frame(RegisterPageAuth))
+                                     command=lambda: address_error_check(master, entry_street.get(),
+                                                                         entry_city.get(), default_state.get(),
+                                                                         entry_post.get()))
         button_register.grid(row=8,
                              column=2,
                              padx=20,
@@ -770,6 +769,10 @@ class RegisterPageAuth(ttk.Frame):
                             padx=20,
                             pady=(0, 10),
                             sticky='w')
+
+        entry_username.focus_set()
+        entry_username.insert(0, Reg_auth[0])
+
         #  Password
         pass_label = ttk.Label(register_frame,
                                text='Password')
@@ -787,12 +790,15 @@ class RegisterPageAuth(ttk.Frame):
                             padx=20,
                             pady=(0, 10),
                             sticky='w')
+
+        entry_password.insert(0, Reg_auth[1])
         # Register button
         button_register = ttk.Button(register_frame,
                                      text='Confirm Authentication details',
                                      width=30,
                                      style='Accent.TButton',
-                                     command=lambda: master.switch_frame(RegisterPageFinal))
+                                     command=lambda: auth_error_check(master, entry_username.get(), entry_password.get()))
+
         button_register.grid(row=4,
                              column=2,
                              padx=20,
@@ -843,7 +849,7 @@ class RegisterPageFinal(ttk.Frame):
         # Header Text
         self.header_label = ttk.Label(register_frame,
                                       text='Your Registration was successful.\n \nPlease use your Username\nand '
-                                           'Password to login', font=('Open Sans', 18))
+                                           'Password to login.', font=('Open Sans', 18))
         self.header_label.grid(row=1,
                                column=0,
                                padx=20,
@@ -874,23 +880,20 @@ def details_error_check(master, fname, sname, email, cell):
         # Allows all letters, spaces and hyphens
         if re.match('^[A-zÀ-ÿ- ]*$', fname):
             Reg_details.append(fname.capitalize())
-            print(Reg_details)
         else:
             raise messagebox.showerror("Invalid First name entry",
-                                       "No numbers or special characters allowed in First name field")
+                                       "No numbers or special characters allowed in First name field.")
 
         # Allows all letters, spaces and hyphens
         if re.match('^[A-zÀ-ÿ- ]*$', sname):
             Reg_details.append(sname.capitalize())
-            print(Reg_details)
         else:
             raise messagebox.showerror("Invalid Last name entry",
-                                       "No numbers or special characters allowed in Last name field")
+                                       "No numbers or special characters allowed in Last name field.")
 
         # Regex for email allows one @ and one dot (co.za will not work)
         if re.match('^[a-z0-9]+[\._]?[a-z0-9]+[@]\w+[.]\w{2,3}$', email):
             Reg_details.append(email)
-            print(Reg_details)
         else:
             raise messagebox.showerror("Invalid Email entry",
                                        "Try using a valid email address.\n[Example: name_surname@mail.com]")
@@ -904,47 +907,151 @@ def details_error_check(master, fname, sname, email, cell):
                                        "Contact number must be 10 digits.")
         else:
             Reg_details.append(cell)
-            print(Reg_details)
 
         master.switch_frame(RegisterPageID)
     else:
 
         messagebox.showerror("Missing field(s)",
-                             "Please ensure that no fields are left blank")
+                             "Please ensure that no field(s) is/are left blank.")
 
 
 def id_error_check(master, id):
     global Reg_id
     Reg_id = ""
-    list_id = []
+
     # Check if id is blank
     if id:
         if not id.isdigit():
             raise messagebox.showerror("Invalid ID entry",
-                                       "ID field can only contain digits\n [Example: 9202204645082]")
+                                       "ID field can only contain digits.\n "
+                                       "[Example: 9202204645082]")
+        # Check if the size of the id is valid
         elif len(id) != 13:
             raise messagebox.showerror("Invalid ID entry",
-                                       "Please ensure that the ID field is 13 digits\n [Example: 9202204645082]")
+                                       "Please ensure that the ID field is 13 digits.\n "
+                                       "[Example: 9202204645082]")
 
+        # Check if the date is valid
+        elif not id_date_check(id):
+            raise messagebox.showerror("Invalid ID entry",
+                                       "Please ensure that the first 6 digits of the ID is a valid birth date.\n "
+                                       "Remember, you must be 18 years or older to register.\n"
+                                       "[Example: 9202204645082]")
+
+        # Check if the 11th digit is valid
+        elif id[10] != "1" and id[10] != "0":
+            raise messagebox.showerror("Invalid ID entry",
+                                       "The 11th digit can only be 0 or 1.\n"
+                                       "0: SA citizen.\n"
+                                       "1: Permanent resident\n"
+                                       "[Example: 9202204645082]")
+
+        # Checksum digit check just to ensure that the ID is valid
+        elif luhn_validator.validate(id):
+            raise messagebox.showerror("Invalid ID entry",
+                                       "Please ensure that the ID field was correctly inputted\n"
+                                       "[Example: 9202204645082]")
+        else:
+            Reg_id = id
+            master.switch_frame(RegisterPageAddress)
     else:
         messagebox.showerror("Missing field",
-                             "Please ensure that the ID field is not left blank")
+                             "Please ensure that the ID field is not left blank.")
+
+
+def id_date_check(id):
+    str_date = ""
+    for x in range(len(id) - 7):  # Populates list with the first six digits of the ID
+        str_date = str_date + id[x]
+
+    year = int(str_date[0] + str_date[1])
+    month = int(str_date[2] + str_date[3])
+    day = int(str_date[4] + str_date[5])
+
+    if year >= 23:
+        year = year + 1900  # Places the year value into 1900 range.
+        # Anyone older than 99 from this year 2022 will be classified as well.
+        # Someone older than 99 in the year 2022 cannot be registered. :(
+    else:
+        year = year + 2000  # Places the year value into the 2000 range
+    if int(date.today().year) - 18 <= year:  # If the year value is in the range of 18 years from the current year,
+        # it becomes invalid
+        return False
+    try:
+        datetime.date(year, month, day)  # Checks if the date is a valid date
+        return True
+    except ValueError:
+        return False
 
 
 def address_error_check(master, street, city, state, post):
-    pass
+    global Reg_address
+    Reg_address = []
+    if street and city and state and post:
+
+        # Allows all letters, numbers and spaces in street field
+        if re.match('^[A-zÀ-ÿ0-9 ]*$', street):
+            Reg_address.append(street)
+        else:
+            raise messagebox.showerror("Invalid Street entry",
+                                       "No special characters allowed in Street field.")
+
+        # Allows letter and spaces in city field
+        if re.match('^[A-zÀ-ÿ ]*$', city):
+            Reg_address.append(city.capitalize())
+        else:
+            raise messagebox.showerror("Invalid City entry",
+                                       "No special characters or numbers allowed in City field.")
+
+        # Checks if the user changed the default state of the option menu
+        if state == "Select an option":
+            raise messagebox.showerror("No State selected",
+                                       "Click on the drop down list to select your state.")
+        else:
+            Reg_address.append(state)
+
+        # Checks that the postal number is valid
+        if not post.isdigit():
+            raise messagebox.showerror("Invalid Postal code entry",
+                                       "Postal code may only consist of 4 digits.")
+        elif len(post) > 4:
+            raise messagebox.showerror("Invalid Postal code entry",
+                                       "Postal code may only consist of 4 digits.")
+        else:
+            Reg_address.append(post)
+
+        master.switch_frame(RegisterPageAuth)
+
+    else:
+        messagebox.showerror("Missing field(s)",
+                             "Please ensure that no field(s) is/are left blank.")
 
 
 def auth_error_check(master, username, password):
-    pass
+    global Reg_auth
+    Reg_auth = []
+    if username and password:
 
+        # Allows letters, numbers and underscore in username. No special characters or spaces
+        if re.match('^[A-z0-9_ ]*$', username):
+            Reg_auth.append(username)
+        else:
+            raise messagebox.showerror("Invalid Username entry",
+                                       "No special characters or spaces allowed in Username entry."
+                                       "\n[Example: tony_stark7])")
+
+
+
+    else:
+        messagebox.showerror("Missing field(s)",
+                             "Please ensure that no field(s) is/are left blank.")
 
 def cancel_register(master):
     # Variables made empty with the intention of clearing the values from the registration page entries
     global Reg_details, Reg_id, Reg_address, Reg_auth
     Reg_details = ["", "", "", ""]
     Reg_id = ""
-    Reg_address = ["", "", "", ""]
+    Reg_address = ["", "", "WC", ""]
     Reg_auth = ["", ""]
     master.switch_frame(LoginPage)
 
