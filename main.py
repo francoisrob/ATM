@@ -38,7 +38,7 @@ from PIL import Image, ImageTk
 import mysql.connector
 from mysql.connector import errorcode
 
-Version = 'v0.818'
+Version = 'v0.82'
 exchange_data = []
 UserID = ''
 UserData = []
@@ -1062,8 +1062,6 @@ class MainMenu(ttk.Frame):
             self._panel.destroy()
         self._panel = new_panel
         self._panel.pack()
-        MainMenu.update(self)
-        print(self.winfo_reqwidth(), self.winfo_reqheight())
 
 
 class AccountsPanel(ttk.Frame):
@@ -1407,12 +1405,12 @@ class PaymentsPanel(ttk.Frame):
         cbb_from['values'] = ('Credit', 'Debit', 'Savings')
 
         ttk.Label(self.pay_panel,
-                  text='Recipient username:').grid(row=2,
-                                                   column=0,
-                                                   sticky='e')
+                  text='Recipient Account ID:').grid(row=2,
+                                                     column=0,
+                                                     sticky='e')
         # recipient Entry
         entry_to = ttk.Entry(self.pay_panel,
-                             width=20)
+                             width=15)
         entry_to.grid(row=2,
                       column=1,
                       padx=10,
@@ -1530,7 +1528,7 @@ def db_connect():
 def exchangeapi(currency):
     url = 'https://cdn.jsdelivr.net/gh/fawazahmed0/currency-api@1/latest/currencies/' + currency + '.json'
     try:
-        r = requests.get(url=url, timeout=1)
+        r = requests.get(url=url, timeout=3)
         data = r.json()[currency]
         exchange_data.append("{:.3f}".format(data['cny']))
         exchange_data.append("{:.3f}".format(data['jpy']))
@@ -1590,21 +1588,84 @@ def fetchAccounts():
             CardType[0][2] = AccountsData[y][0]
 
 
-def pay(account, username, own_reference, recipient_reference, amount):
+def pay(account, userid, own_reference, recipient_reference, amount):
+    valid = False
+    exists = False
+    user = None
+    userdata = None
     if not account:
-        messagebox.showerror('Invalid Input', 'Please choose an account to use.')
-    elif not username:
-        messagebox.showerror('Invalid Input', 'Please type a username.')
+        messagebox.showerror('Invalid Account', 'Please choose an account to use.')
+    elif not userid:
+        messagebox.showerror('Invalid Recipient ID', 'Please type a recipient ID.')
     elif not own_reference:
-        messagebox.showerror('Invalid Input', 'Please add an own reference.')
+        messagebox.showerror('Invalid Reference', 'Please add an own reference.')
     elif not recipient_reference:
-        messagebox.showerror('Invalid Input', 'Please add a recipient reference.')
+        messagebox.showerror('Invalid Reference', 'Please add a recipient reference.')
     elif not amount:
-        messagebox.showerror('Invalid Input', 'Please add an amount.')
-    # elif not isinstance(amount, float):
-    #     messagebox.showerror('Invalid Input', 'Only numbers allowed in value')
+        messagebox.showerror('Invalid Amount', 'Please add an amount.')
     else:
-        print('Pass!')
+        try:
+            amount = float(amount)
+            valid = True
+        except ValueError:
+            messagebox.showerror('Invalid Amount', 'Amount can only be numbers\nPeriod as decimal seperator')
+        else:
+            try:
+                userid = int(userid)
+            except ValueError:
+                valid = False
+                messagebox.showerror('Invalid Input', 'Recipient ID can only be numbers')
+    if valid:
+        if account == 'Debit':
+            account = CardType[0][0]
+        elif account == 'Credit':
+            account = CardType[0][1]
+        else:
+            account = CardType[0][2]
+        for x in AccountsData:
+            if x[0] == account:
+                userdata = x
+                if amount > x[1]:
+                    valid = False
+                    messagebox.showerror('Insufficient Funds',
+                                         'The required funds are not available in the selected account')
+    if valid:
+        try:
+            db = db_connect()
+            db_cursor = db.cursor()
+            sql = 'SELECT * FROM db_atm.tbl_accounts WHERE acc_ID = %s'
+            val = (userid,)
+            db_cursor.execute(sql, val)
+            user = db_cursor.fetchone()
+            if not user:
+                messagebox.showerror('Invalid Recipient ID', 'The ID does not exist')
+            else:
+                exists = True
+                for x in CardType[0]:
+                    if x == user[0]:
+                        messagebox.showerror('Invalid Recipient ID', 'You cannot pay your own account')
+                        exists = False
+        except Exception as e:
+            messagebox.showerror('Error', 'An unknown error occured')
+            print(e)
+    if exists:
+        # Finalizing Payment
+        # user(102, Decimal('4400.05'), datetime.date(2010, 5, 3), 'd', 2, Decimal('0.00'))
+        # userdata(101, Decimal('24000.00'), datetime.date(2013, 3, 2), 'c', 1, Decimal('1000.00'))
+        own_amount = float(userdata[1]) - amount
+        recipient_amount = float(user[1]) + amount
+        print(own_amount, recipient_amount)
+        try:
+            # db = db_connect()
+            # db_cursor = db.cursor()
+            # sql = 'UPDATE db_atm.tbl_users SET password = %s WHERE user_id = %s'
+            # val = (own_amount,)
+            # db_cursor.execute(sql, val)
+            #
+            # db.commit()
+            messagebox.showinfo('Succesfull', 'Payment done succesfully!')
+        except Exception as e:
+            print('AAAAAA', e)
 
 
 if __name__ == "__main__":
