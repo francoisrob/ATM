@@ -178,8 +178,8 @@ class LoginPage(ttk.Frame):
                                   width=29,
                                   style='Accent.TButton',
                                   command=lambda: Login_check(master,
-                                                        entry_username.get(),
-                                                        entry_password.get()))
+                                                              entry_username.get(),
+                                                              entry_password.get()))
         button_login.grid(row=7,
                           column=0,
                           padx=20,
@@ -797,7 +797,8 @@ class RegisterPageAuth(ttk.Frame):
                                      text='Confirm Authentication details',
                                      width=30,
                                      style='Accent.TButton',
-                                     command=lambda: auth_error_check(master, entry_username.get(), entry_password.get()))
+                                     command=lambda: auth_error_check(master, entry_username.get(),
+                                                                      entry_password.get()))
 
         button_register.grid(row=4,
                              column=2,
@@ -1039,12 +1040,28 @@ def auth_error_check(master, username, password):
             raise messagebox.showerror("Invalid Username entry",
                                        "No special characters or spaces allowed in Username entry."
                                        "\n[Example: tony_stark7])")
+        # Password must be 8 or more characters
+        if len(password) < 8:
+            raise messagebox.showerror("Invalid Password entry",
+                                       "Password must be 8 or more characters long")
 
+        # Password must contain |one uppercase, one lowercase, one number, one special character|
+        if re.match("^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?[#?!@$%^&*-]).{8,}$", password):
+            Reg_auth.append(password)
+        else:
+            raise messagebox.showerror("Invalid Password entry",
+                                       "Password must contain:\n"
+                                       "* an uppercase letter\n"
+                                       "* a lowercase letter\n"
+                                       "* a numeric character\n"
+                                       "* a special character\n"
+                                       "[Example: Ir0nman!])")
 
-
+        master.switch_frame(RegisterPageFinal)
     else:
         messagebox.showerror("Missing field(s)",
                              "Please ensure that no field(s) is/are left blank.")
+
 
 def cancel_register(master):
     # Variables made empty with the intention of clearing the values from the registration page entries
