@@ -993,7 +993,6 @@ def ForgotPass(master, username, password, vpassword, email):
 class MainMenu(ttk.Frame):
     def __init__(self, master):
         ttk.Frame.__init__(self, master)
-
         # Gui Creation
         # Center Widget
         self.main_frame = ttk.Frame(self)
@@ -1064,7 +1063,7 @@ class MainMenu(ttk.Frame):
         self._panel = new_panel
         self._panel.pack()
         MainMenu.update(self)
-        # print(self.winfo_reqwidth(), self.winfo_reqheight())
+        print(self.winfo_reqwidth(), self.winfo_reqheight())
 
 
 class AccountsPanel(ttk.Frame):
@@ -1241,42 +1240,52 @@ class CardsPanel(ttk.Frame):
 class PaymentsPanel(ttk.Frame):
     def __init__(self, master):
         ttk.Frame.__init__(self, master)
-
+        self._payments = None
         # Gui Creation
-        self.payments_panel = ttk.Frame(self,
-                                        style='Card.TFrame')
-        self.payments_panel.grid()
+        self.bottom_panel = ttk.Frame(self,
+                                      width=800,
+                                      height=600)
+        self.bottom_panel.grid()
+        self.bottom_panel.grid_propagate()
+
+        self.transfer_panel = ttk.Frame(self.bottom_panel)
+        # self.transfer_panel.pack()
+        self.pay_panel = ttk.Frame(self.bottom_panel)
+        # self.pay_panel.pack()
+        self.payments_panel = ttk.Frame(self.bottom_panel, style='Card.TFrame')
+        self.payments_panel.pack()
         self.canvas = tk.Canvas(self.payments_panel,
                                 width=500,
                                 height=590,
                                 borderwidth=0)
         self.frame = ttk.Frame(self.canvas)
-        self.scrollbard = ttk.Scrollbar(self.payments_panel,
-                                        orient='vertical',
-                                        command=self.canvas.yview)
-        self.canvas.config(yscrollcommand=self.scrollbard.set)
+        self.scrollboard = ttk.Scrollbar(self.payments_panel,
+                                         orient='vertical',
+                                         command=self.canvas.yview)
+        self.canvas.config(yscrollcommand=self.scrollboard.set)
         self.right_panel = ttk.Frame(self.payments_panel,
                                      style='Card.TFrame',
                                      width=284,
                                      height=600)
         self.right_panel.pack(side='right')
-        self.scrollbard.pack(side='right',
-                             fill='y',
-                             pady=2)
+        self.scrollboard.pack(side='right',
+                              fill='y',
+                              pady=2)
         self.canvas.pack(side='left',
                          fill='both',
                          expand=True,
-                         pady=1,
-                         padx=1)
-        self.canvas.create_window((1, 1),
+                         padx=1,
+                         pady=1)
+        self.canvas.create_window((0, 0),
                                   window=self.frame,
-                                  anchor='nw',
+                                  anchor='n',
                                   tags='self.frame')
         self.frame.bind('<Configure>',
                         self.onFrameConfigure)
         self.header = ttk.Frame(self.frame)
         self.header.pack(side='top')
         self.pay_button = ttk.Button(self.header,
+                                     command=self.showpay,
                                      text='Pay')
         self.pay_button.grid(row=0,
                              column=0,
@@ -1352,9 +1361,141 @@ class PaymentsPanel(ttk.Frame):
                        sticky='e',
                        padx=10)
 
+    def update_values(self):
+        for x in self.receipt_frame.winfo_children():
+            x.destroy()
+        self.populate()
+
     def onFrameConfigure(self, x):
         self.canvas.configure(scrollregion=self.canvas.bbox('all'))
         return x
+
+    def showpay(self):
+        self.payments_panel.pack_forget()
+        self.pay_panel.configure(width=800, height=600, style='Card.TFrame')
+        rightpanel = ttk.Frame(self.pay_panel,
+                               style='Card.TFrame',
+                               width=300,
+                               height=600)
+        rightpanel.grid(row=0,
+                        column=3,
+                        rowspan=12)
+        rightpanel.grid_propagate(False)
+        ttk.Label(self.pay_panel,
+                  text='Pay beneficiary',
+                  font=('Open Sans', 20)).grid(row=0,
+                                               column=0,
+                                               padx=152,
+                                               pady=(30, 50),
+                                               columnspan=2)
+        ttk.Label(self.pay_panel,
+                  text='From:').grid(row=1,
+                                     column=0,
+                                     pady=(0, 5),
+                                     sticky='e')
+        value = tk.StringVar()
+        # From Combobox
+        cbb_from = ttk.Combobox(self.pay_panel,
+                                textvariable=value,
+                                width=20)
+        cbb_from.grid(row=1,
+                      column=1,
+                      padx=10,
+                      pady=(0, 5),
+                      sticky='w')
+        cbb_from['state'] = 'readonly'
+        cbb_from['values'] = ('Credit', 'Debit', 'Savings')
+
+        ttk.Label(self.pay_panel,
+                  text='Recipient username:').grid(row=2,
+                                                   column=0,
+                                                   sticky='e')
+        # recipient Entry
+        entry_to = ttk.Entry(self.pay_panel,
+                             width=20)
+        entry_to.grid(row=2,
+                      column=1,
+                      padx=10,
+                      sticky='w')
+        # Own Reference
+        ttk.Label(self.pay_panel,
+                  text='Own Reference').grid(row=3,
+                                             column=0,
+                                             pady=(60, 5),
+                                             sticky='e')
+        entry_own_ref = ttk.Entry(self.pay_panel,
+                                  width=30)
+        entry_own_ref.grid(row=3,
+                           column=1,
+                           padx=10,
+                           pady=(60, 5),
+                           sticky='w')
+        # Recipient reference
+        ttk.Label(self.pay_panel,
+                  text='Recipient Reference').grid(row=4,
+                                                   column=0,
+                                                   sticky='e')
+        entry_recipient_ref = ttk.Entry(self.pay_panel,
+                                        width=30)
+        entry_recipient_ref.grid(row=4,
+                                 column=1,
+                                 padx=10,
+                                 sticky='w')
+        # Value Entry
+        ttk.Label(self.pay_panel,
+                  text='Enter Amount:').grid(row=5,
+                                             column=0,
+                                             pady=(80, 0),
+                                             sticky='e')
+        value_entry = ttk.Entry(self.pay_panel,
+                                width=15)
+        value_entry.grid(row=5,
+                         column=1,
+                         padx=10,
+                         pady=(80, 0),
+                         sticky='w')
+        back_button = ttk.Button(self.pay_panel,
+                                 width=25,
+                                 text='Back',
+                                 command=lambda: self.showpayment(1))
+        back_button.grid(row=6,
+                         column=0,
+                         pady=(60, 0),
+                         padx=(20, 0),
+                         sticky='e')
+        pay_button = ttk.Button(self.pay_panel,
+                                width=25,
+                                text='Pay',
+                                style='Accent.TButton',
+                                command=lambda: self.showpayment(1))
+        pay_button.grid(row=6,
+                        padx=20,
+                        pady=(60, 0),
+                        sticky='w',
+                        column=1)
+        self.pay_panel.pack_propagate(False)
+        self.pay_panel.pack()
+        self.update()
+        print(self.winfo_reqwidth(), self.winfo_reqheight())
+
+    def showpayment(self, x):
+        if x == 1:
+            self.pay_panel.pack_forget()
+            for y in self.pay_panel.winfo_children():
+                y.destroy()
+        else:
+            self.transfer_panel.pack_forget()
+        self.payments_panel.pack()
+        self.update_values()
+
+
+class TransferPanel(ttk.Frame):
+    def __init__(self, master):
+        ttk.Frame.__init__(self, master)
+        # Gui Creation
+        self.cards_panel = ttk.Frame(self, width=800, height=600, style="Card.TFrame")
+        self.cards_panel.grid()
+        self.cards_panel.grid_propagate(False)
 
 
 def db_connect():
