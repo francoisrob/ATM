@@ -44,7 +44,7 @@ UserID = ''
 UserData = []
 TransactionData = []
 AccountsData = []
-CardType = ['', '', '']
+CardType = [['', '', ''], ['Debit', 'Credit', 'Savings']]
 pyglet.font.add_file('theme/OpenSans.ttf')
 
 
@@ -1249,11 +1249,10 @@ class PaymentsPanel(ttk.Frame):
         self.bottom_panel.grid_propagate()
 
         self.transfer_panel = ttk.Frame(self.bottom_panel)
-        # self.transfer_panel.pack()
         self.pay_panel = ttk.Frame(self.bottom_panel)
-        # self.pay_panel.pack()
+
         self.payments_panel = ttk.Frame(self.bottom_panel, style='Card.TFrame')
-        self.payments_panel.pack()
+        # self.payments_panel.pack()
         self.canvas = tk.Canvas(self.payments_panel,
                                 width=500,
                                 height=590,
@@ -1310,6 +1309,7 @@ class PaymentsPanel(ttk.Frame):
                                        style='Card.TFrame')
         self.receipt_frame.pack(side='top')
         self.populate()
+        self.payments_panel.pack()
 
     def populate(self):
         tags = len(TransactionData)
@@ -1330,9 +1330,9 @@ class PaymentsPanel(ttk.Frame):
                        column=0,
                        sticky='news',
                        padx=10)
-            if TransactionData[a][4] == CardType[0]:
+            if TransactionData[a][4] == CardType[0][0]:
                 text = 'Debit'
-            elif TransactionData[a][4] == CardType[1]:
+            elif TransactionData[a][4] == CardType[0][1]:
                 text = 'Credit'
             else:
                 text = 'Savings'
@@ -1424,7 +1424,7 @@ class PaymentsPanel(ttk.Frame):
                                              pady=(60, 5),
                                              sticky='e')
         entry_own_ref = ttk.Entry(self.pay_panel,
-                                  width=30)
+                                  width=20)
         entry_own_ref.grid(row=3,
                            column=1,
                            padx=10,
@@ -1436,7 +1436,7 @@ class PaymentsPanel(ttk.Frame):
                                                    column=0,
                                                    sticky='e')
         entry_recipient_ref = ttk.Entry(self.pay_panel,
-                                        width=30)
+                                        width=20)
         entry_recipient_ref.grid(row=4,
                                  column=1,
                                  padx=10,
@@ -1467,7 +1467,11 @@ class PaymentsPanel(ttk.Frame):
                                 width=25,
                                 text='Pay',
                                 style='Accent.TButton',
-                                command=lambda: self.showpayment(1))
+                                command=lambda: pay(cbb_from.get(),
+                                                    entry_to.get(),
+                                                    entry_own_ref.get(),
+                                                    entry_recipient_ref.get(),
+                                                    value_entry.get()))
         pay_button.grid(row=6,
                         padx=20,
                         pady=(60, 0),
@@ -1475,8 +1479,6 @@ class PaymentsPanel(ttk.Frame):
                         column=1)
         self.pay_panel.pack_propagate(False)
         self.pay_panel.pack()
-        self.update()
-        print(self.winfo_reqwidth(), self.winfo_reqheight())
 
     def showpayment(self, x):
         if x == 1:
@@ -1581,11 +1583,28 @@ def fetchAccounts():
     # 012
     for y in range(0, x):
         if AccountsData[y][3] == 'd':
-            CardType[0] = AccountsData[y][0]
+            CardType[0][0] = AccountsData[y][0]
         elif AccountsData[y][3] == 'c':
-            CardType[1] = AccountsData[y][0]
+            CardType[0][1] = AccountsData[y][0]
         else:
-            CardType[2] = AccountsData[y][0]
+            CardType[0][2] = AccountsData[y][0]
+
+
+def pay(account, username, own_reference, recipient_reference, amount):
+    if not account:
+        messagebox.showerror('Invalid Input', 'Please choose an account to use.')
+    elif not username:
+        messagebox.showerror('Invalid Input', 'Please type a username.')
+    elif not own_reference:
+        messagebox.showerror('Invalid Input', 'Please add an own reference.')
+    elif not recipient_reference:
+        messagebox.showerror('Invalid Input', 'Please add a recipient reference.')
+    elif not amount:
+        messagebox.showerror('Invalid Input', 'Please add an amount.')
+    # elif not isinstance(amount, float):
+    #     messagebox.showerror('Invalid Input', 'Only numbers allowed in value')
+    else:
+        print('Pass!')
 
 
 if __name__ == "__main__":
