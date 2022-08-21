@@ -903,7 +903,7 @@ def details_error_check(master, fname, sname, email, cell):
             raise messagebox.showerror("Invalid Email name entry",
                                        "Email must be less than 45 characters.")
         # Regex for email allows one @ and one dot (co.za will not work)
-        elif re.match('^[a-z0-9]+[\._]?[a-z0-9]+[@]\w+[.]\w{2,3}$', email):
+        elif re.match('^[a-z0-9] + [\._] ? [a-z0-9] + [@]\w + [.] \w{2,3}$', email):
             Reg_details.append(email)
         else:
             raise messagebox.showerror("Invalid Email entry",
@@ -1482,7 +1482,6 @@ class CardsPanel(ttk.Frame):
         self.cards_panel.grid()
         self.cards_panel.grid_propagate(False)
 
-
         self.credit_panel = ttk.Frame(self.cards_panel,
                                       width=600,
                                       height=600,
@@ -1549,15 +1548,13 @@ class CardsPanel(ttk.Frame):
                        pady=60,
                        sticky='NW')
 
-        self.txt3 = ttk.Label(button_3, text="Debit Card\nYour balance: $200000 ", font=('Arial  bold', 15), background='#3895D3')
+        self.txt3 = ttk.Label(button_3, text="Debit Card\nYour balance: $200000 ", font=('Arial  bold', 15),
+                              background='#3895D3')
         self.txt3.grid(row=0,
                        column=0,
                        padx=220,
                        pady=50,
                        )
-
-
-
 
 
 # class CreditCard(ttk.Frame):
@@ -1581,10 +1578,8 @@ class CardsPanel(ttk.Frame):
 #
 #         self.optionmenu_1 = customtkinter.CTkOptionMenu(master=self.card_frame ,
 #                                                         values=["Change Pin", "Set Limit", "Stop Card"],)
-#                                                         # command=self.change_appearance_mode)
+#                                                         # (command=self.change_appearance_mode )
 #         self.optionmenu_1.grid(row=10, column=0, pady=10, padx=20, sticky="w")
-
-
 
 
 class PaymentsPanel(ttk.Frame):
@@ -1697,14 +1692,14 @@ class PaymentsPanel(ttk.Frame):
                       column=0,
                       sticky='n',
                       padx=10)
-            date = ttk.Label(receipt,
-                             text=TransactionData[a][3],
-                             font=('Open Sans Light', 8),
-                             width=20)
-            date.grid(row=0,
-                      column=1,
-                      sticky='e',
-                      padx=10)
+            lbldate = ttk.Label(receipt,
+                                text=TransactionData[a][3],
+                                font=('Open Sans Light', 8),
+                                width=20)
+            lbldate.grid(row=0,
+                         column=1,
+                         sticky='e',
+                         padx=10)
             value = ttk.Label(receipt,
                               text="R {:,.2f}".format(TransactionData[a][2]),
                               width=10,
