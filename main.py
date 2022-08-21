@@ -1931,11 +1931,11 @@ def pay(account, userid, own_reference, recipient_reference, amount):
             add_transaction = '''INSERT INTO db_atm.tbl_transactions 
             (description, amount, date, tbl_accounts_acc_ID, tbl_accounts_tbl_users_user_id) 
             VALUES (%s, %s, %s, %s, %s) '''
-            date = datetime.date.today()
+            transaction_date = datetime.date.today()
             own_amount = amount * -1
             val = (own_reference, own_amount, date, userdata[0], userdata[4])
             db_cursor.execute(add_transaction, val)
-            val = (recipient_reference, amount, date, user[0], user[4])
+            val = (recipient_reference, amount, transaction_date, user[0], user[4])
             db_cursor.execute(add_transaction, val)
             db.commit()
             messagebox.showinfo('Succesfull', 'Payment done succesfully!')
