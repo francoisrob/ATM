@@ -28,7 +28,6 @@ The code to switch between different frames,
 source: https://tinyurl.com/bdedjxcy
 
 """
-
 import tkinter as tk
 import tkinter.ttk as ttk
 import tkinter.messagebox as messagebox
@@ -350,95 +349,95 @@ class RegisterPageDetails(ttk.Frame):
 
         # Header Text
         header_label = ttk.Label(register_frame,
-                                      text='Input your details', font=('Open Sans', 24))
+                                 text='Input your details', font=('Open Sans', 24))
         header_label.grid(row=1,
-                               column=0,
-                               padx=20,
-                               pady=(0, 15),
-                               sticky='w',
-                               columnspan=2)
+                          column=0,
+                          padx=20,
+                          pady=(0, 15),
+                          sticky='w',
+                          columnspan=2)
 
         step_label = ttk.Label(register_frame,
-                                    text='Step 1 of 4', font=('Open Sans', 24))
+                               text='Step 1 of 4', font=('Open Sans', 24))
         step_label.grid(row=1,
-                             column=2,
-                             padx=20,
-                             pady=(0, 15),
-                             sticky='w', )
+                        column=2,
+                        padx=20,
+                        pady=(0, 15),
+                        sticky='w', )
 
         # Input labels and entries
         # First name
         fname_label = ttk.Label(register_frame,
-                                     text='First name')
+                                text='First name')
         fname_label.grid(row=2,
-                              column=0,
-                              sticky='w',
-                              padx=20)
+                         column=0,
+                         sticky='w',
+                         padx=20)
         entry_fname = ttk.Entry(register_frame,
-                                     justify='left',
-                                     width=22,
-                                     style='Custom.TEntry')
+                                justify='left',
+                                width=22,
+                                style='Custom.TEntry')
 
         entry_fname.grid(row=3,
-                              column=0,
-                              padx=20,
-                              pady=(0, 10),
-                              sticky='w')
+                         column=0,
+                         padx=20,
+                         pady=(0, 10),
+                         sticky='w')
         entry_fname.focus_set()
         entry_fname.insert(0, Reg_details[0])
 
         # Surname
         sname_label = ttk.Label(register_frame,
-                                     text='Last name',
-                                     )
+                                text='Last name',
+                                )
         sname_label.grid(row=2,
-                              column=1,
-                              sticky='w',
-                              padx=20)
+                         column=1,
+                         sticky='w',
+                         padx=20)
         entry_sname = ttk.Entry(register_frame,
-                                     justify='left',
-                                     width=22,
-                                     style='Custom.TEntry')
+                                justify='left',
+                                width=22,
+                                style='Custom.TEntry')
         entry_sname.grid(row=3,
-                              column=1,
-                              padx=20,
-                              pady=(0, 10),
-                              sticky='w')
+                         column=1,
+                         padx=20,
+                         pady=(0, 10),
+                         sticky='w')
 
         entry_sname.insert(0, Reg_details[1])
 
         # Email
         email_label = ttk.Label(register_frame,
-                                     text='E-mail')
+                                text='E-mail')
         email_label.grid(row=4,
-                              column=0,
-                              sticky='w',
-                              padx=20)
+                         column=0,
+                         sticky='w',
+                         padx=20)
         entry_email = ttk.Entry(register_frame,
-                                     justify='left',
-                                     width=22)
+                                justify='left',
+                                width=22)
         entry_email.grid(row=5,
-                              column=0,
-                              padx=20,
-                              sticky='w',
-                              pady=(0, 10))
+                         column=0,
+                         padx=20,
+                         sticky='w',
+                         pady=(0, 10))
         entry_email.insert(0, Reg_details[2])
 
         # Cell num
         cellnum_label = ttk.Label(register_frame,
-                                       text='Contact Number')
+                                  text='Contact Number')
         cellnum_label.grid(row=4,
-                                column=1,
-                                sticky='w',
-                                padx=20)
+                           column=1,
+                           sticky='w',
+                           padx=20)
         entry_cellnum = ttk.Entry(register_frame,
-                                       justify='left',
-                                       width=15)
+                                  justify='left',
+                                  width=15)
         entry_cellnum.grid(row=5,
-                                column=1,
-                                padx=20,
-                                sticky='w',
-                                pady=(0, 10))
+                           column=1,
+                           padx=20,
+                           sticky='w',
+                           pady=(0, 10))
 
         entry_cellnum.insert(0, Reg_details[3])
 
@@ -500,21 +499,21 @@ class RegisterPageID(ttk.Frame):
 
         # Header Text
         header_label = ttk.Label(register_frame,
-                                      text='Identification number', font=('Open Sans', 24))
+                                 text='Identification number', font=('Open Sans', 24))
         header_label.grid(row=1,
-                               column=0,
-                               padx=20,
-                               pady=(0, 15),
-                               sticky='w',
-                               columnspan=2)
+                          column=0,
+                          padx=20,
+                          pady=(0, 15),
+                          sticky='w',
+                          columnspan=2)
 
         step_label = ttk.Label(register_frame,
-                                    text='Step 2 of 4', font=('Open Sans', 24))
+                               text='Step 2 of 4', font=('Open Sans', 24))
         step_label.grid(row=1,
-                             column=2,
-                             padx=20,
-                             pady=(0, 15),
-                             sticky='w', )
+                        column=2,
+                        padx=20,
+                        pady=(0, 15),
+                        sticky='w', )
 
         # Input labels and entries
         # ID num
@@ -591,21 +590,21 @@ class RegisterPageAddress(ttk.Frame):
 
         # Header Text
         header_label = ttk.Label(register_frame,
-                                      text='Billing Address', font=('Open Sans', 24))
+                                 text='Billing Address', font=('Open Sans', 24))
         header_label.grid(row=1,
-                               column=0,
-                               padx=20,
-                               pady=(0, 15),
-                               sticky='w',
-                               columnspan=2)
+                          column=0,
+                          padx=20,
+                          pady=(0, 15),
+                          sticky='w',
+                          columnspan=2)
 
         step_label = ttk.Label(register_frame,
-                                    text='Step 3 of 4', font=('Open Sans', 24))
+                               text='Step 3 of 4', font=('Open Sans', 24))
         step_label.grid(row=1,
-                             column=2,
-                             padx=20,
-                             pady=(0, 15),
-                             sticky='w', )
+                        column=2,
+                        padx=20,
+                        pady=(0, 15),
+                        sticky='w', )
 
         # Input labels and entries
         # Street
@@ -736,21 +735,21 @@ class RegisterPageAuth(ttk.Frame):
 
         # Header Text
         header_label = ttk.Label(register_frame,
-                                      text='Authentication details', font=('Open Sans', 24))
+                                 text='Authentication details', font=('Open Sans', 24))
         header_label.grid(row=1,
-                               column=0,
-                               padx=20,
-                               pady=(0, 15),
-                               sticky='w',
-                               columnspan=2)
+                          column=0,
+                          padx=20,
+                          pady=(0, 15),
+                          sticky='w',
+                          columnspan=2)
 
         step_label = ttk.Label(register_frame,
-                                    text='Step 4 of 4', font=('Open Sans', 24))
+                               text='Step 4 of 4', font=('Open Sans', 24))
         step_label.grid(row=1,
-                             column=2,
-                             padx=20,
-                             pady=(0, 15),
-                             sticky='w', )
+                        column=2,
+                        padx=20,
+                        pady=(0, 15),
+                        sticky='w', )
 
         # Input labels and entries
         # Username
@@ -1089,7 +1088,7 @@ def register_insert():
     db = db_connect()
     db_cursor = db.cursor()
     sql = "INSERT INTO db_atm.tbl_users " \
-          "(fname, sname, street , city, state, post, cell_num, email, id_num, username, password )"\
+          "(fname, sname, street , city, state, post, cell_num, email, id_num, username, password )" \
           "VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s);"
     val = (Reg_details[0], Reg_details[1], Reg_address[0], Reg_address[1], Reg_address[2], Reg_address[3],
            Reg_details[3], Reg_details[2], Reg_id, Reg_auth[0], Reg_auth[1])
@@ -1542,6 +1541,7 @@ class PaymentsPanel(ttk.Frame):
         self.header.pack(side='top')
         self.pay_button = ttk.Button(self.header,
                                      command=self.showpay,
+                                     style='Accent.TButton',
                                      text='Pay')
         self.pay_button.grid(row=0,
                              column=0,
@@ -1549,6 +1549,7 @@ class PaymentsPanel(ttk.Frame):
                              pady=40,
                              sticky='e')
         self.transfer_button = ttk.Button(self.header,
+                                          style='Accent.TButton',
                                           text='Transfer')
         self.transfer_button.grid(row=0,
                                   column=1,
@@ -1569,6 +1570,7 @@ class PaymentsPanel(ttk.Frame):
         self.payments_panel.pack()
 
     def populate(self):
+        fetchTransactions()
         tags = len(TransactionData)
         if tags > 30:
             tags = 30
@@ -1724,11 +1726,11 @@ class PaymentsPanel(ttk.Frame):
                                 width=25,
                                 text='Pay',
                                 style='Accent.TButton',
-                                command=lambda: pay(cbb_from.get(),
-                                                    entry_to.get(),
-                                                    entry_own_ref.get(),
-                                                    entry_recipient_ref.get(),
-                                                    value_entry.get()))
+                                command=lambda: self.pay_money(cbb_from.get(),
+                                                               entry_to.get(),
+                                                               entry_own_ref.get(),
+                                                               entry_recipient_ref.get(),
+                                                               value_entry.get()))
         pay_button.grid(row=6,
                         padx=20,
                         pady=(60, 0),
@@ -1746,6 +1748,10 @@ class PaymentsPanel(ttk.Frame):
             self.transfer_panel.pack_forget()
         self.payments_panel.pack()
         self.update_values()
+
+    def pay_money(self, account, userid, own_reference, recipient_reference, amount):
+        if pay(account, userid, own_reference, recipient_reference, amount):
+            self.showpayment(1)
 
 
 class TransferPanel(ttk.Frame):
@@ -1766,8 +1772,8 @@ def db_connect():
         db = mysql.connector.connect(
             host="localhost",
             user="root",
-            password='12345678',
-            # password="toor",
+            # password='12345678',
+            password="toor",
             port="3306"
         )
         return db
@@ -1852,6 +1858,7 @@ def pay(account, userid, own_reference, recipient_reference, amount):
     exists = False
     user = None
     userdata = None
+    # Data verification
     if not account:
         messagebox.showerror('Invalid Account', 'Please choose an account to use.')
     elif not userid:
@@ -1892,9 +1899,9 @@ def pay(account, userid, own_reference, recipient_reference, amount):
         try:
             db = db_connect()
             db_cursor = db.cursor()
-            sql = 'SELECT * FROM db_atm.tbl_accounts WHERE acc_ID = %s'
+            check_id = 'SELECT * FROM db_atm.tbl_accounts WHERE acc_ID = %s'
             val = (userid,)
-            db_cursor.execute(sql, val)
+            db_cursor.execute(check_id, val)
             user = db_cursor.fetchone()
             if not user:
                 messagebox.showerror('Invalid Recipient ID', 'The ID does not exist')
@@ -1909,22 +1916,32 @@ def pay(account, userid, own_reference, recipient_reference, amount):
             print(e)
     if exists:
         # Finalizing Payment
-        # user(102, Decimal('4400.05'), datetime.date(2010, 5, 3), 'd', 2, Decimal('0.00'))
-        # userdata(101, Decimal('24000.00'), datetime.date(2013, 3, 2), 'c', 1, Decimal('1000.00'))
         own_amount = float(userdata[1]) - amount
         recipient_amount = float(user[1]) + amount
-        print(own_amount, recipient_amount)
         try:
-            # db = db_connect()
-            # db_cursor = db.cursor()
-            # sql = 'UPDATE db_atm.tbl_users SET password = %s WHERE user_id = %s'
-            # val = (own_amount,)
-            # db_cursor.execute(sql, val)
-            #
-            # db.commit()
+            # Update Account balances
+            update_amount = 'UPDATE db_atm.tbl_accounts SET acc_balance = %s WHERE acc_ID = %s'
+            val = (own_amount, userdata[0])
+            db = db_connect()
+            db_cursor = db.cursor()
+            db_cursor.execute(update_amount, val)
+            val = (recipient_amount, user[0])
+            db_cursor.execute(update_amount, val)
+            # Add transactions
+            add_transaction = '''INSERT INTO db_atm.tbl_transactions 
+            (description, amount, date, tbl_accounts_acc_ID, tbl_accounts_tbl_users_user_id) 
+            VALUES (%s, %s, %s, %s, %s) '''
+            date = datetime.date.today()
+            own_amount = amount * -1
+            val = (own_reference, own_amount, date, userdata[0], userdata[4])
+            db_cursor.execute(add_transaction, val)
+            val = (recipient_reference, amount, date, user[0], user[4])
+            db_cursor.execute(add_transaction, val)
+            db.commit()
             messagebox.showinfo('Succesfull', 'Payment done succesfully!')
+            return True
         except Exception as e:
-            print('AAAAAA', e)
+            print(e)
 
 
 if __name__ == "__main__":
