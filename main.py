@@ -42,7 +42,7 @@ from datetime import date
 import luhn_validator
 import customtkinter
 
-Version = 'v0.82'
+Version = 'v0.821'
 exchange_data = []
 UserID = ''
 UserData = []
