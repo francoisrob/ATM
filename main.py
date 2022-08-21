@@ -190,7 +190,7 @@ class LoginPage(ttk.Frame):
                                      text='Register',
                                      width=29,
                                      style='Panel.TButton',
-                                     command=lambda: master.switch_frame(RegisterPageAuth))
+                                     command=lambda: master.switch_frame(RegisterPageStart))
         button_register.grid(row=8,
                              padx=20,
                              pady=(0, 10),
@@ -349,18 +349,18 @@ class RegisterPageDetails(ttk.Frame):
                                                             sticky='n')
 
         # Header Text
-        self.header_label = ttk.Label(register_frame,
+        header_label = ttk.Label(register_frame,
                                       text='Input your details', font=('Open Sans', 24))
-        self.header_label.grid(row=1,
+        header_label.grid(row=1,
                                column=0,
                                padx=20,
                                pady=(0, 15),
                                sticky='w',
                                columnspan=2)
 
-        self.step_label = ttk.Label(register_frame,
+        step_label = ttk.Label(register_frame,
                                     text='Step 1 of 4', font=('Open Sans', 24))
-        self.step_label.grid(row=1,
+        step_label.grid(row=1,
                              column=2,
                              padx=20,
                              pady=(0, 15),
@@ -368,89 +368,89 @@ class RegisterPageDetails(ttk.Frame):
 
         # Input labels and entries
         # First name
-        self.fname_label = ttk.Label(register_frame,
+        fname_label = ttk.Label(register_frame,
                                      text='First name')
-        self.fname_label.grid(row=2,
+        fname_label.grid(row=2,
                               column=0,
                               sticky='w',
                               padx=20)
-        self.entry_fname = ttk.Entry(register_frame,
+        entry_fname = ttk.Entry(register_frame,
                                      justify='left',
                                      width=22,
                                      style='Custom.TEntry')
 
-        self.entry_fname.grid(row=3,
+        entry_fname.grid(row=3,
                               column=0,
                               padx=20,
                               pady=(0, 10),
                               sticky='w')
-        self.entry_fname.focus_set()
-        self.entry_fname.insert(0, Reg_details[0])
+        entry_fname.focus_set()
+        entry_fname.insert(0, Reg_details[0])
 
         # Surname
-        self.sname_label = ttk.Label(register_frame,
+        sname_label = ttk.Label(register_frame,
                                      text='Last name',
                                      )
-        self.sname_label.grid(row=2,
+        sname_label.grid(row=2,
                               column=1,
                               sticky='w',
                               padx=20)
-        self.entry_sname = ttk.Entry(register_frame,
+        entry_sname = ttk.Entry(register_frame,
                                      justify='left',
                                      width=22,
                                      style='Custom.TEntry')
-        self.entry_sname.grid(row=3,
+        entry_sname.grid(row=3,
                               column=1,
                               padx=20,
                               pady=(0, 10),
                               sticky='w')
 
-        self.entry_sname.insert(0, Reg_details[1])
+        entry_sname.insert(0, Reg_details[1])
 
         # Email
-        self.email_label = ttk.Label(register_frame,
+        email_label = ttk.Label(register_frame,
                                      text='E-mail')
-        self.email_label.grid(row=4,
+        email_label.grid(row=4,
                               column=0,
                               sticky='w',
                               padx=20)
-        self.entry_email = ttk.Entry(register_frame,
+        entry_email = ttk.Entry(register_frame,
                                      justify='left',
                                      width=22)
-        self.entry_email.grid(row=5,
+        entry_email.grid(row=5,
                               column=0,
                               padx=20,
                               sticky='w',
                               pady=(0, 10))
-        self.entry_email.insert(0, Reg_details[2])
+        entry_email.insert(0, Reg_details[2])
 
         # Cell num
-        self.cellnum_label = ttk.Label(register_frame,
+        cellnum_label = ttk.Label(register_frame,
                                        text='Contact Number')
-        self.cellnum_label.grid(row=4,
+        cellnum_label.grid(row=4,
                                 column=1,
                                 sticky='w',
                                 padx=20)
-        self.entry_cellnum = ttk.Entry(register_frame,
+        entry_cellnum = ttk.Entry(register_frame,
                                        justify='left',
                                        width=15)
-        self.entry_cellnum.grid(row=5,
+        entry_cellnum.grid(row=5,
                                 column=1,
                                 padx=20,
                                 sticky='w',
                                 pady=(0, 10))
 
-        self.entry_cellnum.insert(0, Reg_details[3])
+        entry_cellnum.insert(0, Reg_details[3])
 
         # Register button
         button_register = ttk.Button(register_frame,
                                      text='Confirm details',
                                      width=20,
                                      style='Accent.TButton',
-                                     command=lambda: details_error_check(master, self.entry_fname.get(),
-                                                                         self.entry_sname.get(),
-                                                                         self.entry_email.get(),
-                                                                         self.entry_cellnum.get()))
+                                     command=lambda: details_error_check(master, entry_fname.get(),
+                                                                         entry_sname.get(),
+                                                                         entry_email.get(),
+                                                                         entry_cellnum.get()))
         button_register.grid(row=6,
                              column=2,
                              padx=20,
@@ -499,18 +499,18 @@ class RegisterPageID(ttk.Frame):
                                                             sticky='n')
 
         # Header Text
-        self.header_label = ttk.Label(register_frame,
+        header_label = ttk.Label(register_frame,
                                       text='Identification number', font=('Open Sans', 24))
-        self.header_label.grid(row=1,
+        header_label.grid(row=1,
                                column=0,
                                padx=20,
                                pady=(0, 15),
                                sticky='w',
                                columnspan=2)
 
-        self.step_label = ttk.Label(register_frame,
+        step_label = ttk.Label(register_frame,
                                     text='Step 2 of 4', font=('Open Sans', 24))
-        self.step_label.grid(row=1,
+        step_label.grid(row=1,
                              column=2,
                              padx=20,
                              pady=(0, 15),
@@ -590,18 +590,18 @@ class RegisterPageAddress(ttk.Frame):
                                                             sticky='n')
 
         # Header Text
-        self.header_label = ttk.Label(register_frame,
+        header_label = ttk.Label(register_frame,
                                       text='Billing Address', font=('Open Sans', 24))
-        self.header_label.grid(row=1,
+        header_label.grid(row=1,
                                column=0,
                                padx=20,
                                pady=(0, 15),
                                sticky='w',
                                columnspan=2)
 
-        self.step_label = ttk.Label(register_frame,
+        step_label = ttk.Label(register_frame,
                                     text='Step 3 of 4', font=('Open Sans', 24))
-        self.step_label.grid(row=1,
+        step_label.grid(row=1,
                              column=2,
                              padx=20,
                              pady=(0, 15),
@@ -735,18 +735,18 @@ class RegisterPageAuth(ttk.Frame):
                                                             sticky='n')
 
         # Header Text
-        self.header_label = ttk.Label(register_frame,
+        header_label = ttk.Label(register_frame,
                                       text='Authentication details', font=('Open Sans', 24))
-        self.header_label.grid(row=1,
+        header_label.grid(row=1,
                                column=0,
                                padx=20,
                                pady=(0, 15),
                                sticky='w',
                                columnspan=2)
 
-        self.step_label = ttk.Label(register_frame,
+        step_label = ttk.Label(register_frame,
                                     text='Step 4 of 4', font=('Open Sans', 24))
-        self.step_label.grid(row=1,
+        step_label.grid(row=1,
                              column=2,
                              padx=20,
                              pady=(0, 15),
@@ -833,7 +833,7 @@ class RegisterPageAuth(ttk.Frame):
 class RegisterPageFinal(ttk.Frame):
     def __init__(self, master):
         ttk.Frame.__init__(self, master)
-
+        register_insert()
         # GUI creation
         # Center Widget
         register_frame = ttk.Frame(self)
@@ -846,17 +846,17 @@ class RegisterPageFinal(ttk.Frame):
                                                             pady=(20, 10),
                                                             padx=20,
                                                             sticky='n')
-
         # Header Text
-        self.header_label = ttk.Label(register_frame,
-                                      text='Your Registration was successful.\n \nPlease use your Username\nand '
-                                           'Password to login.', font=('Open Sans', 18))
-        self.header_label.grid(row=1,
-                               column=0,
-                               padx=20,
-                               pady=(0, 15),
-                               sticky='w',
-                               columnspan=2)
+        header_label = ttk.Label(register_frame,
+                                 text='Your Registration was successful.\n \nPlease use your Username\nand '
+                                      'Password to login.', font=('Open Sans', 18))
+
+        header_label.grid(row=1,
+                          column=0,
+                          padx=20,
+                          pady=(0, 15),
+                          sticky='w',
+                          columnspan=2)
 
         # Register button
         button_register = ttk.Button(register_frame,
@@ -878,22 +878,31 @@ def details_error_check(master, fname, sname, email, cell):
     Reg_details = []
     if fname and sname and email and cell:
 
+        if len(fname) > 45:
+            raise messagebox.showerror("Invalid First name entry",
+                                       "First name must be less than 45 characters.")
         # Allows all letters, spaces and hyphens
-        if re.match('^[A-zÀ-ÿ- ]*$', fname):
+        elif re.match('^[A-zÀ-ÿ- ]*$', fname):
             Reg_details.append(fname.capitalize())
         else:
             raise messagebox.showerror("Invalid First name entry",
                                        "No numbers or special characters allowed in First name field.")
 
+        if len(sname) > 45:
+            raise messagebox.showerror("Invalid Last name entry",
+                                       "Last name must be less than 45 characters.")
         # Allows all letters, spaces and hyphens
-        if re.match('^[A-zÀ-ÿ- ]*$', sname):
+        elif re.match('^[A-zÀ-ÿ- ]*$', sname):
             Reg_details.append(sname.capitalize())
         else:
             raise messagebox.showerror("Invalid Last name entry",
                                        "No numbers or special characters allowed in Last name field.")
 
+        if len(fname) > 45:
+            raise messagebox.showerror("Invalid Email name entry",
+                                       "Email must be less than 45 characters.")
         # Regex for email allows one @ and one dot (co.za will not work)
-        if re.match('^[a-z0-9]+[\._]?[a-z0-9]+[@]\w+[.]\w{2,3}$', email):
+        elif re.match('^[a-z0-9]+[\._]?[a-z0-9]+[@]\w+[.]\w{2,3}$', email):
             Reg_details.append(email)
         else:
             raise messagebox.showerror("Invalid Email entry",
@@ -990,6 +999,9 @@ def address_error_check(master, street, city, state, post):
     Reg_address = []
     if street and city and state and post:
 
+        if len(street) > 45:
+            raise messagebox.showerror("Invalid Street entry",
+                                       "Street must be less than 45 characters.")
         # Allows all letters, numbers and spaces in street field
         if re.match('^[A-zÀ-ÿ0-9 ]*$', street):
             Reg_address.append(street)
@@ -997,6 +1009,9 @@ def address_error_check(master, street, city, state, post):
             raise messagebox.showerror("Invalid Street entry",
                                        "No special characters allowed in Street field.")
 
+        if len(city) > 45:
+            raise messagebox.showerror("Invalid city entry",
+                                       "City must be less than 45 characters.")
         # Allows letter and spaces in city field
         if re.match('^[A-zÀ-ÿ ]*$', city):
             Reg_address.append(city.capitalize())
@@ -1033,6 +1048,9 @@ def auth_error_check(master, username, password):
     Reg_auth = []
     if username and password:
 
+        if len(username) > 45:
+            raise messagebox.showerror("Invalid Username entry",
+                                       "Username must be less than 45 characters.")
         # Allows letters, numbers and underscore in username. No special characters or spaces
         if re.match('^[A-z0-9_ ]*$', username):
             Reg_auth.append(username)
@@ -1040,13 +1058,17 @@ def auth_error_check(master, username, password):
             raise messagebox.showerror("Invalid Username entry",
                                        "No special characters or spaces allowed in Username entry."
                                        "\n[Example: tony_stark7])")
+
+        if len(password) > 45:
+            raise messagebox.showerror("Invalid Password entry",
+                                       "Password must be less than 45 characters.")
         # Password must be 8 or more characters
         if len(password) < 8:
             raise messagebox.showerror("Invalid Password entry",
                                        "Password must be 8 or more characters long")
 
         # Password must contain |one uppercase, one lowercase, one number, one special character|
-        if re.match("^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?[#?!@$%^&*-]).{8,}$", password):
+        elif re.match("^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?[#?!@$%^&*-]).{8,}$", password):
             Reg_auth.append(password)
         else:
             raise messagebox.showerror("Invalid Password entry",
@@ -1061,6 +1083,19 @@ def auth_error_check(master, username, password):
     else:
         messagebox.showerror("Missing field(s)",
                              "Please ensure that no field(s) is/are left blank.")
+
+
+def register_insert():
+    db = db_connect()
+    db_cursor = db.cursor()
+    sql = "INSERT INTO db_atm.tbl_users " \
+          "(fname, sname, street , city, state, post, cell_num, email, id_num, username, password )"\
+          "VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s);"
+    val = (Reg_details[0], Reg_details[1], Reg_address[0], Reg_address[1], Reg_address[2], Reg_address[3],
+           Reg_details[3], Reg_details[2], Reg_id, Reg_auth[0], Reg_auth[1])
+    db_cursor.execute(sql, val)
+    db.commit()
+    db.close()
 
 
 def cancel_register(master):
