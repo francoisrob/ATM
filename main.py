@@ -40,6 +40,7 @@ import re
 import datetime
 from datetime import date
 import luhn_validator
+import customtkinter
 
 Version = 'v0.82'
 exchange_data = []
@@ -105,7 +106,7 @@ class Application(tk.Tk):
 
 
 class LoginPage(ttk.Frame):
-    def __init__(self, master):
+    def __init__(self, master, button_login=None):
         ttk.Frame.__init__(self, master)
         # GUI creation
         # Center Widget
@@ -172,6 +173,7 @@ class LoginPage(ttk.Frame):
                           lambda e: master.switch_frame(ForgotPage))
 
         # Login in
+        assert isinstance(button_login, object)
         button_login = ttk.Button(login_frame,
                                   text='SIGN IN',
                                   width=29,
@@ -1463,34 +1465,126 @@ class AccountsPanel(ttk.Frame):
                        pady=10)
 
 
+class Panel:
+    pass
+
+
+class CreditCard:
+    pass
+
+
 class CardsPanel(ttk.Frame):
-    def __init__(self, master):
+    def __init__(self, master, button_1=None):
         ttk.Frame.__init__(self, master)
         # Gui Creation
+        self.button_1 = button_1
         self.cards_panel = ttk.Frame(self, width=800, height=600, style="Card.TFrame")
         self.cards_panel.grid()
         self.cards_panel.grid_propagate(False)
 
-        # ttk.Label(self.cards_panel, text="Cards").grid(column=0,
-        #                                                row=0,
-        #                                                padx=30,
-        #                                                pady=(30, 0),
-        #                                                sticky='w')
+
         self.credit_panel = ttk.Frame(self.cards_panel,
                                       width=600,
-                                      height=200,
+                                      height=600,
                                       style='Card.TFrame')
+
         self.credit_panel.grid(row=0, column=0, padx=1)
-        self.debit_panel = ttk.Frame(self.cards_panel,
-                                     width=600,
-                                     height=200,
-                                     style='Card.TFrame')
-        self.debit_panel.grid(row=1, column=0, padx=1)
-        self.savings_panel = ttk.Frame(self.cards_panel,
-                                       width=600,
-                                       height=200,
-                                       style='Card.TFrame')
-        self.savings_panel.grid(row=2, column=0, padx=1)
+
+        button_1 = customtkinter.CTkButton(self.credit_panel, width=600,
+                                           height=130,
+                                           command=lambda: master.switch_frame(RegisterPageStart),
+                                           )
+        # button_1.pack(pady=20, padx=100)
+        button_1.grid(pady=20, padx=100)
+
+        button_2 = customtkinter.CTkButton(self.credit_panel, width=600,
+                                           height=130)
+        # button_2.pack(pady=20, padx=15)
+        button_2.grid(pady=20, padx=15)
+
+        button_3 = customtkinter.CTkButton(self.credit_panel, width=600,
+                                           height=130)
+        # button_3.pack(pady=20, padx=15)
+        button_3.grid(pady=20, padx=15)
+
+        # adding images
+
+        self.image = Image.open('card1.png')
+        self.image = self.image.resize((200, 100))
+        self.bg_image = ImageTk.PhotoImage(self.image)
+        self.img1 = ttk.Label(button_1, image=self.bg_image)
+        self.img1.grid(row=0,
+                       column=0,
+                       padx=10,
+                       pady=20,
+                       sticky='W')
+
+        self.img2 = ttk.Label(button_2, image=self.bg_image)
+        self.img2.grid(row=0,
+                       column=0,
+                       padx=10,
+                       pady=20,
+                       sticky='W')
+
+        self.img3 = ttk.Label(button_3, image=self.bg_image)
+        self.img3.grid(row=0,
+                       column=0,
+                       padx=10,
+                       pady=20,
+                       sticky='W')
+
+        # adding text to the buttons
+
+        self.txt1 = ttk.Label(button_1, text="Credit Card \nYour balance: $400500", font=('Arial bold', 15))
+        self.txt1.grid(row=0,
+                       column=0,
+                       padx=220,
+                       pady=60,
+                       sticky='N')
+
+        self.txt2 = ttk.Label(button_2, text="Saving Card \nYour balance: $8900000", font=('Arial bold', 15))
+        self.txt2.grid(row=0,
+                       column=0,
+                       padx=220,
+                       pady=60,
+                       sticky='NW')
+
+        self.txt3 = ttk.Label(button_3, text="Debit Card\nYour balance: $200000 ", font=('Arial  bold', 15), background='#3895D3')
+        self.txt3.grid(row=0,
+                       column=0,
+                       padx=220,
+                       pady=50,
+                       )
+
+
+
+
+
+# class CreditCard(ttk.Frame):
+#     def __init__(self, master):
+#         ttk.Frame.__init__(self, master)
+#         # GUI creation
+#         # Center Widget
+#         self.card_frame = None
+#         card_frame = ttk.Frame(self)
+#         card_frame.grid()
+#         self.image = Image.open('card1.png')
+#         self.image = self.image.resize((200, 50))
+#         self.bg_image = ImageTk.PhotoImage(self.image)
+#         ttk.Label(card_frame, image=self.bg_image).grid(row=0,
+#                                                             column=0,
+#                                                             pady=(20, 10),
+#                                                             padx=20,
+#                                                             sticky='n')
+#         self.label_mode = customtkinter.CTkLabel(master=self.card_frame , text="Cards")
+#         self.label_mode.grid(row=9, column=0, pady=0, padx=20, sticky="w")
+#
+#         self.optionmenu_1 = customtkinter.CTkOptionMenu(master=self.card_frame ,
+#                                                         values=["Change Pin", "Set Limit", "Stop Card"],)
+#                                                         # command=self.change_appearance_mode)
+#         self.optionmenu_1.grid(row=10, column=0, pady=10, padx=20, sticky="w")
+
+
 
 
 class PaymentsPanel(ttk.Frame):
@@ -1773,10 +1867,12 @@ def db_connect():
             host="localhost",
             user="root",
             # password='12345678',
-            password="toor",
+            # password="toor",
+            password='Kgalela@07',
             port="3306"
         )
         return db
+
     except mysql.connector.Error as e:
         if e.errno == errorcode.ER_ACCESS_DENIED_ERROR:
             print("Something is wrong with your user name or password")
