@@ -286,7 +286,7 @@ class RegisterPageStart(ttk.Frame):
                         padx=20)
 
         req3_label = ttk.Label(register_frame,
-                               text='* ZA Identification number (18 years or older)')
+                               text='* ZA Identification number-\n\t(18 years or older)')
         req3_label.grid(row=4,
                         column=0,
                         sticky='w',
@@ -304,6 +304,7 @@ class RegisterPageStart(ttk.Frame):
         req5_label.grid(row=6,
                         column=0,
                         sticky='w',
+                        pady=(0, 20),
                         padx=20)
 
         # Register button
@@ -903,7 +904,8 @@ def details_error_check(master, fname, sname, email, cell):
             raise messagebox.showerror("Invalid Email name entry",
                                        "Email must be less than 45 characters.")
         # Regex for email allows one @ and one dot (co.za will not work)
-        elif re.match('^[a-z0-9] + [\._] ? [a-z0-9] + [@]\w + [.] \w{2,3}$', email):
+        # elif re.match('^[a-z0-9] + [\._] ? [a-z0-9] + [@]\w + [.] \w{2,3}$', email):
+        elif re.match(r'([A-Za-z0-9]+[.-_])*[A-Za-z0-9]+@[A-Za-z0-9-]+(\.[A-Z|a-z]{2,})+', email):
             Reg_details.append(email)
         else:
             raise messagebox.showerror("Invalid Email entry",
@@ -926,31 +928,31 @@ def details_error_check(master, fname, sname, email, cell):
                              "Please ensure that no field(s) is/are left blank.")
 
 
-def id_error_check(master, id):
+def id_error_check(master, inputid):
     global Reg_id
     Reg_id = ""
 
     # Check if id is blank
-    if id:
-        if not id.isdigit():
+    if inputid:
+        if not inputid.isdigit():
             raise messagebox.showerror("Invalid ID entry",
                                        "ID field can only contain digits.\n "
                                        "[Example: 9202204645082]")
         # Check if the size of the id is valid
-        elif len(id) != 13:
+        elif len(inputid) != 13:
             raise messagebox.showerror("Invalid ID entry",
                                        "Please ensure that the ID field is 13 digits.\n "
                                        "[Example: 9202204645082]")
 
         # Check if the date is valid
-        elif not id_date_check(id):
+        elif not id_date_check(inputid):
             raise messagebox.showerror("Invalid ID entry",
                                        "Please ensure that the first 6 digits of the ID is a valid birth date.\n "
                                        "Remember, you must be 18 years or older to register.\n"
                                        "[Example: 9202204645082]")
 
         # Check if the 11th digit is valid
-        elif id[10] != "1" and id[10] != "0":
+        elif inputid[10] != "1" and inputid[10] != "0":
             raise messagebox.showerror("Invalid ID entry",
                                        "The 11th digit can only be 0 or 1.\n"
                                        "0: SA citizen.\n"
@@ -958,22 +960,22 @@ def id_error_check(master, id):
                                        "[Example: 9202204645082]")
 
         # Checksum digit check just to ensure that the ID is valid
-        elif luhn_validator.validate(id):
+        elif luhn_validator.validate(inputid):
             raise messagebox.showerror("Invalid ID entry",
                                        "Please ensure that the ID field was correctly inputted\n"
                                        "[Example: 9202204645082]")
         else:
-            Reg_id = id
+            Reg_id = inputid
             master.switch_frame(RegisterPageAddress)
     else:
         messagebox.showerror("Missing field",
                              "Please ensure that the ID field is not left blank.")
 
 
-def id_date_check(id):
+def id_date_check(inputid):
     str_date = ""
-    for x in range(len(id) - 7):  # Populates list with the first six digits of the ID
-        str_date = str_date + id[x]
+    for x in range(len(inputid) - 7):  # Populates list with the first six digits of the ID
+        str_date = str_date + inputid[x]
 
     year = int(str_date[0] + str_date[1])
     month = int(str_date[2] + str_date[3])
@@ -1426,12 +1428,14 @@ class AccountsPanel(ttk.Frame):
                                                columnspan=2)
         self.tag_panel = ttk.Frame(self.left_panel, style="Card.TFrame")
         self.tag_panel.grid(row=3, column=0, padx=30, pady=(0, 20))
+        self.recent_transactions()
+
+    def recent_transactions(self):
         tags = len(TransactionData)
         if tags > 10:
             tags = 10
         for a in range(0, tags):
             frame = ttk.Frame(self.tag_panel,
-                              # style='Card.TFrame',
                               width=700,
                               height=30)
             frame.pack(side='top',
@@ -1445,15 +1449,15 @@ class AccountsPanel(ttk.Frame):
                        sticky='news',
                        padx=10,
                        pady=10)
-            date = ttk.Label(frame,
-                             text=TransactionData[a][3],
-                             width=20,
-                             font=('Open Sans Light', 8))
-            date.grid(row=0,
-                      column=1,
-                      sticky='e',
-                      padx=10,
-                      pady=10)
+            lbldate = ttk.Label(frame,
+                                text=TransactionData[a][3],
+                                width=20,
+                                font=('Open Sans Light', 8))
+            lbldate.grid(row=0,
+                         column=1,
+                         sticky='e',
+                         padx=10,
+                         pady=10)
             value = ttk.Label(frame,
                               text="R {:,.2f}".format((TransactionData[a][2])),
                               width=10,
