@@ -42,13 +42,13 @@ import datetime
 from datetime import date
 import luhn_validator
 
-Version = 'v0.818'
+Version = 'v0.82'
 exchange_data = []
 UserID = ''
 UserData = []
 TransactionData = []
 AccountsData = []
-CardType = ['', '', '']
+CardType = [['', '', ''], ['Debit', 'Credit', 'Savings']]
 pyglet.font.add_file('theme/OpenSans.ttf')
 Reg_details = ["", "", "", ""]
 Reg_id = ""
@@ -1217,7 +1217,6 @@ def ForgotPass(master, username, password, vpassword, email):
 class MainMenu(ttk.Frame):
     def __init__(self, master):
         ttk.Frame.__init__(self, master)
-
         # Gui Creation
         # Center Widget
         self.main_frame = ttk.Frame(self)
@@ -1287,8 +1286,6 @@ class MainMenu(ttk.Frame):
             self._panel.destroy()
         self._panel = new_panel
         self._panel.pack()
-        MainMenu.update(self)
-        # print(self.winfo_reqwidth(), self.winfo_reqheight())
 
 
 class AccountsPanel(ttk.Frame):
@@ -1465,42 +1462,51 @@ class CardsPanel(ttk.Frame):
 class PaymentsPanel(ttk.Frame):
     def __init__(self, master):
         ttk.Frame.__init__(self, master)
-
+        self._payments = None
         # Gui Creation
-        self.payments_panel = ttk.Frame(self,
-                                        style='Card.TFrame')
-        self.payments_panel.grid()
+        self.bottom_panel = ttk.Frame(self,
+                                      width=800,
+                                      height=600)
+        self.bottom_panel.grid()
+        self.bottom_panel.grid_propagate()
+
+        self.transfer_panel = ttk.Frame(self.bottom_panel)
+        self.pay_panel = ttk.Frame(self.bottom_panel)
+
+        self.payments_panel = ttk.Frame(self.bottom_panel, style='Card.TFrame')
+        # self.payments_panel.pack()
         self.canvas = tk.Canvas(self.payments_panel,
                                 width=500,
                                 height=590,
                                 borderwidth=0)
         self.frame = ttk.Frame(self.canvas)
-        self.scrollbard = ttk.Scrollbar(self.payments_panel,
-                                        orient='vertical',
-                                        command=self.canvas.yview)
-        self.canvas.config(yscrollcommand=self.scrollbard.set)
+        self.scrollboard = ttk.Scrollbar(self.payments_panel,
+                                         orient='vertical',
+                                         command=self.canvas.yview)
+        self.canvas.config(yscrollcommand=self.scrollboard.set)
         self.right_panel = ttk.Frame(self.payments_panel,
                                      style='Card.TFrame',
                                      width=284,
                                      height=600)
         self.right_panel.pack(side='right')
-        self.scrollbard.pack(side='right',
-                             fill='y',
-                             pady=2)
+        self.scrollboard.pack(side='right',
+                              fill='y',
+                              pady=2)
         self.canvas.pack(side='left',
                          fill='both',
                          expand=True,
-                         pady=1,
-                         padx=1)
-        self.canvas.create_window((1, 1),
+                         padx=1,
+                         pady=1)
+        self.canvas.create_window((0, 0),
                                   window=self.frame,
-                                  anchor='nw',
+                                  anchor='n',
                                   tags='self.frame')
         self.frame.bind('<Configure>',
                         self.onFrameConfigure)
         self.header = ttk.Frame(self.frame)
         self.header.pack(side='top')
         self.pay_button = ttk.Button(self.header,
+                                     command=self.showpay,
                                      text='Pay')
         self.pay_button.grid(row=0,
                              column=0,
@@ -1525,6 +1531,7 @@ class PaymentsPanel(ttk.Frame):
                                        style='Card.TFrame')
         self.receipt_frame.pack(side='top')
         self.populate()
+        self.payments_panel.pack()
 
     def populate(self):
         tags = len(TransactionData)
@@ -1545,9 +1552,9 @@ class PaymentsPanel(ttk.Frame):
                        column=0,
                        sticky='news',
                        padx=10)
-            if TransactionData[a][4] == CardType[0]:
+            if TransactionData[a][4] == CardType[0][0]:
                 text = 'Debit'
-            elif TransactionData[a][4] == CardType[1]:
+            elif TransactionData[a][4] == CardType[0][1]:
                 text = 'Credit'
             else:
                 text = 'Savings'
@@ -1576,9 +1583,143 @@ class PaymentsPanel(ttk.Frame):
                        sticky='e',
                        padx=10)
 
+    def update_values(self):
+        for x in self.receipt_frame.winfo_children():
+            x.destroy()
+        self.populate()
+
     def onFrameConfigure(self, x):
         self.canvas.configure(scrollregion=self.canvas.bbox('all'))
         return x
+
+    def showpay(self):
+        self.payments_panel.pack_forget()
+        self.pay_panel.configure(width=800, height=600, style='Card.TFrame')
+        rightpanel = ttk.Frame(self.pay_panel,
+                               style='Card.TFrame',
+                               width=300,
+                               height=600)
+        rightpanel.grid(row=0,
+                        column=3,
+                        rowspan=12)
+        rightpanel.grid_propagate(False)
+        ttk.Label(self.pay_panel,
+                  text='Pay beneficiary',
+                  font=('Open Sans', 20)).grid(row=0,
+                                               column=0,
+                                               padx=152,
+                                               pady=(30, 50),
+                                               columnspan=2)
+        ttk.Label(self.pay_panel,
+                  text='From:').grid(row=1,
+                                     column=0,
+                                     pady=(0, 5),
+                                     sticky='e')
+        value = tk.StringVar()
+        # From Combobox
+        cbb_from = ttk.Combobox(self.pay_panel,
+                                textvariable=value,
+                                width=20)
+        cbb_from.grid(row=1,
+                      column=1,
+                      padx=10,
+                      pady=(0, 5),
+                      sticky='w')
+        cbb_from['state'] = 'readonly'
+        cbb_from['values'] = ('Credit', 'Debit', 'Savings')
+
+        ttk.Label(self.pay_panel,
+                  text='Recipient Account ID:').grid(row=2,
+                                                     column=0,
+                                                     sticky='e')
+        # recipient Entry
+        entry_to = ttk.Entry(self.pay_panel,
+                             width=15)
+        entry_to.grid(row=2,
+                      column=1,
+                      padx=10,
+                      sticky='w')
+        # Own Reference
+        ttk.Label(self.pay_panel,
+                  text='Own Reference').grid(row=3,
+                                             column=0,
+                                             pady=(60, 5),
+                                             sticky='e')
+        entry_own_ref = ttk.Entry(self.pay_panel,
+                                  width=20)
+        entry_own_ref.grid(row=3,
+                           column=1,
+                           padx=10,
+                           pady=(60, 5),
+                           sticky='w')
+        # Recipient reference
+        ttk.Label(self.pay_panel,
+                  text='Recipient Reference').grid(row=4,
+                                                   column=0,
+                                                   sticky='e')
+        entry_recipient_ref = ttk.Entry(self.pay_panel,
+                                        width=20)
+        entry_recipient_ref.grid(row=4,
+                                 column=1,
+                                 padx=10,
+                                 sticky='w')
+        # Value Entry
+        ttk.Label(self.pay_panel,
+                  text='Enter Amount:').grid(row=5,
+                                             column=0,
+                                             pady=(80, 0),
+                                             sticky='e')
+        value_entry = ttk.Entry(self.pay_panel,
+                                width=15)
+        value_entry.grid(row=5,
+                         column=1,
+                         padx=10,
+                         pady=(80, 0),
+                         sticky='w')
+        back_button = ttk.Button(self.pay_panel,
+                                 width=25,
+                                 text='Back',
+                                 command=lambda: self.showpayment(1))
+        back_button.grid(row=6,
+                         column=0,
+                         pady=(60, 0),
+                         padx=(20, 0),
+                         sticky='e')
+        pay_button = ttk.Button(self.pay_panel,
+                                width=25,
+                                text='Pay',
+                                style='Accent.TButton',
+                                command=lambda: pay(cbb_from.get(),
+                                                    entry_to.get(),
+                                                    entry_own_ref.get(),
+                                                    entry_recipient_ref.get(),
+                                                    value_entry.get()))
+        pay_button.grid(row=6,
+                        padx=20,
+                        pady=(60, 0),
+                        sticky='w',
+                        column=1)
+        self.pay_panel.pack_propagate(False)
+        self.pay_panel.pack()
+
+    def showpayment(self, x):
+        if x == 1:
+            self.pay_panel.pack_forget()
+            for y in self.pay_panel.winfo_children():
+                y.destroy()
+        else:
+            self.transfer_panel.pack_forget()
+        self.payments_panel.pack()
+        self.update_values()
+
+
+class TransferPanel(ttk.Frame):
+    def __init__(self, master):
+        ttk.Frame.__init__(self, master)
+        # Gui Creation
+        self.cards_panel = ttk.Frame(self, width=800, height=600, style="Card.TFrame")
+        self.cards_panel.grid()
+        self.cards_panel.grid_propagate(False)
 
 
 def db_connect():
@@ -1611,7 +1752,7 @@ def db_connect():
 def exchangeapi(currency):
     url = 'https://cdn.jsdelivr.net/gh/fawazahmed0/currency-api@1/latest/currencies/' + currency + '.json'
     try:
-        r = requests.get(url=url, timeout=1)
+        r = requests.get(url=url, timeout=3)
         data = r.json()[currency]
         exchange_data.append("{:.3f}".format(data['cny']))
         exchange_data.append("{:.3f}".format(data['jpy']))
@@ -1664,11 +1805,91 @@ def fetchAccounts():
     # 012
     for y in range(0, x):
         if AccountsData[y][3] == 'd':
-            CardType[0] = AccountsData[y][0]
+            CardType[0][0] = AccountsData[y][0]
         elif AccountsData[y][3] == 'c':
-            CardType[1] = AccountsData[y][0]
+            CardType[0][1] = AccountsData[y][0]
         else:
-            CardType[2] = AccountsData[y][0]
+            CardType[0][2] = AccountsData[y][0]
+
+
+def pay(account, userid, own_reference, recipient_reference, amount):
+    valid = False
+    exists = False
+    user = None
+    userdata = None
+    if not account:
+        messagebox.showerror('Invalid Account', 'Please choose an account to use.')
+    elif not userid:
+        messagebox.showerror('Invalid Recipient ID', 'Please type a recipient ID.')
+    elif not own_reference:
+        messagebox.showerror('Invalid Reference', 'Please add an own reference.')
+    elif not recipient_reference:
+        messagebox.showerror('Invalid Reference', 'Please add a recipient reference.')
+    elif not amount:
+        messagebox.showerror('Invalid Amount', 'Please add an amount.')
+    else:
+        try:
+            amount = float(amount)
+            valid = True
+        except ValueError:
+            messagebox.showerror('Invalid Amount', 'Amount can only be numbers\nPeriod as decimal seperator')
+        else:
+            try:
+                userid = int(userid)
+            except ValueError:
+                valid = False
+                messagebox.showerror('Invalid Input', 'Recipient ID can only be numbers')
+    if valid:
+        if account == 'Debit':
+            account = CardType[0][0]
+        elif account == 'Credit':
+            account = CardType[0][1]
+        else:
+            account = CardType[0][2]
+        for x in AccountsData:
+            if x[0] == account:
+                userdata = x
+                if amount > x[1]:
+                    valid = False
+                    messagebox.showerror('Insufficient Funds',
+                                         'The required funds are not available in the selected account')
+    if valid:
+        try:
+            db = db_connect()
+            db_cursor = db.cursor()
+            sql = 'SELECT * FROM db_atm.tbl_accounts WHERE acc_ID = %s'
+            val = (userid,)
+            db_cursor.execute(sql, val)
+            user = db_cursor.fetchone()
+            if not user:
+                messagebox.showerror('Invalid Recipient ID', 'The ID does not exist')
+            else:
+                exists = True
+                for x in CardType[0]:
+                    if x == user[0]:
+                        messagebox.showerror('Invalid Recipient ID', 'You cannot pay your own account')
+                        exists = False
+        except Exception as e:
+            messagebox.showerror('Error', 'An unknown error occured')
+            print(e)
+    if exists:
+        # Finalizing Payment
+        # user(102, Decimal('4400.05'), datetime.date(2010, 5, 3), 'd', 2, Decimal('0.00'))
+        # userdata(101, Decimal('24000.00'), datetime.date(2013, 3, 2), 'c', 1, Decimal('1000.00'))
+        own_amount = float(userdata[1]) - amount
+        recipient_amount = float(user[1]) + amount
+        print(own_amount, recipient_amount)
+        try:
+            # db = db_connect()
+            # db_cursor = db.cursor()
+            # sql = 'UPDATE db_atm.tbl_users SET password = %s WHERE user_id = %s'
+            # val = (own_amount,)
+            # db_cursor.execute(sql, val)
+            #
+            # db.commit()
+            messagebox.showinfo('Succesfull', 'Payment done succesfully!')
+        except Exception as e:
+            print('AAAAAA', e)
 
 
 if __name__ == "__main__":
