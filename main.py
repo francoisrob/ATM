@@ -863,7 +863,7 @@ class RegisterPageFinal(ttk.Frame):
                                      text='Return to Login Page',
                                      width=40,
                                      style='Accent.TButton',
-                                     command=lambda: master.switch_frame(LoginPage))
+                                     command=lambda: cancel_register(master))
         button_register.grid(row=6,
                              column=0,
                              padx=20,

@@ -52,6 +52,9 @@
   <component name="DBNavigator.Project.ExecutionManager">
     <retain-sticky-names value="false" />
   </component>
+  <component name="DBNavigator.Project.FileConnectionMappingManager">
+    <mapping file-url="file://$PROJECT_DIR$/DB_script_v.1.sql" connection-id="1ff08fad-2c8c-4a54-949d-1cc5e2f7ba01" session-id="MAIN" current-schema="db_atm" />
+  </component>
   <component name="DBNavigator.Project.MethodExecutionManager">
     <method-browser />
     <execution-history>

@@ -21,7 +21,7 @@ CREATE TABLE IF NOT EXISTS `db_ATM`.`tbl_users` (
   `fname` VARCHAR(45) NOT NULL,
   `sname` VARCHAR(45) NOT NULL,
   `street` VARCHAR(45) NOT NULL,
-  `city` VARCHAR(20) NOT NULL,
+  `city` VARCHAR(45) NOT NULL,
   `state` VARCHAR(3) NOT NULL,
   `post` VARCHAR(4) NOT NULL,
   `cell_num` VARCHAR(10) NOT NULL,
