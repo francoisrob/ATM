@@ -176,9 +176,7 @@ class LoginPage(ttk.Frame):
                                   text='SIGN IN',
                                   width=29,
                                   style='Accent.TButton',
-                                  command=lambda: Login_check(master,
-                                                              entry_username.get(),
-                                                              entry_password.get()))
+                                  command=lambda: login_check(master, entry_username.get(), entry_password.get()))
         button_login.grid(row=7,
                           column=0,
                           padx=20,
@@ -196,7 +194,7 @@ class LoginPage(ttk.Frame):
                              columnspan=2)
 
 
-def Login_check(master, username, password):
+def login_check(master, username, password):
     username = 'js'
     password = '1234'
     global UserID
@@ -328,7 +326,7 @@ class RegisterPageStart(ttk.Frame):
                            columnspan=1)
 
 
-# Register page for name, email, cell   [Remember to remove redundant self.'s][Was testing something ;)]
+# Register page for name, email, cell
 class RegisterPageDetails(ttk.Frame):
     def __init__(self, master):
         ttk.Frame.__init__(self, master)
@@ -901,7 +899,7 @@ def details_error_check(master, fname, sname, email, cell):
             raise messagebox.showerror("Invalid Email name entry",
                                        "Email must be less than 45 characters.")
         # Regex for email allows one @ and one dot (co.za will not work)
-        elif re.match('^[a-z0-9]+[\._]?[a-z0-9]+[@]\w+[.]\w{2,3}$', email):
+        elif re.match('^[a-z0-9]+[._]?[a-z0-9]+@\w+[.]\w{2,3}$', email):
             Reg_details.append(email)
         else:
             raise messagebox.showerror("Invalid Email entry",
@@ -924,31 +922,31 @@ def details_error_check(master, fname, sname, email, cell):
                              "Please ensure that no field(s) is/are left blank.")
 
 
-def id_error_check(master, id):
+def id_error_check(master, za_id):
     global Reg_id
     Reg_id = ""
 
     # Check if id is blank
-    if id:
-        if not id.isdigit():
+    if za_id:
+        if not za_id.isdigit():
             raise messagebox.showerror("Invalid ID entry",
                                        "ID field can only contain digits.\n "
                                        "[Example: 9202204645082]")
         # Check if the size of the id is valid
-        elif len(id) != 13:
+        elif len(za_id) != 13:
             raise messagebox.showerror("Invalid ID entry",
                                        "Please ensure that the ID field is 13 digits.\n "
                                        "[Example: 9202204645082]")
 
         # Check if the date is valid
-        elif not id_date_check(id):
+        elif not id_date_check(za_id):
             raise messagebox.showerror("Invalid ID entry",
                                        "Please ensure that the first 6 digits of the ID is a valid birth date.\n "
                                        "Remember, you must be 18 years or older to register.\n"
                                        "[Example: 9202204645082]")
 
         # Check if the 11th digit is valid
-        elif id[10] != "1" and id[10] != "0":
+        elif za_id[10] != "1" and za_id[10] != "0":
             raise messagebox.showerror("Invalid ID entry",
                                        "The 11th digit can only be 0 or 1.\n"
                                        "0: SA citizen.\n"
@@ -956,22 +954,22 @@ def id_error_check(master, id):
                                        "[Example: 9202204645082]")
 
         # Checksum digit check just to ensure that the ID is valid
-        elif luhn_validator.validate(id):
+        elif luhn_validator.validate(za_id):
             raise messagebox.showerror("Invalid ID entry",
                                        "Please ensure that the ID field was correctly inputted\n"
                                        "[Example: 9202204645082]")
         else:
-            Reg_id = id
+            Reg_id = za_id
             master.switch_frame(RegisterPageAddress)
     else:
         messagebox.showerror("Missing field",
                              "Please ensure that the ID field is not left blank.")
 
 
-def id_date_check(id):
+def id_date_check(za_id):
     str_date = ""
-    for x in range(len(id) - 7):  # Populates list with the first six digits of the ID
-        str_date = str_date + id[x]
+    for x in range(len(za_id) - 7):  # Populates list with the first six digits of the ID
+        str_date = str_date + za_id[x]
 
     year = int(str_date[0] + str_date[1])
     month = int(str_date[2] + str_date[3])
