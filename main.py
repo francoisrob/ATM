@@ -106,7 +106,7 @@ class Application(tk.Tk):
 
 
 class LoginPage(ttk.Frame):
-    def __init__(self, master, button_login=None):
+    def __init__(self, master):
         ttk.Frame.__init__(self, master)
         # GUI creation
         # Center Widget
@@ -172,7 +172,6 @@ class LoginPage(ttk.Frame):
         forgot_label.bind("<Button-1>",
                           lambda: master.switch_frame(ForgotPage))
         # Login in
-        assert isinstance(button_login, object)
         button_login = ttk.Button(login_frame,
                                   text='SIGN IN',
                                   width=29,
