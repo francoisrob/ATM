@@ -170,8 +170,7 @@ class LoginPage(ttk.Frame):
                           pady=(0, 15),
                           padx=20)
         forgot_label.bind("<Button-1>",
-                          lambda e: master.switch_frame(ForgotPage))
-
+                          lambda: master.switch_frame(ForgotPage))
         # Login in
         assert isinstance(button_login, object)
         button_login = ttk.Button(login_frame,
@@ -186,7 +185,6 @@ class LoginPage(ttk.Frame):
                           padx=20,
                           pady=10,
                           columnspan=2)
-
         button_register = ttk.Button(login_frame,
                                      text='Register',
                                      width=29,
@@ -207,7 +205,6 @@ def Login_check(master, username, password):
         messagebox.showerror("Invalid entry", "Username cannot be left blank.\nPlease enter a Username.")
     elif not password:
         messagebox.showerror("Invalid entry", "Password cannot be left blank.\nPlease enter a Password.")
-
     # Username and password entered
     else:
         db = db_connect()
@@ -216,21 +213,18 @@ def Login_check(master, username, password):
         users = db_cursor.fetchall()
         user_input = password
         user_password = ""
-
         for user in users:
             if user[0] == username:
                 user_input = password  # Fetches the typed password
                 user_password = user[1]  # Fetches the correct password
                 UserID = user[2]
                 # Reason for this is because I do not want an error message running on each unmatched entry
-
         if user_password == "":
             # Warning message displayed for unmatched entry form db
             messagebox.showerror("Invalid entry", "Username or password is incorrect")
         elif user_input == user_password:
             # Correct input which takes you to the MainMenu frame
             exchangeapi('zar')
-            print("user:", username, "pass:", password, 'userID:', UserID)
             fetchUser()
             fetchAccounts()
             fetchTransactions()
@@ -238,7 +232,6 @@ def Login_check(master, username, password):
         else:
             # Password is incorrect and does not match username
             messagebox.showerror("Invalid entry", "Username or password is incorrect")
-
         # You can be specific and tell the user what is wrong with their inputs.
         # The reason I want to leave it ambiguous is, because anybody can guess a username and in the instance
         # where they guess correctly they can attempt to crack the password.
@@ -1102,6 +1095,9 @@ def register_insert():
 
 
 def cancel_register(master):
+    """
+    :type master: Misc | None
+    """
     # Variables made empty with the intention of clearing the values from the registration page entries
     global Reg_details, Reg_id, Reg_address, Reg_auth
     Reg_details = ["", "", "", ""]
