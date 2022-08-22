@@ -173,7 +173,9 @@ class LoginPage(ttk.Frame):
                                   text='SIGN IN',
                                   width=29,
                                   style='Accent.TButton',
-                                  command=lambda: login_check(master, entry_username.get(), entry_password.get()))
+                                  command=lambda: Login_check(master,
+                                                              entry_username.get(),
+                                                              entry_password.get()))
         button_login.grid(row=7,
                           column=0,
                           padx=20,
@@ -188,9 +190,10 @@ class LoginPage(ttk.Frame):
                              padx=20,
                              pady=(0, 10),
                              columnspan=2)
+        login_frame.grid()
 
 
-def login_check(master, username, password):
+def Login_check(master, username, password):
     username = 'js'
     password = '1234'
     global UserID
@@ -226,7 +229,6 @@ def login_check(master, username, password):
         else:
             # Password is incorrect and does not match username
             messagebox.showerror("Invalid entry", "Username or password is incorrect")
-
         # You can be specific and tell the user what is wrong with their inputs.
         # The reason I want to leave it ambiguous is, because anybody can guess a username and in the instance
         # where they guess correctly they can attempt to crack the password.
@@ -291,6 +293,7 @@ class RegisterPageStart(ttk.Frame):
         req5_label.grid(row=6,
                         column=0,
                         sticky='w',
+                        pady=(0, 20),
                         padx=20)
 
         # Register button
@@ -466,6 +469,7 @@ class RegisterPageDetails(ttk.Frame):
                                     column=1,
                                     pady=(20, 20),
                                     )
+        register_frame.grid()
 
 
 # Register page for id num
@@ -557,6 +561,7 @@ class RegisterPageID(ttk.Frame):
                                     column=1,
                                     pady=(20, 20),
                                     )
+        register_frame.grid()
 
 
 # Register page for billing address
@@ -867,54 +872,64 @@ class RegisterPageFinal(ttk.Frame):
 def details_error_check(master, fname, sname, email, cell):
     global Reg_details
     Reg_details = []
+    check = [False, False, False, False]
     if fname and sname and email and cell:
-
-        if len(fname) > 45:
-            raise messagebox.showerror("Invalid First name entry",
-                                       "First name must be less than 45 characters.")
-        # Allows all letters, spaces and hyphens
-        elif re.match('^[A-zÀ-ÿ- ]*$', fname):
-            Reg_details.append(fname.capitalize())
+        # Fname check
+        if not len(fname) > 45:
+            # Allows all letters, spaces and hyphens
+            if re.match('^[A-zÀ-ÿ- ]*$', fname):
+                Reg_details.append(fname.capitalize())
+                check[0] = True
+            else:
+                messagebox.showerror("Invalid First name entry",
+                                     "No numbers or special characters allowed in First name field.")
         else:
-            raise messagebox.showerror("Invalid First name entry",
-                                       "No numbers or special characters allowed in First name field.")
-
-        if len(sname) > 45:
-            raise messagebox.showerror("Invalid Last name entry",
-                                       "Last name must be less than 45 characters.")
-        # Allows all letters, spaces and hyphens
-        elif re.match('^[A-zÀ-ÿ- ]*$', sname):
-            Reg_details.append(sname.capitalize())
+            messagebox.showerror("Invalid First name entry",
+                                 "First name must be less than 45 characters.")
+        # Sname check
+        if not len(sname) > 45:
+            # Allows all letters, spaces and hyphens
+            if re.match('^[A-zÀ-ÿ- ]*$', sname):
+                Reg_details.append(sname.capitalize())
+                check[1] = True
+            else:
+                messagebox.showerror("Invalid Last name entry",
+                                     "No numbers or special characters allowed in Last name field.")
         else:
-            raise messagebox.showerror("Invalid Last name entry",
-                                       "No numbers or special characters allowed in Last name field.")
-
-        if len(fname) > 45:
-            raise messagebox.showerror("Invalid Email name entry",
-                                       "Email must be less than 45 characters.")
-        # Regex for email allows one @ and one dot (co.za will not work)
-        # elif re.match('^[a-z0-9] + [\._] ? [a-z0-9] + [@]\w + [.] \w{2,3}$', email):
-        elif re.match(r'([A-Za-z0-9]+[.-_])*[A-Za-z0-9]+@[A-Za-z0-9-]+(\.[A-Z|a-z]{2,})+', email):
-            Reg_details.append(email)
+            messagebox.showerror("Invalid Last name entry",
+                                 "Last name must be less than 45 characters.")
+        # Email check
+        if not len(fname) > 45:
+            # Regex for email allows one @ and one dot (.co.za will not work)
+            # elif re.match('^[a-z0-9] + [\._] ? [a-z0-9] + [@]\w + [.] \w{2,3}$', email):
+            if re.match(r'([A-Za-z0-9]+[.-_])*[A-Za-z0-9]+@[A-Za-z0-9-]+(\.[A-Z|a-z]{2,})+', email):
+                Reg_details.append(email)
+                check[2] = True
+            else:
+                messagebox.showerror("Invalid Email entry",
+                                     "Try using a valid email address.\n[Example: name_surname@mail.com]")
         else:
-            raise messagebox.showerror("Invalid Email entry",
-                                       "Try using a valid email address.\n[Example: name_surname@mail.com]")
-
-        # Cellnum must be 10 digits
-        if not cell.isdigit():
-            raise messagebox.showerror("Invalid Contact number entry",
-                                       "Contact number can only contain digits.")
-        elif len(cell) != 10:
-            raise messagebox.showerror("Invalid Contact number entry",
-                                       "Contact number must be 10 digits.")
+            messagebox.showerror("Invalid Email name entry",
+                                 "Email must be less than 45 characters.")
+        # Cellphone number check
+        if cell.isdigit():
+            if len(cell) == 10:
+                Reg_details.append(cell)
+                check[3] = True
+            else:
+                messagebox.showerror("Invalid Contact number entry",
+                                     "Contact number must be 10 digits.")
         else:
-            Reg_details.append(cell)
+            messagebox.showerror("Invalid Contact number entry",
+                                 "Contact number can only contain digits.")
 
         master.switch_frame(RegisterPageID)
     else:
-
         messagebox.showerror("Missing field(s)",
                              "Please ensure that no field(s) is/are left blank.")
+
+    if check[0] and check[1] and check[2] and check[3]:
+        master.switch_frame(RegisterPageID)
 
 
 def id_error_check(master, inputid):
@@ -923,42 +938,51 @@ def id_error_check(master, inputid):
 
     # Check if id is blank
     if inputid:
-        if not inputid.isdigit():
-            raise messagebox.showerror("Invalid ID entry",
-                                       "ID field can only contain digits.\n "
-                                       "[Example: 9202204645082]")
-        # Check if the size of the id is valid
-        elif len(inputid) != 13:
-            raise messagebox.showerror("Invalid ID entry",
-                                       "Please ensure that the ID field is 13 digits.\n "
-                                       "[Example: 9202204645082]")
 
-        # Check if the date is valid
-        elif not id_date_check(inputid):
-            raise messagebox.showerror("Invalid ID entry",
-                                       "Please ensure that the first 6 digits of the ID is a valid birth date.\n "
-                                       "Remember, you must be 18 years or older to register.\n"
-                                       "[Example: 9202204645082]")
+        # checks if the id is made up of digits only
+        if inputid.isdigit():
 
-        # Check if the 11th digit is valid
-        elif inputid[10] != "1" and inputid[10] != "0":
-            raise messagebox.showerror("Invalid ID entry",
-                                       "The 11th digit can only be 0 or 1.\n"
-                                       "0: SA citizen.\n"
-                                       "1: Permanent resident\n"
-                                       "[Example: 9202204645082]")
+            # Check if the size of the id is valid
+            if len(inputid) == 13:
 
-        # Checksum digit check just to ensure that the ID is valid
-        elif luhn_validator.validate(inputid):
-            raise messagebox.showerror("Invalid ID entry",
-                                       "Please ensure that the ID field was correctly inputted\n"
-                                       "[Example: 9202204645082]")
+                # Check if the date is valid
+                if id_date_check(inputid):
+
+                    # Check if the 11th digit is valid
+                    if inputid[10] == "1" or inputid[10] == "0":
+
+                        # Checksum digit check just to ensure that the ID is valid
+                        if not luhn_validator.validate(inputid):
+                            Reg_id = inputid
+                        else:
+                            messagebox.showerror("Invalid ID entry",
+                                                 "Please ensure that the ID field was correctly inputted\n"
+                                                 "[Example: 9202204645082]")
+                    else:
+                        messagebox.showerror("Invalid ID entry",
+                                             "The 11th digit can only be 0 or 1.\n"
+                                             "0: SA citizen.\n"
+                                             "1: Permanent resident\n"
+                                             "[Example: 9202204645082]")
+                else:
+                    messagebox.showerror("Invalid ID entry",
+                                         "Please ensure that the first 6 digits of the ID is a valid birth date.\n "
+                                         "Remember, you must be 18 years or older to register.\n"
+                                         "[Example: 9202204645082]")
+            else:
+                messagebox.showerror("Invalid ID entry",
+                                     "Please ensure that the ID field is 13 digits.\n "
+                                     "[Example: 9202204645082]")
         else:
-            Reg_id = inputid
-            master.switch_frame(RegisterPageAddress)
+            messagebox.showerror("Invalid ID entry",
+                                 "ID field can only contain digits.\n "
+                                 "[Example: 9202204645082]")
+
     else:
         messagebox.showerror("Missing field",
                              "Please ensure that the ID field is not left blank.")
+    if Reg_id:
+        master.switch_frame(RegisterPageAddress)
 
 
 def id_date_check(inputid):
@@ -989,113 +1013,120 @@ def id_date_check(inputid):
 def address_error_check(master, street, city, state, post):
     global Reg_address
     Reg_address = []
+    check = [False, False, False, False]
     if street and city and state and post:
 
+        # Street check
         if len(street) > 45:
-            raise messagebox.showerror("Invalid Street entry",
-                                       "Street must be less than 45 characters.")
-        # Allows all letters, numbers and spaces in street field
-        if re.match('^[A-zÀ-ÿ0-9 ]*$', street):
+            messagebox.showerror("Invalid Street entry",
+                                 "Street must be less than 45 characters.")
+            # Allows letter and spaces and numbers in street field
+        elif not re.match('^[a-zA-z0-9 ]*$', street):
+            messagebox.showerror("Invalid Street entry",
+                                 "No special characters allowed in Street field.")
+        else:
             Reg_address.append(street)
-        else:
-            raise messagebox.showerror("Invalid Street entry",
-                                       "No special characters allowed in Street field.")
+            check[0] = True
 
+        # City check
         if len(city) > 45:
-            raise messagebox.showerror("Invalid city entry",
-                                       "City must be less than 45 characters.")
-        # Allows letter and spaces in city field
-        if re.match('^[A-zÀ-ÿ ]*$', city):
-            Reg_address.append(city.capitalize())
+            messagebox.showerror("Invalid city entry",
+                                 "City must be less than 45 characters.")
+
+            # Allows letter and spaces in city field
+        elif not re.match('^[a-zA-Z ]*$', city):
+            messagebox.showerror("Invalid City entry",
+                                 "No special characters or numbers allowed in City field.")
         else:
-            raise messagebox.showerror("Invalid City entry",
-                                       "No special characters or numbers allowed in City field.")
+            Reg_address.append(city.capitalize())
+            check[1] = True
 
         # Checks if the user changed the default state of the option menu
-        if state == "Select an option":
-            raise messagebox.showerror("No State selected",
-                                       "Click on the drop down list to select your state.")
-        else:
+        if not state == "Select an option":
             Reg_address.append(state)
+            check[2] = True
+        else:
+            messagebox.showerror("No State selected",
+                                 "Click on the drop down list to select your state.")
 
-        # Checks that the postal number is valid
+        # Postal number check
         if not post.isdigit():
-            raise messagebox.showerror("Invalid Postal code entry",
-                                       "Postal code may only consist of 4 digits.")
-        elif len(post) > 4:
-            raise messagebox.showerror("Invalid Postal code entry",
-                                       "Postal code may only consist of 4 digits.")
+            messagebox.showerror("Invalid Postal code entry",
+                                 "Postal code may only consist of digits.")
+        elif len(post) != 4:
+            messagebox.showerror("Invalid Postal code entry",
+                                 "Postal code may only consist of 4 digits.")
         else:
             Reg_address.append(post)
-
-        master.switch_frame(RegisterPageAuth)
+            check[3] = True
 
     else:
         messagebox.showerror("Missing field(s)",
                              "Please ensure that no field(s) is/are left blank.")
+
+    if check[0] and check[1] and check[2] and check[3]:
+        master.switch_frame(RegisterPageAuth)
 
 
 def auth_error_check(master, username, password):
     global Reg_auth
     Reg_auth = []
+    check = [False, False]
     if username and password:
 
-        if len(username) > 45:
-            raise messagebox.showerror("Invalid Username entry",
-                                       "Username must be less than 45 characters.")
+        if not len(username) > 45:
+            # Allows letters, numbers and underscore in username. No special characters or spaces
+            if re.match('^[A-z0-9_ ]*$', username):
+                db = db_connect()
+                db_cur = db.cursor()
+                sql = "SELECT username FROM db_atm.tbl_users WHERE username = %s"
+                val = (username,)
+                db_cur.execute(sql, val)
+                db_username = db_cur.fetchone()
+                if not db_username:
+                    Reg_auth.append(username)
+                    check[0] = True
+                else:
+                    messagebox.showerror("Invalid Username entry",
+                                         "Username already in use\n Please try a different username."
+                                         "\n[Example: tony_stark7])")
+            else:
+                messagebox.showerror("Invalid Username entry",
+                                     "No special characters or spaces allowed in Username entry."
+                                     "\n[Example: tony_stark7])")
 
-        # Allows letters, numbers and underscore in username. No special characters or spaces
-        if not re.match('^[A-z0-9_ ]*$', username):
-            raise messagebox.showerror("Invalid Username entry",
-                                       "No special characters or spaces allowed in Username entry."
-                                       "\n[Example: tony_stark7])")
-
-        # Checks if the username exists in the database
-        if username_db_check:
-            raise messagebox.showerror("Invalid Username entry", "Username already in use.\n"
-                                                                 "Please try a different username"
-                                                                 "\n[Example: tony_stark7]")
         else:
-            Reg_auth.append(username)
+            messagebox.showerror("Invalid Username entry",
+                                 "Username must be less than 45 characters.")
 
         if len(password) > 45:
-            raise messagebox.showerror("Invalid Password entry",
-                                       "Password must be less than 45 characters.")
+            messagebox.showerror("Invalid Password entry",
+                                 "Password must be less than 45 characters.")
+
         # Password must be 8 or more characters
         elif len(password) < 8:
-            raise messagebox.showerror("Invalid Password entry",
-                                       "Password must be 8 or more characters long")
+            messagebox.showerror("Invalid Password entry",
+                                 "Password must be 8 or more characters long")
 
-        # Password must contain |one uppercase, one lowercase, one number, one special character|
-        elif re.match("^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?[#?!@$%^&*-]).{8,}$", password):
-            Reg_auth.append(password)
+        elif not re.match("^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?[#?!@$%^&*-]).{8,}$", password):
+            messagebox.showerror("Invalid Password entry",
+                                 "Password must contain:\n"
+                                 "* an uppercase letter\n"
+                                 "* a lowercase letter\n"
+                                 "* a numeric character\n"
+                                 "* a special character\n"
+                                 "[Example: Ir0nman!])")
         else:
-            raise messagebox.showerror("Invalid Password entry",
-                                       "Password must contain:\n"
-                                       "* an uppercase letter\n"
-                                       "* a lowercase letter\n"
-                                       "* a numeric character\n"
-                                       "* a special character\n"
-                                       "[Example: Ir0nman!])")
+            Reg_auth.append(password)
+            check[1] = True
 
-        master.switch_frame(RegisterPageFinal)
+
     else:
         messagebox.showerror("Missing field(s)",
                              "Please ensure that no field(s) is/are left blank.")
 
-
-def username_db_check(username):
-    db = db_connect()
-    db_cursor = db.cursor()
-    sql = "SELECT username FROM db_atm.tbl_users"
-    db_cursor.execute(sql)
-    db_usernames = db_cursor.fetchall()
-
-    for db_username in db_usernames:
-        if db_username == username:
-            return True
-
-    return False
+    if check[0] and check[1]:
+        master.switch_frame(RegisterPageFinal)
 
 
 def register_insert():
@@ -1122,7 +1153,6 @@ def cancel_register(master):
     Reg_address = ["", "", "WC", ""]
     Reg_auth = ["", ""]
     master.switch_frame(LoginPage)
-
 
 class ForgotPage(ttk.Frame):
     def __init__(self, master):
@@ -1850,9 +1880,11 @@ def db_connect():
             user="root",
             # password='12345678',
             password="toor",
+            # password='Kgalela@07',
             port="3306"
         )
         return db
+
     except mysql.connector.Error as e:
         if e.errno == errorcode.ER_ACCESS_DENIED_ERROR:
             print("Something is wrong with your user name or password")
