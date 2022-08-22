@@ -2,31 +2,6 @@
                                         ============================
                                         |  Python ATM Application  |
                                         ============================
-
-
-Objectives:
-    * This program should have a gui with different frames/pages to access different parts of the program.
-    * There must be a login page for the user to log in with a Username and password.
-    * There must be a with-draw option.
-    * User should be able to view their funds.
-    * Should be secure, the program should take extra measures in encryption preventing any
-    unauthorized manipulation of data.
-
-Ideas:
-    * Fancy gui with animations, backgrounds, custom buttons etc.
-    * Widgets to resize to window dimensions.
-    *
-
-
-Glossary:
-
-*args allow us to pass a variable number of non-keyword arguments to a function, as a tuple
-**kwargs allow us to pass variable number of keyword arguments to a function, type= Dictionary
-source: https://tinyurl.com/yeyvstc3
-
-The code to switch between different frames,
-source: https://tinyurl.com/bdedjxcy
-
 """
 import tkinter as tk
 import tkinter.ttk as ttk
@@ -956,7 +931,7 @@ def id_error_check(master, inputid):
                             Reg_id = inputid
                         else:
                             messagebox.showerror("Invalid ID entry",
-                                                 "Please ensure that the ID field was correctly inputted\n"
+                                                 "Please ensure that the ID field was correctly entered\n"
                                                  "[Example: 9202204645082]")
                     else:
                         messagebox.showerror("Invalid ID entry",
@@ -1466,9 +1441,10 @@ class AccountsPanel(ttk.Frame):
         ttk.Label(self.left_panel,
                   text='Recent Transactions',
                   font=('Open Sans Bold', 14)).grid(row=2,
+                                                    padx=150,
                                                     columnspan=2)
         self.tag_panel = ttk.Frame(self.left_panel, style="Card.TFrame")
-        self.tag_panel.grid(row=3, column=0, padx=30, pady=(0, 20))
+        self.tag_panel.grid(row=3, padx=25, pady=(0, 20))
         self.recent_transactions()
         self.accounts_panel.grid()
 
@@ -1508,7 +1484,7 @@ class AccountsPanel(ttk.Frame):
             value.grid(row=0,
                        column=2,
                        sticky='e',
-                       padx=10,
+                       padx=(10, 13),
                        pady=10)
 
 
