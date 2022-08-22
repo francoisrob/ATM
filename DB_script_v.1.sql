@@ -64,7 +64,7 @@ CREATE TABLE IF NOT EXISTS `db_ATM`.`tbl_transactions` (
   `trans_id` INT NOT NULL AUTO_INCREMENT,
   `description` VARCHAR(100) NOT NULL,
   `amount` DECIMAL(13,2) NOT NULL,
-  `date` DATE NOT NULL,
+  `date` DATETIME NOT NULL,
   `tbl_accounts_acc_ID` INT NOT NULL,
   `tbl_accounts_tbl_users_user_id` INT NOT NULL,
   PRIMARY KEY (`trans_id`, `tbl_accounts_acc_ID`, `tbl_accounts_tbl_users_user_id`),

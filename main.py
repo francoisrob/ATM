@@ -41,7 +41,7 @@ import datetime
 from datetime import date
 import luhn_validator
 
-Version = 'v0.82'
+Version = 'v0.821'
 exchange_data = []
 UserID = ''
 UserData = []
@@ -110,8 +110,6 @@ class LoginPage(ttk.Frame):
         # GUI creation
         # Center Widget
         login_frame = ttk.Frame(self)
-        login_frame.grid()
-
         self.image = Image.open('bank_logo.png')
         self.image = self.image.resize((100, 50))
         self.bg_image = ImageTk.PhotoImage(self.image)
@@ -170,7 +168,6 @@ class LoginPage(ttk.Frame):
                           padx=20)
         forgot_label.bind("<Button-1>",
                           lambda e: master.switch_frame(ForgotPage))
-
         # Login in
         button_login = ttk.Button(login_frame,
                                   text='SIGN IN',
@@ -182,7 +179,6 @@ class LoginPage(ttk.Frame):
                           padx=20,
                           pady=10,
                           columnspan=2)
-
         button_register = ttk.Button(login_frame,
                                      text='Register',
                                      width=29,
@@ -203,30 +199,26 @@ def login_check(master, username, password):
         messagebox.showerror("Invalid entry", "Username cannot be left blank.\nPlease enter a Username.")
     elif not password:
         messagebox.showerror("Invalid entry", "Password cannot be left blank.\nPlease enter a Password.")
-
     # Username and password entered
     else:
         db = db_connect()
         db_cursor = db.cursor()
         db_cursor.execute("SELECT username, password, user_id FROM db_atm.tbl_users")
         users = db_cursor.fetchall()
-        user_password = ""
         user_input = password
-
+        user_password = ""
         for user in users:
             if user[0] == username:
                 user_input = password  # Fetches the typed password
                 user_password = user[1]  # Fetches the correct password
                 UserID = user[2]
                 # Reason for this is because I do not want an error message running on each unmatched entry
-
         if user_password == "":
             # Warning message displayed for unmatched entry form db
             messagebox.showerror("Invalid entry", "Username or password is incorrect")
         elif user_input == user_password:
             # Correct input which takes you to the MainMenu frame
             exchangeapi('zar')
-            print("user:", username, "pass:", password, 'userID:', UserID)
             fetchUser()
             fetchAccounts()
             fetchTransactions()
@@ -247,7 +239,6 @@ class RegisterPageStart(ttk.Frame):
         # GUI creation
         # Center Widget
         register_frame = ttk.Frame(self)
-        register_frame.grid()
         self.image = Image.open('bank_logo.png')
         self.image = self.image.resize((100, 50))
         self.bg_image = ImageTk.PhotoImage(self.image)
@@ -282,7 +273,7 @@ class RegisterPageStart(ttk.Frame):
                         padx=20)
 
         req3_label = ttk.Label(register_frame,
-                               text='* ZA Identification number (18 years or older)')
+                               text='* ZA Identification number-\n\t(18 years or older)')
         req3_label.grid(row=4,
                         column=0,
                         sticky='w',
@@ -324,9 +315,10 @@ class RegisterPageStart(ttk.Frame):
                            column=0,
                            pady=(0, 10),
                            columnspan=1)
+        register_frame.grid()
 
 
-# Register page for name, email, cell
+# Register page for name, email, cell   [Remember to remove redundant self.'s][Was testing something ;)]
 class RegisterPageDetails(ttk.Frame):
     def __init__(self, master):
         ttk.Frame.__init__(self, master)
@@ -335,7 +327,6 @@ class RegisterPageDetails(ttk.Frame):
         # GUI creation
         # Center Widget
         register_frame = ttk.Frame(self)
-        register_frame.grid()
         self.image = Image.open('bank_logo.png')
         self.image = self.image.resize((100, 50))
         self.bg_image = ImageTk.PhotoImage(self.image)
@@ -485,7 +476,7 @@ class RegisterPageID(ttk.Frame):
         # GUI creation
         # Center Widget
         register_frame = ttk.Frame(self)
-        register_frame.grid()
+        # register_frame.grid()
         self.image = Image.open('bank_logo.png')
         self.image = self.image.resize((100, 50))
         self.bg_image = ImageTk.PhotoImage(self.image)
@@ -576,7 +567,7 @@ class RegisterPageAddress(ttk.Frame):
         # GUI creation
         # Center Widget
         register_frame = ttk.Frame(self)
-        register_frame.grid()
+        # register_frame.grid()
         self.image = Image.open('bank_logo.png')
         self.image = self.image.resize((100, 50))
         self.bg_image = ImageTk.PhotoImage(self.image)
@@ -711,6 +702,7 @@ class RegisterPageAddress(ttk.Frame):
                                     column=1,
                                     pady=(20, 20),
                                     )
+        register_frame.grid()
 
 
 # Register page for username and password
@@ -721,7 +713,7 @@ class RegisterPageAuth(ttk.Frame):
         # GUI creation
         # Center Widget
         register_frame = ttk.Frame(self)
-        register_frame.grid()
+        # register_frame.grid()
         self.image = Image.open('bank_logo.png')
         self.image = self.image.resize((100, 50))
         self.bg_image = ImageTk.PhotoImage(self.image)
@@ -824,6 +816,7 @@ class RegisterPageAuth(ttk.Frame):
                                     column=1,
                                     pady=(20, 20),
                                     )
+        register_frame.grid()
 
 
 # Registration successful page
@@ -834,7 +827,7 @@ class RegisterPageFinal(ttk.Frame):
         # GUI creation
         # Center Widget
         register_frame = ttk.Frame(self)
-        register_frame.grid()
+        # register_frame.grid()
         self.image = Image.open('bank_logo.png')
         self.image = self.image.resize((100, 50))
         self.bg_image = ImageTk.PhotoImage(self.image)
@@ -865,6 +858,7 @@ class RegisterPageFinal(ttk.Frame):
                              column=0,
                              padx=20,
                              pady=(20, 20), )
+        register_frame.grid()
 
 
 "Error handling for registration input values"
@@ -899,7 +893,8 @@ def details_error_check(master, fname, sname, email, cell):
             raise messagebox.showerror("Invalid Email name entry",
                                        "Email must be less than 45 characters.")
         # Regex for email allows one @ and one dot (co.za will not work)
-        elif re.match('^[a-z0-9]+[._]?[a-z0-9]+@\w+[.]\w{2,3}$', email):
+        # elif re.match('^[a-z0-9] + [\._] ? [a-z0-9] + [@]\w + [.] \w{2,3}$', email):
+        elif re.match(r'([A-Za-z0-9]+[.-_])*[A-Za-z0-9]+@[A-Za-z0-9-]+(\.[A-Z|a-z]{2,})+', email):
             Reg_details.append(email)
         else:
             raise messagebox.showerror("Invalid Email entry",
@@ -922,31 +917,31 @@ def details_error_check(master, fname, sname, email, cell):
                              "Please ensure that no field(s) is/are left blank.")
 
 
-def id_error_check(master, za_id):
+def id_error_check(master, inputid):
     global Reg_id
     Reg_id = ""
 
     # Check if id is blank
-    if za_id:
-        if not za_id.isdigit():
+    if inputid:
+        if not inputid.isdigit():
             raise messagebox.showerror("Invalid ID entry",
                                        "ID field can only contain digits.\n "
                                        "[Example: 9202204645082]")
         # Check if the size of the id is valid
-        elif len(za_id) != 13:
+        elif len(inputid) != 13:
             raise messagebox.showerror("Invalid ID entry",
                                        "Please ensure that the ID field is 13 digits.\n "
                                        "[Example: 9202204645082]")
 
         # Check if the date is valid
-        elif not id_date_check(za_id):
+        elif not id_date_check(inputid):
             raise messagebox.showerror("Invalid ID entry",
                                        "Please ensure that the first 6 digits of the ID is a valid birth date.\n "
                                        "Remember, you must be 18 years or older to register.\n"
                                        "[Example: 9202204645082]")
 
         # Check if the 11th digit is valid
-        elif za_id[10] != "1" and za_id[10] != "0":
+        elif inputid[10] != "1" and inputid[10] != "0":
             raise messagebox.showerror("Invalid ID entry",
                                        "The 11th digit can only be 0 or 1.\n"
                                        "0: SA citizen.\n"
@@ -954,22 +949,22 @@ def id_error_check(master, za_id):
                                        "[Example: 9202204645082]")
 
         # Checksum digit check just to ensure that the ID is valid
-        elif luhn_validator.validate(za_id):
+        elif luhn_validator.validate(inputid):
             raise messagebox.showerror("Invalid ID entry",
                                        "Please ensure that the ID field was correctly inputted\n"
                                        "[Example: 9202204645082]")
         else:
-            Reg_id = za_id
+            Reg_id = inputid
             master.switch_frame(RegisterPageAddress)
     else:
         messagebox.showerror("Missing field",
                              "Please ensure that the ID field is not left blank.")
 
 
-def id_date_check(za_id):
+def id_date_check(inputid):
     str_date = ""
-    for x in range(len(za_id) - 7):  # Populates list with the first six digits of the ID
-        str_date = str_date + za_id[x]
+    for x in range(len(inputid) - 7):  # Populates list with the first six digits of the ID
+        str_date = str_date + inputid[x]
 
     year = int(str_date[0] + str_date[1])
     month = int(str_date[2] + str_date[3])
@@ -1117,6 +1112,9 @@ def register_insert():
 
 
 def cancel_register(master):
+    """
+    :type master: Misc | None
+    """
     # Variables made empty with the intention of clearing the values from the registration page entries
     global Reg_details, Reg_id, Reg_address, Reg_auth
     Reg_details = ["", "", "", ""]
@@ -1132,7 +1130,6 @@ class ForgotPage(ttk.Frame):
         # GUI creation
         # Center Widget
         forgot_page = ttk.Frame(self)
-        forgot_page.grid()
 
         self.image = Image.open('bank_logo.png')
         self.image = self.image.resize((100, 50))
@@ -1212,7 +1209,6 @@ class ForgotPage(ttk.Frame):
                              padx=20,
                              pady=(0, 10),
                              sticky='w')
-
         # Save Pass
         button_save = ttk.Button(forgot_page,
                                  text='Save Password',
@@ -1235,6 +1231,7 @@ class ForgotPage(ttk.Frame):
                          column=0,
                          padx=20,
                          pady=10)
+        forgot_page.pack()
 
 
 def ForgotPass(master, username, password, vpassword, email):
@@ -1277,13 +1274,10 @@ class MainMenu(ttk.Frame):
         self.main_frame.columnconfigure(1, weight=3)
         # Left Panel
         self.left_panel = ttk.Frame(self.main_frame)
-        self.left_panel.pack(side='left', fill='y')
         # Right Panel
         self.right_panel = ttk.Frame(self.main_frame)
         self.right_panel.pack(side='right')
         self._panel = None
-        self.show_panel(AccountsPanel)
-
         self.header_panel = ttk.Panedwindow(self.left_panel,
                                             height=150)
         self.header_panel.pack(side='top', fill='x')
@@ -1332,6 +1326,9 @@ class MainMenu(ttk.Frame):
         if self.tk.call("ttk::style", "theme", "use") == "azure-dark":
             theme_button.state(['selected'])
 
+        self.left_panel.pack(side='left', fill='y')
+        self.show_panel(AccountsPanel)
+
     def show_panel(self, panel):
         # This function displays new panels on the right
         new_panel = panel(self.right_panel)
@@ -1346,11 +1343,7 @@ class AccountsPanel(ttk.Frame):
         ttk.Frame.__init__(self, master)
         # Gui Creation
         self.accounts_panel = ttk.Frame(self,
-                                        width=800,
-                                        height=600,
                                         style="Card.TFrame")
-        self.accounts_panel.grid()
-        self.accounts_panel.grid_propagate(False)
         self.left_panel = ttk.Frame(self.accounts_panel,
                                     style='Card.TFrame',
                                     width=500,
@@ -1378,13 +1371,17 @@ class AccountsPanel(ttk.Frame):
                                 pady=(0, 10))
 
         # Foregin exchange frame
-        self.exchange_frame = ttk.Frame(self.accounts_panel,
-                                        width=300,
-                                        height=600, )
-        self.exchange_frame.grid(column=2,
-                                 row=0,
-                                 sticky='e')
-        self.exchange_frame.grid_propagate(False)
+        self.right_panel = ttk.Frame(self.accounts_panel,
+                                     width=298,
+                                     height=598)
+        self.right_panel.grid_propagate(False)
+        self.right_panel.grid(column=2,
+                              row=0,
+                              padx=1,
+                              pady=1,
+                              sticky='e')
+        self.exchange_frame = ttk.Frame(self.right_panel)
+        self.exchange_frame.grid()
         ttk.Label(self.exchange_frame,
                   text='Foreign Exchange',
                   font=('Open Sans', 14),
@@ -1443,12 +1440,15 @@ class AccountsPanel(ttk.Frame):
                                                columnspan=2)
         self.tag_panel = ttk.Frame(self.left_panel, style="Card.TFrame")
         self.tag_panel.grid(row=3, column=0, padx=30, pady=(0, 20))
+        self.recent_transactions()
+        self.accounts_panel.grid()
+
+    def recent_transactions(self):
         tags = len(TransactionData)
         if tags > 10:
             tags = 10
         for a in range(0, tags):
             frame = ttk.Frame(self.tag_panel,
-                              # style='Card.TFrame',
                               width=700,
                               height=30)
             frame.pack(side='top',
@@ -1462,15 +1462,16 @@ class AccountsPanel(ttk.Frame):
                        sticky='news',
                        padx=10,
                        pady=10)
-            date = ttk.Label(frame,
-                             text=TransactionData[a][3],
-                             width=20,
-                             font=('Open Sans Light', 8))
-            date.grid(row=0,
-                      column=1,
-                      sticky='e',
-                      padx=10,
-                      pady=10)
+            dates = TransactionData[a][3].strftime('%Y-%m-%d %H:%M')
+            lbldate = ttk.Label(frame,
+                                text=dates,
+                                width=20,
+                                font=('Open Sans Light', 10))
+            lbldate.grid(row=0,
+                         column=1,
+                         sticky='e',
+                         padx=4,
+                         pady=10)
             value = ttk.Label(frame,
                               text="R {:,.2f}".format((TransactionData[a][2])),
                               width=10,
@@ -1486,48 +1487,20 @@ class CardsPanel(ttk.Frame):
     def __init__(self, master):
         ttk.Frame.__init__(self, master)
         # Gui Creation
-        self.cards_panel = ttk.Frame(self, width=800, height=600, style="Card.TFrame")
-        self.cards_panel.grid()
-        self.cards_panel.grid_propagate(False)
-
-        # ttk.Label(self.cards_panel, text="Cards").grid(column=0,
-        #                                                row=0,
-        #                                                padx=30,
-        #                                                pady=(30, 0),
-        #                                                sticky='w')
-        self.credit_panel = ttk.Frame(self.cards_panel,
-                                      width=600,
-                                      height=200,
-                                      style='Card.TFrame')
-        self.credit_panel.grid(row=0, column=0, padx=1)
-        self.debit_panel = ttk.Frame(self.cards_panel,
-                                     width=600,
-                                     height=200,
-                                     style='Card.TFrame')
-        self.debit_panel.grid(row=1, column=0, padx=1)
-        self.savings_panel = ttk.Frame(self.cards_panel,
-                                       width=600,
-                                       height=200,
-                                       style='Card.TFrame')
-        self.savings_panel.grid(row=2, column=0, padx=1)
-
 
 class PaymentsPanel(ttk.Frame):
     def __init__(self, master):
         ttk.Frame.__init__(self, master)
         self._payments = None
         # Gui Creation
-        self.bottom_panel = ttk.Frame(self,
-                                      width=800,
-                                      height=600)
-        self.bottom_panel.grid()
-        self.bottom_panel.grid_propagate()
+        self.bottom_panel = ttk.Frame(self)
+        # self.bottom_panel.grid()
+        # self.bottom_panel.grid_propagate(False)
 
         self.transfer_panel = ttk.Frame(self.bottom_panel)
         self.pay_panel = ttk.Frame(self.bottom_panel)
 
         self.payments_panel = ttk.Frame(self.bottom_panel, style='Card.TFrame')
-        # self.payments_panel.pack()
         self.canvas = tk.Canvas(self.payments_panel,
                                 width=500,
                                 height=590,
@@ -1552,7 +1525,7 @@ class PaymentsPanel(ttk.Frame):
                          pady=1)
         self.canvas.create_window((0, 0),
                                   window=self.frame,
-                                  anchor='n',
+                                  anchor='center',
                                   tags='self.frame')
         self.frame.bind('<Configure>',
                         self.onFrameConfigure)
@@ -1580,13 +1553,14 @@ class PaymentsPanel(ttk.Frame):
                   font=('Open Sans Bold', 14)).grid(row=1,
                                                     column=0,
                                                     columnspan=2,
-                                                    padx=190,
+                                                    padx=188,
                                                     pady=1)
         self.receipt_frame = ttk.Frame(self.frame,
                                        style='Card.TFrame')
         self.receipt_frame.pack(side='top')
-        self.populate()
         self.payments_panel.pack()
+        self.populate()
+        self.bottom_panel.grid()
 
     def populate(self):
         fetchTransactions()
@@ -1622,14 +1596,15 @@ class PaymentsPanel(ttk.Frame):
                       column=0,
                       sticky='n',
                       padx=10)
-            date = ttk.Label(receipt,
-                             text=TransactionData[a][3],
-                             font=('Open Sans Light', 8),
-                             width=20)
-            date.grid(row=0,
-                      column=1,
-                      sticky='e',
-                      padx=10)
+            dates = TransactionData[a][3].strftime('%Y-%m-%d %H:%M')
+            lbldate = ttk.Label(receipt,
+                                text=dates,
+                                font=('Open Sans Light', 10),
+                                width=20)
+            lbldate.grid(row=0,
+                         column=1,
+                         sticky='e',
+                         padx=10)
             value = ttk.Label(receipt,
                               text="R {:,.2f}".format(TransactionData[a][2]),
                               width=10,
@@ -1650,7 +1625,7 @@ class PaymentsPanel(ttk.Frame):
 
     def showpay(self):
         self.payments_panel.pack_forget()
-        self.pay_panel.configure(width=800, height=600, style='Card.TFrame')
+        self.pay_panel.configure(style='Card.TFrame')
         rightpanel = ttk.Frame(self.pay_panel,
                                style='Card.TFrame',
                                width=300,
@@ -1791,8 +1766,8 @@ def db_connect():
         db = mysql.connector.connect(
             host="localhost",
             user="root",
-            password='12345678',
-            # password="toor",
+            # password='12345678',
+            password="toor",
             port="3306"
         )
         return db
@@ -1886,6 +1861,12 @@ def pay(account, userid, own_reference, recipient_reference, amount):
         messagebox.showerror('Invalid Reference', 'Please add an own reference.')
     elif not recipient_reference:
         messagebox.showerror('Invalid Reference', 'Please add a recipient reference.')
+
+    elif len(own_reference) > 20:
+        messagebox.showerror('Invalid Reference', 'Own reference length exceeds the maximum\n (20 characters)')
+    elif len(recipient_reference) > 20:
+        messagebox.showerror('Invalid Reference', 'Recipient reference length exceeds the maximum\n (20 characters)')
+
     elif not amount:
         messagebox.showerror('Invalid Amount', 'Please add an amount.')
     else:
@@ -1950,17 +1931,20 @@ def pay(account, userid, own_reference, recipient_reference, amount):
             add_transaction = '''INSERT INTO db_atm.tbl_transactions 
             (description, amount, date, tbl_accounts_acc_ID, tbl_accounts_tbl_users_user_id) 
             VALUES (%s, %s, %s, %s, %s) '''
-            transaction_date = datetime.date.today()
+            transaction_date = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
             own_amount = amount * -1
-            val = (own_reference, own_amount, date, userdata[0], userdata[4])
+            val = (own_reference, own_amount, transaction_date, userdata[0], userdata[4])
+            print(val)
             db_cursor.execute(add_transaction, val)
             val = (recipient_reference, amount, transaction_date, user[0], user[4])
+            print(val)
             db_cursor.execute(add_transaction, val)
             db.commit()
             messagebox.showinfo('Succesfull', 'Payment done succesfully!')
             return True
         except Exception as e:
             print(e)
+            raise e
 
 
 if __name__ == "__main__":
