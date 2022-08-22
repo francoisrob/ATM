@@ -194,8 +194,8 @@ class LoginPage(ttk.Frame):
 
 
 def Login_check(master, username, password):
-    username = 'jc'
-    password = '1234'
+    # username = 'jc'
+    # password = '1234'
     global UserID
     # No username and password entered
     if not username:
@@ -1308,7 +1308,7 @@ class MainMenu(ttk.Frame):
         self.right_panel.pack(side='right')
         self._panel = None
         self.header_panel = ttk.Panedwindow(self.left_panel,
-                                            height=150)
+                                            height=160)
         self.header_panel.pack(side='top', fill='x')
         self.header_panel.pack_propagate(False)
         self.image = Image.open('theme/bank_logo.png')
@@ -1616,7 +1616,7 @@ class CardsPanel(ttk.Frame):
                 scard = True
                 s_panel = ttk.Frame(self.savings_panel)
                 s_panel.grid(column=1, row=0, pady=40, sticky='n')
-                ttk.Label(s_panel, text='Debit Account', font=('Open Sans Bold', 14)).grid(row=0)
+                ttk.Label(s_panel, text='Savings Account', font=('Open Sans Bold', 14)).grid(row=0)
                 # data
                 ttk.Label(s_panel,
                           text=f'{AccountsData[count][0]}',
