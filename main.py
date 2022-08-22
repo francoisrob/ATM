@@ -41,7 +41,7 @@ import datetime
 from datetime import date
 import luhn_validator
 
-Version = 'v0.822'
+Version = 'v1.0822'
 exchange_data = []
 UserID = ''
 UserData = []
