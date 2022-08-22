@@ -110,7 +110,7 @@ class LoginPage(ttk.Frame):
         # GUI creation
         # Center Widget
         login_frame = ttk.Frame(self)
-        self.image = Image.open('bank_logo.png')
+        self.image = Image.open('theme/bank_logo.png')
         self.image = self.image.resize((100, 50))
         self.bg_image = ImageTk.PhotoImage(self.image)
         ttk.Label(login_frame, image=self.bg_image).grid(row=0,
@@ -194,7 +194,7 @@ class LoginPage(ttk.Frame):
 
 
 def Login_check(master, username, password):
-    username = 'js'
+    username = 'jc'
     password = '1234'
     global UserID
     # No username and password entered
@@ -241,7 +241,7 @@ class RegisterPageStart(ttk.Frame):
         # GUI creation
         # Center Widget
         register_frame = ttk.Frame(self)
-        self.image = Image.open('bank_logo.png')
+        self.image = Image.open('theme/bank_logo.png')
         self.image = self.image.resize((100, 50))
         self.bg_image = ImageTk.PhotoImage(self.image)
         ttk.Label(register_frame, image=self.bg_image).grid(row=0,
@@ -330,7 +330,7 @@ class RegisterPageDetails(ttk.Frame):
         # GUI creation
         # Center Widget
         register_frame = ttk.Frame(self)
-        self.image = Image.open('bank_logo.png')
+        self.image = Image.open('theme/bank_logo.png')
         self.image = self.image.resize((100, 50))
         self.bg_image = ImageTk.PhotoImage(self.image)
         ttk.Label(register_frame, image=self.bg_image).grid(row=0,
@@ -481,7 +481,7 @@ class RegisterPageID(ttk.Frame):
         # Center Widget
         register_frame = ttk.Frame(self)
         # register_frame.grid()
-        self.image = Image.open('bank_logo.png')
+        self.image = Image.open('theme/bank_logo.png')
         self.image = self.image.resize((100, 50))
         self.bg_image = ImageTk.PhotoImage(self.image)
         ttk.Label(register_frame, image=self.bg_image).grid(row=0,
@@ -573,7 +573,7 @@ class RegisterPageAddress(ttk.Frame):
         # Center Widget
         register_frame = ttk.Frame(self)
         # register_frame.grid()
-        self.image = Image.open('bank_logo.png')
+        self.image = Image.open('theme/bank_logo.png')
         self.image = self.image.resize((100, 50))
         self.bg_image = ImageTk.PhotoImage(self.image)
         ttk.Label(register_frame, image=self.bg_image).grid(row=0,
@@ -719,7 +719,7 @@ class RegisterPageAuth(ttk.Frame):
         # Center Widget
         register_frame = ttk.Frame(self)
         # register_frame.grid()
-        self.image = Image.open('bank_logo.png')
+        self.image = Image.open('theme/bank_logo.png')
         self.image = self.image.resize((100, 50))
         self.bg_image = ImageTk.PhotoImage(self.image)
         ttk.Label(register_frame, image=self.bg_image).grid(row=0,
@@ -833,7 +833,7 @@ class RegisterPageFinal(ttk.Frame):
         # Center Widget
         register_frame = ttk.Frame(self)
         # register_frame.grid()
-        self.image = Image.open('bank_logo.png')
+        self.image = Image.open('theme/bank_logo.png')
         self.image = self.image.resize((100, 50))
         self.bg_image = ImageTk.PhotoImage(self.image)
         ttk.Label(register_frame, image=self.bg_image).grid(row=0,
@@ -1120,7 +1120,6 @@ def auth_error_check(master, username, password):
             Reg_auth.append(password)
             check[1] = True
 
-
     else:
         messagebox.showerror("Missing field(s)",
                              "Please ensure that no field(s) is/are left blank.")
@@ -1161,7 +1160,7 @@ class ForgotPage(ttk.Frame):
         # Center Widget
         forgot_page = ttk.Frame(self)
 
-        self.image = Image.open('bank_logo.png')
+        self.image = Image.open('theme/bank_logo.png')
         self.image = self.image.resize((100, 50))
         self.bg_image = ImageTk.PhotoImage(self.image)
         ttk.Label(forgot_page, image=self.bg_image).grid(row=0,
@@ -1312,7 +1311,7 @@ class MainMenu(ttk.Frame):
                                             height=150)
         self.header_panel.pack(side='top', fill='x')
         self.header_panel.pack_propagate(False)
-        self.image = Image.open('bank_logo.png')
+        self.image = Image.open('theme/bank_logo.png')
         self.image = self.image.resize((100, 50))
         self.bg_image = ImageTk.PhotoImage(self.image)
         ttk.Label(self.header_panel, image=self.bg_image).pack(side='top',
@@ -1391,7 +1390,7 @@ class AccountsPanel(ttk.Frame):
         for a in AccountsData:
             total += a[1]
         self.balance_label = ttk.Label(self.left_panel,
-                                       text="R {:,.2f}".format(total),
+                                       text="R {:,.2f}".format(total).replace(',', ' '),
                                        font=('Open Sans', 20))
         self.balance_label.grid(column=0,
                                 row=1,
@@ -1466,8 +1465,8 @@ class AccountsPanel(ttk.Frame):
         # Recent transactions
         ttk.Label(self.left_panel,
                   text='Recent Transactions',
-                  font=('Open Sans', 14)).grid(row=2,
-                                               columnspan=2)
+                  font=('Open Sans Bold', 14)).grid(row=2,
+                                                    columnspan=2)
         self.tag_panel = ttk.Frame(self.left_panel, style="Card.TFrame")
         self.tag_panel.grid(row=3, column=0, padx=30, pady=(0, 20))
         self.recent_transactions()
@@ -1517,6 +1516,160 @@ class CardsPanel(ttk.Frame):
     def __init__(self, master):
         ttk.Frame.__init__(self, master)
         # Gui Creation
+        self.bottom_panel = ttk.Frame(self, style='Card.TFrame')
+        self.card_panel = ttk.Frame(self.bottom_panel)
+        self.main_panel = ttk.Frame(self.card_panel,
+                                    style='Card.TFrame',
+                                    width=600,
+                                    height=600)
+        self.main_panel.pack_propagate(False)
+        # self.main_panel.pack(side='left')
+        self.right_panel = ttk.Frame(self.card_panel,
+                                     width=200,
+                                     height=600,
+                                     style='Card.TFrame')
+        self.right_panel.pack_propagate(False)
+        self.right_panel.pack(side='right')
+        self.card_panel.grid()
+        self.bottom_panel.grid()
+
+        # Credit panel
+        self.credit_panel = ttk.Frame(self.main_panel,
+                                      style='Card.TFrame'
+                                      )
+        self.credit_panel.pack(side='top', fill='x', padx=1)
+
+        # Debit panel
+        self.debit_panel = ttk.Frame(self.main_panel,
+                                     height=200,
+                                     width=600,
+                                     style='Card.TFrame'
+                                     )
+        self.debit_panel.pack_propagate(False)
+        self.debit_panel.pack(side='top', fill='x', padx=1)
+
+        # Savings panel
+        self.savings_panel = ttk.Frame(self.main_panel,
+                                       height=200,
+                                       width=600,
+                                       style='Card.TFrame'
+                                       )
+        self.savings_panel.pack_propagate(False)
+        self.savings_panel.pack(side='top', fill='x', padx=1)
+
+        self.image = Image.open('theme/credit_card.png')
+        self.image = self.image.resize((204, 120))
+        self.c_img = ImageTk.PhotoImage(self.image)
+        self.credit_img = ttk.Label(self.credit_panel, image=self.c_img)
+        self.credit_img.grid(column=0, row=0, padx=(50, 20), pady=38)
+
+        self.image = Image.open('theme/debit_card.png')
+        self.image = self.image.resize((204, 120))
+        self.d_img = ImageTk.PhotoImage(self.image)
+        self.debit_img = ttk.Label(self.debit_panel, image=self.d_img)
+        self.debit_img.grid(column=0, row=0, padx=(50, 20), pady=38)
+
+        self.image = Image.open('theme/savings_card.png')
+        self.image = self.image.resize((204, 120))
+        self.s_img = ImageTk.PhotoImage(self.image)
+        self.saving_img = ttk.Label(self.savings_panel, image=self.s_img)
+        self.saving_img.grid(column=0, row=0, padx=(50, 20), pady=38)
+        self.populate()
+        self.main_panel.pack(side='left')
+
+    def populate(self):
+        ccard, dcard, scard = False, False, False
+        count = 0
+        for x in CardType[1]:
+            if x == 'Credit':
+                ccard = True
+                c_panel = ttk.Frame(self.credit_panel)
+                c_panel.grid(column=1, row=0, pady=40, sticky='n')
+                ttk.Label(c_panel, text='Credit Account', font=('Open Sans Bold', 14)).grid(row=0)
+                # data
+                ttk.Label(c_panel,
+                          text=f'{AccountsData[count][0]}',
+                          font=('Open Sans Light', 12)).grid(row=1, sticky='nw')
+                ttk.Label(c_panel,
+                          text="R {:,.2f}".format(AccountsData[count][1]).replace(',', ' '),
+                          font=('Open Sans', 14)).grid(row=2, sticky='sw', pady=(10, 0))
+                ttk.Label(c_panel,
+                          text='Balance',
+                          font=('Open Sans Light', 10)).grid(row=3, sticky='nw')
+            elif x == 'Debit':
+                dcard = True
+                d_panel = ttk.Frame(self.debit_panel)
+                d_panel.grid(column=1, row=0, pady=40, sticky='n')
+                ttk.Label(d_panel, text='Debit Account', font=('Open Sans Bold', 14)).grid(row=0)
+                # data
+                ttk.Label(d_panel,
+                          text=f'{AccountsData[count][0]}',
+                          font=('Open Sans Light', 12)).grid(row=1, sticky='nw')
+                ttk.Label(d_panel,
+                          text="R {:,.2f}".format(AccountsData[count][1]).replace(',', ' '),
+                          font=('Open Sans', 14)).grid(row=2, sticky='sw', pady=(10, 0))
+                ttk.Label(d_panel,
+                          text='Balance',
+                          font=('Open Sans Light', 10)).grid(row=3, sticky='nw')
+
+            elif x == 'Savings':
+                scard = True
+                s_panel = ttk.Frame(self.savings_panel)
+                s_panel.grid(column=1, row=0, pady=40, sticky='n')
+                ttk.Label(s_panel, text='Debit Account', font=('Open Sans Bold', 14)).grid(row=0)
+                # data
+                ttk.Label(s_panel,
+                          text=f'{AccountsData[count][0]}',
+                          font=('Open Sans Light', 12)).grid(row=1, sticky='nw')
+                ttk.Label(s_panel,
+                          text="R {:,.2f}".format(AccountsData[count][1]).replace(',', ' '),
+                          font=('Open Sans', 14)).grid(row=2, sticky='sw', pady=(10, 0))
+                ttk.Label(s_panel,
+                          text='Balance',
+                          font=('Open Sans Light', 10)).grid(row=3, sticky='nw')
+            count += 1
+        if not ccard:
+            ttk.Label(self.credit_panel,
+                      text='You don''t have a Credit Account',
+                      font=('Open Sans Bold', 14)).grid(column=1,
+                                                        sticky='news',
+                                                        padx=152,
+                                                        pady=(60, 20),
+                                                        row=0)
+            ttk.Button(self.credit_panel,
+                       style='Accent.TButton',
+                       text='Apply Now').grid(column=1,
+                                              pady=(0, 54),
+                                              row=1)
+            self.credit_img.grid_remove()
+        if not dcard:
+            ttk.Label(self.debit_panel,
+                      text='You don''t have a Debit Account',
+                      font=('Open Sans Bold', 14)).grid(column=1,
+                                                        sticky='news',
+                                                        padx=152,
+                                                        pady=(60, 20),
+                                                        row=0)
+            ttk.Button(self.debit_panel,
+                       style='Accent.TButton',
+                       text='Apply Now').grid(column=1,
+                                              pady=(0, 54),
+                                              row=1)
+            self.debit_img.grid_remove()
+        if not scard:
+            ttk.Label(self.savings_panel,
+                      text='You don''t have a Savings Account',
+                      font=('Open Sans Bold', 14)).grid(column=1,
+                                                        sticky='news',
+                                                        padx=152,
+                                                        pady=(60, 20),
+                                                        row=0)
+            ttk.Button(self.savings_panel,
+                       style='Accent.TButton',
+                       text='Apply Now').grid(column=1,
+                                              pady=(0, 54),
+                                              row=1)
+            self.saving_img.grid_remove()
 
 
 class PaymentsPanel(ttk.Frame):
@@ -1527,7 +1680,6 @@ class PaymentsPanel(ttk.Frame):
         self.bottom_panel = ttk.Frame(self, style='Card.TFrame')
         self.transfer_panel = ttk.Frame(self.bottom_panel)
         self.pay_panel = ttk.Frame(self.bottom_panel)
-
         self.payments_panel = ttk.Frame(self.bottom_panel, style='Card.TFrame')
         self.canvas = tk.Canvas(self.payments_panel,
                                 width=500,
@@ -1553,7 +1705,7 @@ class PaymentsPanel(ttk.Frame):
                          pady=1)
         self.canvas.create_window((0, 0),
                                   window=self.frame,
-                                  anchor='center',
+                                  anchor='n',
                                   tags='self.frame')
         self.frame.bind('<Configure>',
                         self.onFrameConfigure)
@@ -1572,6 +1724,8 @@ class PaymentsPanel(ttk.Frame):
                                           command=self.show_transfer,
                                           style='Accent.TButton',
                                           text='Transfer')
+        if len(CardType[0]) == 1:
+            self.transfer_button['state'] = tk.DISABLED
         self.transfer_button.grid(row=0,
                                   column=1,
                                   padx=10,
@@ -1761,8 +1915,6 @@ class PaymentsPanel(ttk.Frame):
                         column=1)
         self.pay_panel.pack_propagate(False)
         self.pay_panel.pack()
-        self.update()
-        print(self.winfo_reqwidth(), self.winfo_reqheight())
 
     def show_transfer(self):
         self.payments_panel.pack_forget()
@@ -1878,8 +2030,8 @@ def db_connect():
         db = mysql.connector.connect(
             host="localhost",
             user="root",
-            password='12345678',
-            # password="toor",
+            # password='12345678',
+            password="toor",
             # password='Kgalela@07',
             port="3306"
         )
