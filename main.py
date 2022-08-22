@@ -210,8 +210,8 @@ def login_check(master, username, password):
         db_cursor = db.cursor()
         db_cursor.execute("SELECT username, password, user_id FROM db_atm.tbl_users")
         users = db_cursor.fetchall()
-        user_input = password
         user_password = ""
+        user_input = password
 
         for user in users:
             if user[0] == username:
@@ -1048,19 +1048,26 @@ def auth_error_check(master, username, password):
         if len(username) > 45:
             raise messagebox.showerror("Invalid Username entry",
                                        "Username must be less than 45 characters.")
+
         # Allows letters, numbers and underscore in username. No special characters or spaces
-        if re.match('^[A-z0-9_ ]*$', username):
-            Reg_auth.append(username)
-        else:
+        if not re.match('^[A-z0-9_ ]*$', username):
             raise messagebox.showerror("Invalid Username entry",
                                        "No special characters or spaces allowed in Username entry."
                                        "\n[Example: tony_stark7])")
+
+        # Checks if the username exists in the database
+        if username_db_check:
+            raise messagebox.showerror("Invalid Username entry", "Username already in use.\n"
+                                                                 "Please try a different username"
+                                                                 "\n[Example: tony_stark7]")
+        else:
+            Reg_auth.append(username)
 
         if len(password) > 45:
             raise messagebox.showerror("Invalid Password entry",
                                        "Password must be less than 45 characters.")
         # Password must be 8 or more characters
-        if len(password) < 8:
+        elif len(password) < 8:
             raise messagebox.showerror("Invalid Password entry",
                                        "Password must be 8 or more characters long")
 
@@ -1080,6 +1087,20 @@ def auth_error_check(master, username, password):
     else:
         messagebox.showerror("Missing field(s)",
                              "Please ensure that no field(s) is/are left blank.")
+
+
+def username_db_check(username):
+    db = db_connect()
+    db_cursor = db.cursor()
+    sql = "SELECT username FROM db_atm.tbl_users"
+    db_cursor.execute(sql)
+    db_usernames = db_cursor.fetchall()
+
+    for db_username in db_usernames:
+        if db_username == username:
+            return True
+
+    return False
 
 
 def register_insert():
@@ -1770,8 +1791,8 @@ def db_connect():
         db = mysql.connector.connect(
             host="localhost",
             user="root",
-            # password='12345678',
-            password="toor",
+            password='12345678',
+            # password="toor",
             port="3306"
         )
         return db
