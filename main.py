@@ -41,13 +41,13 @@ import datetime
 from datetime import date
 import luhn_validator
 
-Version = 'v0.821'
+Version = 'v0.822'
 exchange_data = []
 UserID = ''
 UserData = []
 TransactionData = []
 AccountsData = []
-CardType = [['', '', ''], ['Debit', 'Credit', 'Savings']]
+CardType = []
 pyglet.font.add_file('theme/OpenSans.ttf')
 Reg_details = ["", "", "", ""]
 Reg_id = ""
@@ -976,11 +976,11 @@ def id_date_check(inputid):
     day = int(str_date[4] + str_date[5])
 
     if year >= 23:
-        year = year + 1900  # Places the year value into 1900 range.
+        year += 1900  # Places the year value into 1900 range.
         # Anyone older than 99 from this year 2022 will be classified as well.
         # Someone older than 99 in the year 2022 cannot be registered. :(
     else:
-        year = year + 2000  # Places the year value into the 2000 range
+        year += 2000  # Places the year value into the 2000 range
     if int(date.today().year) - 18 <= year:  # If the year value is in the range of 18 years from the current year,
         # it becomes invalid
         return False
@@ -1242,7 +1242,7 @@ def ForgotPass(master, username, password, vpassword, email):
                 val = (password, user[2])
                 db_cursor.execute(sql, val)
                 db.commit()
-                messagebox.showinfo('Succesfull', 'Password updated succesfully!')
+                messagebox.showinfo('Successful', 'Password updated successfully!')
                 master.switch_frame(LoginPage)
             else:
                 messagebox.showerror('Invalid Entry', 'The input does not appear to be associated with an account')
@@ -1354,7 +1354,7 @@ class AccountsPanel(ttk.Frame):
                                 columnspan=1,
                                 pady=(0, 10))
 
-        # Foregin exchange frame
+        # Foreign exchange frame
         self.right_panel = ttk.Frame(self.accounts_panel,
                                      width=298,
                                      height=598)
@@ -1472,15 +1472,13 @@ class CardsPanel(ttk.Frame):
         ttk.Frame.__init__(self, master)
         # Gui Creation
 
+
 class PaymentsPanel(ttk.Frame):
     def __init__(self, master):
         ttk.Frame.__init__(self, master)
         self._payments = None
         # Gui Creation
-        self.bottom_panel = ttk.Frame(self)
-        # self.bottom_panel.grid()
-        # self.bottom_panel.grid_propagate(False)
-
+        self.bottom_panel = ttk.Frame(self, style='Card.TFrame')
         self.transfer_panel = ttk.Frame(self.bottom_panel)
         self.pay_panel = ttk.Frame(self.bottom_panel)
 
@@ -1525,6 +1523,7 @@ class PaymentsPanel(ttk.Frame):
                              pady=40,
                              sticky='e')
         self.transfer_button = ttk.Button(self.header,
+                                          command=self.show_transfer,
                                           style='Accent.TButton',
                                           text='Transfer')
         self.transfer_button.grid(row=0,
@@ -1641,7 +1640,7 @@ class PaymentsPanel(ttk.Frame):
                       pady=(0, 5),
                       sticky='w')
         cbb_from['state'] = 'readonly'
-        cbb_from['values'] = ('Credit', 'Debit', 'Savings')
+        cbb_from['values'] = CardType[1]
 
         ttk.Label(self.pay_panel,
                   text='Recipient Account ID:').grid(row=2,
@@ -1716,20 +1715,103 @@ class PaymentsPanel(ttk.Frame):
                         column=1)
         self.pay_panel.pack_propagate(False)
         self.pay_panel.pack()
+        self.update()
+        print(self.winfo_reqwidth(), self.winfo_reqheight())
+
+    def show_transfer(self):
+        self.payments_panel.pack_forget()
+        self.transfer_panel.configure(style='Card.TFrame')
+        rightpanel = ttk.Frame(self.transfer_panel,
+                               style='Card.TFrame',
+                               width=299,
+                               height=600)
+        rightpanel.grid(row=0,
+                        column=3,
+                        rowspan=12)
+        rightpanel.grid_propagate(False)
+        ttk.Label(self.transfer_panel,
+                  text='Transfers',
+                  font=('Open Sans', 20)).grid(row=0,
+                                               column=0,
+                                               padx=189,
+                                               pady=(30, 50))
+        ttk.Label(self.transfer_panel,
+                  text='From:').grid(row=1, sticky='s')
+
+        acc_from = tk.StringVar()
+        # From Combobox
+        cbb_from = ttk.Combobox(self.transfer_panel,
+                                textvariable=acc_from,
+                                width=20)
+        cbb_from.grid(row=2, sticky='n')
+        cbb_from['state'] = 'readonly'
+        cbb_from['values'] = CardType[1]
+
+        ttk.Label(self.transfer_panel,
+                  text='To:').grid(row=3, sticky='s')
+
+        acc_to = tk.StringVar()
+        # to Combobox
+        cbb_to = ttk.Combobox(self.transfer_panel,
+                              textvariable=acc_to,
+                              width=20)
+        cbb_to.grid(row=4,
+                    pady=(0, 80),
+                    sticky='n')
+        cbb_to['state'] = 'readonly'
+        cbb_to['values'] = CardType[1]
+
+        # Value Entry
+        ttk.Label(self.transfer_panel,
+                  text='Enter Amount:').grid(row=7, sticky='s')
+        value_entry = ttk.Entry(self.transfer_panel,
+                                width=15)
+        value_entry.grid(row=8,
+                         pady=(0, 70),
+                         sticky='n')
+
+        back_button = ttk.Button(self.transfer_panel,
+                                 width=25,
+                                 text='Back',
+                                 command=lambda: self.showpayment(2))
+        back_button.grid(row=9,
+                         column=0,
+                         sticky='w',
+                         pady=20,
+                         padx=(30, 0))
+        transfer_button = ttk.Button(self.transfer_panel,
+                                     width=25,
+                                     text='Pay',
+                                     command=lambda: self.transfer_money(cbb_from.get(),
+                                                                         cbb_to.get(),
+                                                                         value_entry.get()),
+                                     style='Accent.TButton')
+        transfer_button.grid(row=9,
+                             padx=(0, 30),
+                             sticky='e',
+                             pady=20)
+        self.transfer_panel.pack_propagate(False)
+        self.transfer_panel.pack()
 
     def showpayment(self, x):
+        self.update_values()
         if x == 1:
             self.pay_panel.pack_forget()
             for y in self.pay_panel.winfo_children():
                 y.destroy()
         else:
             self.transfer_panel.pack_forget()
+            for y in self.transfer_panel.winfo_children():
+                y.destroy()
         self.payments_panel.pack()
-        self.update_values()
 
     def pay_money(self, account, userid, own_reference, recipient_reference, amount):
         if pay(account, userid, own_reference, recipient_reference, amount):
             self.showpayment(1)
+
+    def transfer_money(self, acc_from, acc_to, amount):
+        if transfer(acc_from, acc_to, amount):
+            self.showpayment(2)
 
 
 class TransferPanel(ttk.Frame):
@@ -1820,17 +1902,20 @@ def fetchAccounts():
     sql = "SELECT * FROM db_atm.tbl_accounts WHERE tbl_users_user_id = %s"
     adr = (UserID,)
     db_cursor.execute(sql, adr)
-    AccountsData = db_cursor.fetchall()
-    x = len(AccountsData)
-    # dcs
-    # 012
-    for y in range(0, x):
-        if AccountsData[y][3] == 'd':
-            CardType[0][0] = AccountsData[y][0]
-        elif AccountsData[y][3] == 'c':
-            CardType[0][1] = AccountsData[y][0]
-        else:
-            CardType[0][2] = AccountsData[y][0]
+    AccountsData = sorted(db_cursor.fetchall(), key=lambda x: x[3])
+    length = len(AccountsData)
+    card_type = []
+    card_num = []
+    for a in range(0, length):
+        card_num.append(AccountsData[a][0])
+        if AccountsData[a][3] == 'c':
+            card_type.append('Credit')
+        elif AccountsData[a][3] == 'd':
+            card_type.append('Debit')
+        elif AccountsData[a][3] == 's':
+            card_type.append('Savings')
+    CardType.insert(0, card_num)
+    CardType.insert(1, card_type)
 
 
 def pay(account, userid, own_reference, recipient_reference, amount):
@@ -1898,7 +1983,7 @@ def pay(account, userid, own_reference, recipient_reference, amount):
                         messagebox.showerror('Invalid Recipient ID', 'You cannot pay your own account')
                         exists = False
         except Exception as e:
-            messagebox.showerror('Error', 'An unknown error occured')
+            messagebox.showerror('Error', 'An unknown error occurred')
             print(e)
     if exists:
         # Finalizing Payment
@@ -1920,17 +2005,76 @@ def pay(account, userid, own_reference, recipient_reference, amount):
             transaction_date = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
             own_amount = amount * -1
             val = (own_reference, own_amount, transaction_date, userdata[0], userdata[4])
-            print(val)
             db_cursor.execute(add_transaction, val)
             val = (recipient_reference, amount, transaction_date, user[0], user[4])
-            print(val)
             db_cursor.execute(add_transaction, val)
             db.commit()
-            messagebox.showinfo('Succesfull', 'Payment done succesfully!')
+            messagebox.showinfo('Successful', 'Payment done successfully!')
             return True
         except Exception as e:
             print(e)
             raise e
+
+
+def transfer(acc_from, acc_to, amount):
+    valid = False
+    # Data verification
+    if not acc_from:
+        messagebox.showerror('Invalid Account', 'Please choose an account to use.')
+    elif not acc_to:
+        messagebox.showerror('Invalid Account', 'Please choose an account to transfer to.')
+    elif acc_to == acc_from:
+        messagebox.showerror('Invalid Account', 'Please choose a different account to transfer to')
+    elif not amount:
+        messagebox.showerror('Invalid Amount', 'Please add an amount.')
+    else:
+        try:
+            amount = float(amount)
+            valid = True
+        except ValueError:
+            messagebox.showerror('Invalid Amount', 'Amount can only be numbers\nPeriod as decimal seperator')
+            valid = False
+    if valid:
+        if acc_from == 'Credit':
+            acc_from = CardType[0][0]
+        elif acc_from == 'Debit':
+            acc_from = CardType[0][1]
+        else:
+            acc_from = CardType[0][2]
+        if acc_to == 'Credit':
+            acc_to = CardType[0][0]
+        elif acc_to == 'Debit':
+            acc_to = CardType[0][1]
+        else:
+            acc_to = CardType[0][2]
+        for x in AccountsData:
+            if x[0] == acc_from:
+                acc_from = x
+                if amount > x[1]:
+                    valid = False
+                    messagebox.showerror('Insufficient Funds',
+                                         'The required funds are not available in the selected account')
+            elif x[0] == acc_to:
+                acc_to = x
+
+    if valid:
+        # Finalize transfer
+        from_amount = float(acc_from[1]) - amount
+        to_amount = float(acc_to[1]) + amount
+        try:
+            # Update account balances
+            update_amount = 'UPDATE db_atm.tbl_accounts SET acc_balance = %s WHERE acc_ID = %s'
+            val = (from_amount, acc_from[0])
+            db = db_connect()
+            db_cursor = db.cursor()
+            db_cursor.execute(update_amount, val)
+            val = (to_amount, acc_to[0])
+            db_cursor.execute(update_amount, val)
+            db.commit()
+            messagebox.showinfo('Successful', 'Transfer made successfully!')
+            return True
+        except Exception as e:
+            print(e)
 
 
 if __name__ == "__main__":
