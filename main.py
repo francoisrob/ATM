@@ -92,9 +92,10 @@ class Application(tk.Tk):
 
 def monitor_time(self, thread):
     if thread.is_alive():
-        self.after(10, lambda: monitor_time(self, thread))
+        self.after(100, lambda: monitor_time(self, thread))
     else:
-        self.after(10, lambda: monitor_time(self, thread))
+        self.after(1000, lambda: monitor_time(self, thread))
+        thread.run()
         # if not thread.run():
         #     if (not str(self._frame) == '.!loginpage'):
         #         print(self._frame)
@@ -227,7 +228,7 @@ class LoginPage(ttk.Frame):
 
 
 def Login_check(master, username, password):
-    username = 'jc'
+    username = 'js'
     password = '1234'
     global UserID
     # No username and password entered
