@@ -33,10 +33,11 @@ CardType = []
 pyglet.font.add_file('theme/OpenSans.ttf')
 Reg_details = ["", "", "", ""]
 Reg_id = ""
-Reg_address = ["", "", "WC", ""]  # Leave WC as the default value || Used to populate a listbox
+Reg_address = ["", "", "", ""]
 Reg_auth = ["", ""]
 BankLogo = ImageTk.PhotoImage
 latestTime = datetime
+
 
 class Application(tk.Tk):
     def __init__(self, *args, **kwargs):
@@ -100,6 +101,7 @@ def monitor_time(self, thread):
     else:
         self.after(1000, lambda: monitor_time(self, thread))
         thread.run()
+
 
 def monitor_exchange(self, thread):
     if thread.is_alive():
@@ -451,10 +453,8 @@ class RegisterPageDetails(ttk.Frame):
                                      text='Confirm details',
                                      width=20,
                                      style='Accent.TButton',
-                                     command=lambda: details_error_check(master, entry_fname.get(),
-                                                                         entry_sname.get(),
-                                                                         entry_email.get(),
-                                                                         entry_cellnum.get()))
+                                     command=lambda: details_error_check(master, entry_fname.get(), entry_sname.get(),
+                                                                         entry_email.get(), entry_cellnum.get()))
         button_register.grid(row=6,
                              column=2,
                              padx=20,
@@ -670,15 +670,21 @@ class RegisterPageAddress(ttk.Frame):
                          sticky='w',
                          padx=20)
 
+        # State combobox
         default_state = tk.StringVar()
-        default_state.set("Select an option")
-        provinces_list = ["WC", "EC", "FS", "GP", "KZN", "NC", "NW", "LP", "MP"]
-        ddl_state = tk.OptionMenu(register_frame, default_state, *provinces_list)
-        ddl_state.grid(row=5,
+        cmb_state = ttk.Combobox(register_frame,
+                                 textvariable=default_state,
+                                 width=20)
+        cmb_state.grid(row=5,
                        column=0,
-                       sticky='w',
-                       padx=20)
+                       padx=20,
+                       pady=(0, 10),
+                       sticky='w')
 
+        cmb_state['state'] = 'readonly'
+        cmb_state['values'] = ["WC - Western Cape", "ES - Eastern Cape", "FS - Free State",
+                               "GP - Gauteng", "KZN - Kwazulu-Natal", "NC - Northern Cape",
+                               "NW - North West", "LP - Limpopo", "MP - Mpumalanga"]
         # Register button
         button_register = ttk.Button(register_frame,
                                      text='Confirm Billing Address',
@@ -874,57 +880,59 @@ def details_error_check(master, fname, sname, email, cell):
     global Reg_details
     Reg_details = []
     check = [False, False, False, False]
+
     if fname and sname and email and cell:
+
         # Fname check
-        if len(fname) <= 45:
-            # Allows all letters, spaces and hyphens
-            if re.match('^[A-zÀ-ÿ- ]*$', fname):
-                Reg_details.append(fname.capitalize())
-                check[0] = True
-            else:
-                messagebox.showerror("Invalid First name entry",
-                                     "No numbers or special characters allowed in First name field.")
-        else:
+        if len(fname) > 45:
             messagebox.showerror("Invalid First name entry",
                                  "First name must be less than 45 characters.")
-        # Sname check
-        if len(sname) <= 45:
             # Allows all letters, spaces and hyphens
-            if re.match('^[A-zÀ-ÿ- ]*$', sname):
-                Reg_details.append(sname.capitalize())
-                check[1] = True
-            else:
-                messagebox.showerror("Invalid Last name entry",
-                                     "No numbers or special characters allowed in Last name field.")
+        elif not re.match('^[A-zÀ-ÿ- ]*$', fname):
+            messagebox.showerror("Invalid First name entry",
+                                 "No numbers or special characters allowed in First name field.")
         else:
+            Reg_details.append(fname.capitalize())
+            check[0] = True
+
+        # Sname check
+        if len(sname) > 45:
             messagebox.showerror("Invalid Last name entry",
                                  "Last name must be less than 45 characters.")
-        # Email check
-        if len(fname) <= 45:
-            # Regex for email allows one @ and one dot (.co.za will not work)
-            # elif re.match('^[a-z0-9] + [\._] ? [a-z0-9] + [@]\w + [.] \w{2,3}$', email):
-            if re.match(r'([A-Za-z0-9]+[.-_])*[A-Za-z0-9]+@[A-Za-z0-9-]+(\.[A-Z|a-z]{2,})+', email):
-                Reg_details.append(email)
-                check[2] = True
-            else:
-                messagebox.showerror("Invalid Email entry",
-                                     "Try using a valid email address.\n[Example: name_surname@mail.com]")
+            # Allows all letters, spaces and hyphens
+        elif not re.match('^[A-zÀ-ÿ- ]*$', sname):
+            messagebox.showerror("Invalid Last name entry",
+                                 "No numbers or special characters allowed in Last name field.")
         else:
+            Reg_details.append(sname.capitalize())
+            check[1] = True
+
+        # Email check
+        if len(fname) > 45:
             messagebox.showerror("Invalid Email name entry",
                                  "Email must be less than 45 characters.")
-        # Cellphone number check
-        if cell.isdigit():
-            if len(cell) == 10:
-                Reg_details.append(cell)
-                check[3] = True
-            else:
-                messagebox.showerror("Invalid Contact number entry",
-                                     "Contact number must be 10 digits.")
+
+        elif not re.match(r'([A-Za-z0-9]+[.-_])*[A-Za-z0-9]+@[A-Za-z0-9-]+(\.[A-Z|a-z]{2,})+', email):
+            # Regex for email allows one @ and one dot (.co.za will not work)
+            # elif re.match('^[a-z0-9] + [\._] ? [a-z0-9] + [@]\w + [.] \w{2,3}$', email):
+            messagebox.showerror("Invalid Email entry",
+                                 "Try using a valid email address.\n[Example: name_surname@mail.com]")
         else:
+            Reg_details.append(email)
+            check[2] = True
+
+        # Cellphone number check
+        if not cell.isdigit():
             messagebox.showerror("Invalid Contact number entry",
                                  "Contact number can only contain digits.")
 
-        master.switch_frame(RegisterPageID)
+        elif len(cell) != 10:
+            messagebox.showerror("Invalid Contact number entry",
+                                 "Contact number must be 10 digits.")
+        else:
+            Reg_details.append(cell)
+            check[3] = True
+
     else:
         messagebox.showerror("Missing field(s)",
                              "Please ensure that no field(s) is/are left blank.")
@@ -965,7 +973,7 @@ def id_error_check(master, inputid):
                                  "[Example: 9202204645082]")
 
         # Checksum digit check just to ensure that the ID is valid
-        elif luhn_validator.validate(inputid):
+        elif luhn_validator.validate(inputid, 13):
             Reg_id = inputid
         else:
             messagebox.showerror("Invalid ID entry",
@@ -977,13 +985,10 @@ def id_error_check(master, inputid):
 
 
 def id_date_check(inputid):
-    str_date = ""
-    for x in range(len(inputid) - 7):  # Populates list with the first six digits of the ID
-        str_date = str_date + inputid[x]
-
-    year = int(str_date[0] + str_date[1])
-    month = int(str_date[2] + str_date[3])
-    day = int(str_date[4] + str_date[5])
+    # Gets the first 6 digits of the id number
+    year = int(inputid[0:2])
+    month = int(inputid[2:4])
+    day = int(inputid[4:6])
 
     if year >= 23:
         year += 1900  # Places the year value into 1900 range.
@@ -1011,6 +1016,7 @@ def address_error_check(master, street, city, state, post):
         if len(street) > 45:
             messagebox.showerror("Invalid Street entry",
                                  "Street must be less than 45 characters.")
+
             # Allows letter and spaces and numbers in street field
         elif not re.match('^[a-zA-z0-9 ]*$', street):
             messagebox.showerror("Invalid Street entry",
@@ -1033,12 +1039,12 @@ def address_error_check(master, street, city, state, post):
             check[1] = True
 
         # Checks if the user changed the default state of the option menu
-        if state != "Select an option":
-            Reg_address.append(state)
-            check[2] = True
-        else:
+        if state == "":
             messagebox.showerror("No State selected",
                                  "Click on the drop down list to select your state.")
+        else:
+            Reg_address.append(state[0:2])
+            check[2] = True
 
         # Postal number check
         if not post.isdigit():
@@ -1145,7 +1151,7 @@ def cancel_register(master):
     global Reg_details, Reg_id, Reg_address, Reg_auth
     Reg_details = ["", "", "", ""]
     Reg_id = ""
-    Reg_address = ["", "", "WC", ""]
+    Reg_address = ["", "", "", ""]
     Reg_auth = ["", ""]
     master.switch_frame(LoginPage)
 
@@ -1639,7 +1645,7 @@ class CardsPanel(ttk.Frame):
             count += 1
         if not ccard:
             ttk.Label(self.credit_panel,
-                      text='You do not have a Credit Account',
+                      text='You don''t have a Credit Account',
                       font=('Open Sans Bold', 14)).grid(column=1,
                                                         sticky='news',
                                                         padx=152,
@@ -2050,8 +2056,8 @@ def db_connect():
         db = mysql.connector.connect(
             host="localhost",
             user="root",
-            # password='12345678',
-            password="toor",
+            password='12345678',
+            # password="toor",
             # password='Kgalela@07',
             port="3306"
         )
@@ -2111,6 +2117,7 @@ class liveAPI(Thread):
             return True
         except requests.exceptions.ConnectionError:
             return False
+
 
 def fetchUser():
     global UserData
