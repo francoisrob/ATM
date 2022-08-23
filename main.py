@@ -206,9 +206,7 @@ class LoginPage(ttk.Frame):
                                   text='SIGN IN',
                                   width=29,
                                   style='Accent.TButton',
-                                  command=lambda: Login_check(master,
-                                                              entry_username.get(),
-                                                              entry_password.get()))
+                                  command=lambda: login_check(master, entry_username.get(), entry_password.get()))
         button_login.grid(row=7,
                           column=0,
                           padx=20,
@@ -226,8 +224,8 @@ class LoginPage(ttk.Frame):
         login_frame.grid()
 
 
-def Login_check(master, username, password):
-    username = 'jc'
+def login_check(master, username, password):
+    username = 'js'
     password = '1234'
     global UserID
     # No username and password entered
@@ -957,47 +955,37 @@ def id_error_check(master, inputid):
     if inputid:
 
         # checks if the id is made up of digits only
-        if inputid.isdigit():
-
-            # Check if the size of the id is valid
-            if len(inputid) == 13:
-
-                # Check if the date is valid
-                if id_date_check(inputid):
-
-                    # Check if the 11th digit is valid
-                    if inputid[10] == "1" or inputid[10] == "0":
-
-                        # Checksum digit check just to ensure that the ID is valid
-                        if luhn_validator.validate(inputid):
-                            Reg_id = inputid
-                        else:
-                            messagebox.showerror("Invalid ID entry",
-                                                 "Please ensure that the ID field was correctly entered\n"
-                                                 "[Example: 9202204645082]")
-                    else:
-                        messagebox.showerror("Invalid ID entry",
-                                             "The 11th digit can only be 0 or 1.\n"
-                                             "0: SA citizen.\n"
-                                             "1: Permanent resident\n"
-                                             "[Example: 9202204645082]")
-                else:
-                    messagebox.showerror("Invalid ID entry",
-                                         "Please ensure that the first 6 digits of the ID is a valid birth date.\n "
-                                         "Remember, you must be 18 years or older to register.\n"
-                                         "[Example: 9202204645082]")
-            else:
-                messagebox.showerror("Invalid ID entry",
-                                     "Please ensure that the ID field is 13 digits.\n "
-                                     "[Example: 9202204645082]")
-        else:
+        if not inputid.isdigit():
             messagebox.showerror("Invalid ID entry",
                                  "ID field can only contain digits.\n "
                                  "[Example: 9202204645082]")
+        # Check if the size of the id is valid
+        elif len(inputid) != 13:
+            messagebox.showerror("Invalid ID entry",
+                                 "Please ensure that the ID field is 13 digits.\n "
+                                 "[Example: 9202204645082]")
+        # Check if the date is valid
+        elif not id_date_check(inputid):
+            messagebox.showerror("Invalid ID entry",
+                                 "Please ensure that the first 6 digits of the ID is a valid birth date.\n "
+                                 "Remember, you must be 18 years or older to register.\n"
+                                 "[Example: 9202204645082]")
+        # Check if the 11th digit is valid
+        elif inputid[10] != "1" and inputid[10] != "0":
+            messagebox.showerror("Invalid ID entry",
+                                 "The 11th digit can only be 0 or 1.\n"
+                                 "0: SA citizen.\n"
+                                 "1: Permanent resident\n"
+                                 "[Example: 9202204645082]")
 
-    else:
-        messagebox.showerror("Missing field",
-                             "Please ensure that the ID field is not left blank.")
+        # Checksum digit check just to ensure that the ID is valid
+        elif luhn_validator.validate(inputid):
+            Reg_id = inputid
+        else:
+            messagebox.showerror("Invalid ID entry",
+                                 "Please ensure that the ID field was correctly entered\n"
+                                 "[Example: 9202204645082]")
+
     if Reg_id:
         master.switch_frame(RegisterPageAddress)
 
@@ -2076,8 +2064,8 @@ def db_connect():
         db = mysql.connector.connect(
             host="localhost",
             user="root",
-            # password='12345678',
-            password="toor",
+            password='12345678',
+            # password="toor",
             # password='Kgalela@07',
             port="3306"
         )
