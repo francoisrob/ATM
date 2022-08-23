@@ -1,14 +1,18 @@
 """
-                                        ============================
-                                        |  Python ATM Application  |
-                                        ============================
+
+                                            ============================
+                                            |  Python ATM Application  |
+                                            ============================
+
+                A graphical desktop banking application built using the Python programming language
+
+
 """
 import tkinter as tk
 import tkinter.ttk as ttk
 import tkinter.messagebox as messagebox
 import pyglet
 import requests
-# import http.client as httplib
 from PIL import Image, ImageTk
 import mysql.connector
 from mysql.connector import errorcode
@@ -92,9 +96,10 @@ class Application(tk.Tk):
 
 def monitor_time(self, thread):
     if thread.is_alive():
-        self.after(10, lambda: monitor_time(self, thread))
+        self.after(100, lambda: monitor_time(self, thread))
     else:
-        self.after(10, lambda: monitor_time(self, thread))
+        self.after(1000, lambda: monitor_time(self, thread))
+        thread.run()
         # if not thread.run():
         #     if (not str(self._frame) == '.!loginpage'):
         #         print(self._frame)
@@ -2064,8 +2069,8 @@ def db_connect():
         db = mysql.connector.connect(
             host="localhost",
             user="root",
-            password='12345678',
-            # password="toor",
+            # password='12345678',
+            password="toor",
             # password='Kgalela@07',
             port="3306"
         )
