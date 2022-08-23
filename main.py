@@ -926,6 +926,10 @@ def details_error_check(master, fname, sname, email, cell):
             messagebox.showerror("Invalid Contact number entry",
                                  "Contact number can only contain digits.")
 
+        elif cell[0] != '0':
+            messagebox.showerror("Invalid Contact number entry",
+                                 "Contact number must be start with a 0.")
+
         elif len(cell) != 10:
             messagebox.showerror("Invalid Contact number entry",
                                  "Contact number must be 10 digits.")
@@ -2055,11 +2059,13 @@ def db_connect():
     try:
         db = mysql.connector.connect(
             host="localhost",
-            user="root",
+            #user="root",
             # password='12345678',
-            password="toor",
+            #password="toor",
             # password='Kgalela@07',
-            port="3306"
+            port="3306",
+            user="root",
+            password='Milan9860'
         )
         return db
 
