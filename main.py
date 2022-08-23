@@ -15,9 +15,10 @@ import re
 import datetime
 from datetime import date
 import luhn_validator
+from threading import Thread
 
 Version = 'v1.0822'
-exchange_data = []
+exchange_data = ['', '', '', '', '', '', '', '', '', '', '', '']
 UserID = ''
 UserData = []
 TransactionData = []
@@ -28,6 +29,8 @@ Reg_details = ["", "", "", ""]
 Reg_id = ""
 Reg_address = ["", "", "WC", ""]  # Leave WC as the default value || Used to populate a listbox
 Reg_auth = ["", ""]
+BankLogo = ImageTk.PhotoImage
+latestTime = datetime
 
 
 class Application(tk.Tk):
@@ -37,6 +40,14 @@ class Application(tk.Tk):
         self.geometry('1100x700')
         self.title('National Bank')
         self.iconbitmap('theme/favicon.ico')
+
+        # Thread
+        background = backgroundTime()
+        background.start()
+        monitor_time(self, background)
+        api = liveAPI()
+        api.start()
+        monitor_exchange(self, api)
 
         # Theme
         self.tk.call("source", "azure.tcl")
@@ -51,7 +62,6 @@ class Application(tk.Tk):
         ttk.Label(self, image=self.bg_image).place(relx=.5,
                                                    rely=.5,
                                                    anchor='center')
-
         self.switch_frame(LoginPage)
 
     def switch_frame(self, page_name):
@@ -79,20 +89,53 @@ class Application(tk.Tk):
         self.minsize(width=width, height=height)
 
 
+def monitor_time(self, thread):
+    if thread.is_alive():
+        self.after(100, lambda: monitor_time(self, thread))
+    else:
+        self.after(1000, lambda: monitor_time(self, thread))
+        thread.run()
+
+def monitor_exchange(self, thread):
+    if thread.is_alive():
+        self.after(3000, lambda: monitor_exchange(self, thread))
+        print(datetime.datetime.now().strftime("%H:%M:%S"), 'busy')
+    else:
+        print(datetime.datetime.now().strftime("%H:%M:%S"), 'Fetching data...')
+        if not exchange_data == ['', '', '', '', '', '', '', '', '', '', '', '']:
+            self.after(30000, lambda: monitor_exchange(self, thread))
+            thread.run()
+            print(datetime.datetime.now().strftime("%H:%M:%S"), 'Fetched Data')
+        else:
+            print(datetime.datetime.now().strftime("%H:%M:%S"), 'no connection')
+            self.after(1000, lambda: monitor_exchange(self, thread))
+            thread.run()
+
+
+class backgroundTime(Thread):
+    def __init__(self):
+        super().__init__()
+
+    def run(self):
+        global latestTime
+        latestTime = datetime.datetime.now().strftime("%m/%d/%Y, %H:%M:%S")
+
+
 class LoginPage(ttk.Frame):
     def __init__(self, master):
         ttk.Frame.__init__(self, master)
+        global BankLogo
         # GUI creation
         # Center Widget
         login_frame = ttk.Frame(self)
         self.image = Image.open('theme/bank_logo.png')
         self.image = self.image.resize((100, 50))
-        self.bg_image = ImageTk.PhotoImage(self.image)
-        ttk.Label(login_frame, image=self.bg_image).grid(row=0,
-                                                         column=0,
-                                                         pady=(20, 10),
-                                                         padx=20,
-                                                         sticky='n')
+        BankLogo = ImageTk.PhotoImage(self.image)
+        ttk.Label(login_frame, image=BankLogo).grid(row=0,
+                                                    column=0,
+                                                    pady=(20, 10),
+                                                    padx=20,
+                                                    sticky='n')
 
         # Header Text
         self.header_label = ttk.Label(login_frame,
@@ -169,8 +212,8 @@ class LoginPage(ttk.Frame):
 
 
 def Login_check(master, username, password):
-    # username = 'jc'
-    # password = '1234'
+    username = 'jc'
+    password = '1234'
     global UserID
     # No username and password entered
     if not username:
@@ -196,11 +239,13 @@ def Login_check(master, username, password):
             messagebox.showerror("Invalid entry", "Username or password is incorrect")
         elif user_input == user_password:
             # Correct input which takes you to the MainMenu frame
-            exchangeapi('zar')
-            fetchUser()
-            fetchAccounts()
-            fetchTransactions()
-            master.switch_frame(MainMenu)
+            if not exchange_data == ['', '', '', '', '', '', '', '', '', '', '', '']:
+                fetchUser()
+                fetchAccounts()
+                fetchTransactions()
+                master.switch_frame(MainMenu)
+            else:
+                messagebox.showerror('No Connection', 'Make sure you have a stable internet connection then try again')
         else:
             # Password is incorrect and does not match username
             messagebox.showerror("Invalid entry", "Username or password is incorrect")
@@ -216,14 +261,11 @@ class RegisterPageStart(ttk.Frame):
         # GUI creation
         # Center Widget
         register_frame = ttk.Frame(self)
-        self.image = Image.open('theme/bank_logo.png')
-        self.image = self.image.resize((100, 50))
-        self.bg_image = ImageTk.PhotoImage(self.image)
-        ttk.Label(register_frame, image=self.bg_image).grid(row=0,
-                                                            column=0,
-                                                            pady=(20, 10),
-                                                            padx=20,
-                                                            sticky='n')
+        ttk.Label(register_frame, image=BankLogo).grid(row=0,
+                                                       column=0,
+                                                       pady=(20, 10),
+                                                       padx=20,
+                                                       sticky='n')
 
         # Header Text
         self.header_label = ttk.Label(register_frame,
@@ -305,14 +347,11 @@ class RegisterPageDetails(ttk.Frame):
         # GUI creation
         # Center Widget
         register_frame = ttk.Frame(self)
-        self.image = Image.open('theme/bank_logo.png')
-        self.image = self.image.resize((100, 50))
-        self.bg_image = ImageTk.PhotoImage(self.image)
-        ttk.Label(register_frame, image=self.bg_image).grid(row=0,
-                                                            column=0,
-                                                            pady=(20, 10),
-                                                            padx=20,
-                                                            sticky='n')
+        ttk.Label(register_frame, image=BankLogo).grid(row=0,
+                                                       column=0,
+                                                       pady=(20, 10),
+                                                       padx=20,
+                                                       sticky='n')
 
         # Header Text
         header_label = ttk.Label(register_frame,
@@ -456,14 +495,11 @@ class RegisterPageID(ttk.Frame):
         # Center Widget
         register_frame = ttk.Frame(self)
         # register_frame.grid()
-        self.image = Image.open('theme/bank_logo.png')
-        self.image = self.image.resize((100, 50))
-        self.bg_image = ImageTk.PhotoImage(self.image)
-        ttk.Label(register_frame, image=self.bg_image).grid(row=0,
-                                                            column=0,
-                                                            pady=(20, 10),
-                                                            padx=20,
-                                                            sticky='n')
+        ttk.Label(register_frame, image=BankLogo).grid(row=0,
+                                                       column=0,
+                                                       pady=(20, 10),
+                                                       padx=20,
+                                                       sticky='n')
 
         # Header Text
         header_label = ttk.Label(register_frame,
@@ -548,14 +584,11 @@ class RegisterPageAddress(ttk.Frame):
         # Center Widget
         register_frame = ttk.Frame(self)
         # register_frame.grid()
-        self.image = Image.open('theme/bank_logo.png')
-        self.image = self.image.resize((100, 50))
-        self.bg_image = ImageTk.PhotoImage(self.image)
-        ttk.Label(register_frame, image=self.bg_image).grid(row=0,
-                                                            column=0,
-                                                            pady=(20, 10),
-                                                            padx=20,
-                                                            sticky='n')
+        ttk.Label(register_frame, image=BankLogo).grid(row=0,
+                                                       column=0,
+                                                       pady=(20, 10),
+                                                       padx=20,
+                                                       sticky='n')
 
         # Header Text
         header_label = ttk.Label(register_frame,
@@ -694,14 +727,11 @@ class RegisterPageAuth(ttk.Frame):
         # Center Widget
         register_frame = ttk.Frame(self)
         # register_frame.grid()
-        self.image = Image.open('theme/bank_logo.png')
-        self.image = self.image.resize((100, 50))
-        self.bg_image = ImageTk.PhotoImage(self.image)
-        ttk.Label(register_frame, image=self.bg_image).grid(row=0,
-                                                            column=0,
-                                                            pady=(20, 10),
-                                                            padx=20,
-                                                            sticky='n')
+        ttk.Label(register_frame, image=BankLogo).grid(row=0,
+                                                       column=0,
+                                                       pady=(20, 10),
+                                                       padx=20,
+                                                       sticky='n')
 
         # Header Text
         header_label = ttk.Label(register_frame,
@@ -808,14 +838,11 @@ class RegisterPageFinal(ttk.Frame):
         # Center Widget
         register_frame = ttk.Frame(self)
         # register_frame.grid()
-        self.image = Image.open('theme/bank_logo.png')
-        self.image = self.image.resize((100, 50))
-        self.bg_image = ImageTk.PhotoImage(self.image)
-        ttk.Label(register_frame, image=self.bg_image).grid(row=0,
-                                                            column=0,
-                                                            pady=(20, 10),
-                                                            padx=20,
-                                                            sticky='n')
+        ttk.Label(register_frame, image=BankLogo).grid(row=0,
+                                                       column=0,
+                                                       pady=(20, 10),
+                                                       padx=20,
+                                                       sticky='n')
         # Header Text
         header_label = ttk.Label(register_frame,
                                  text='Your Registration was successful.\n \nPlease use your Username\nand '
@@ -927,7 +954,7 @@ def id_error_check(master, inputid):
                     if inputid[10] == "1" or inputid[10] == "0":
 
                         # Checksum digit check just to ensure that the ID is valid
-                        if not luhn_validator.validate(inputid):
+                        if luhn_validator.validate(inputid):
                             Reg_id = inputid
                         else:
                             messagebox.showerror("Invalid ID entry",
@@ -1089,8 +1116,7 @@ def auth_error_check(master, username, password):
                                  "* an uppercase letter\n"
                                  "* a lowercase letter\n"
                                  "* a numeric character\n"
-                                 "* a special character\n"
-                                 "[Example: Ir0nman!])")
+                                 "* a special character")
         else:
             Reg_auth.append(password)
             check[1] = True
@@ -1112,6 +1138,12 @@ def register_insert():
     val = (Reg_details[0], Reg_details[1], Reg_address[0], Reg_address[1], Reg_address[2], Reg_address[3],
            Reg_details[3], Reg_details[2], Reg_id, Reg_auth[0], Reg_auth[1])
     db_cursor.execute(sql, val)
+    acc_id = db_cursor.lastrowid
+    sql = "INSERT INTO db_atm.tbl_accounts " \
+          "(acc_balance, date_created, acc_type, tbl_users_user_id, credit_due)" \
+          "VALUES (%s, %s, %s, %s, %s);"
+    val = (float(0), datetime.date.today(), 'd', acc_id, float(0))
+    db_cursor.execute(sql, val)
     db.commit()
     db.close()
 
@@ -1128,20 +1160,17 @@ def cancel_register(master):
     Reg_auth = ["", ""]
     master.switch_frame(LoginPage)
 
+
 class ForgotPage(ttk.Frame):
     def __init__(self, master):
         ttk.Frame.__init__(self, master)
         # GUI creation
         # Center Widget
         forgot_page = ttk.Frame(self)
-
-        self.image = Image.open('theme/bank_logo.png')
-        self.image = self.image.resize((100, 50))
-        self.bg_image = ImageTk.PhotoImage(self.image)
-        ttk.Label(forgot_page, image=self.bg_image).grid(row=0,
-                                                         column=0,
-                                                         pady=20,
-                                                         padx=20)
+        ttk.Label(forgot_page, image=BankLogo).grid(row=0,
+                                                    column=0,
+                                                    pady=20,
+                                                    padx=20)
         # Header Text
         self.header_label = ttk.Label(forgot_page,
                                       text='Forgot Password',
@@ -1286,12 +1315,9 @@ class MainMenu(ttk.Frame):
                                             height=160)
         self.header_panel.pack(side='top', fill='x')
         self.header_panel.pack_propagate(False)
-        self.image = Image.open('theme/bank_logo.png')
-        self.image = self.image.resize((100, 50))
-        self.bg_image = ImageTk.PhotoImage(self.image)
-        ttk.Label(self.header_panel, image=self.bg_image).pack(side='top',
-                                                               padx=20,
-                                                               pady=10)
+        ttk.Label(self.header_panel, image=BankLogo).pack(side='top',
+                                                          padx=20,
+                                                          pady=10)
         self.header_label = ttk.Label(self.header_panel, text='Welcome back', font=('Open Sans', 18))
         self.header_label.pack(side='top')
         self.header_name = ttk.Label(self.header_panel, text=UserData[1], font=('Open Sans', 18))
@@ -1384,17 +1410,19 @@ class AccountsPanel(ttk.Frame):
                               padx=1,
                               pady=1,
                               sticky='e')
-        self.exchange_frame = ttk.Frame(self.right_panel)
-        self.exchange_frame.grid()
+        self.exchange_frame = ttk.Frame(self.right_panel, style='Card.TFrame')
+        self.exchange_frame.grid(row=0,
+                                 padx=25,
+                                 pady=25,
+                                 column=0)
         ttk.Label(self.exchange_frame,
                   text='Foreign Exchange',
                   font=('Open Sans', 14),
                   justify='center').grid(column=0,
                                          columnspan=2,
                                          row=0,
-                                         padx=(70, 0),
-                                         pady=(20, 10),
-                                         sticky='news')
+                                         padx=40,
+                                         pady=30)
         self.list = tk.Listbox(self.exchange_frame,
                                font=('Open Sans', 10),
                                borderwidth=0,
@@ -1402,7 +1430,7 @@ class AccountsPanel(ttk.Frame):
         self.list.grid(column=0,
                        row=1,
                        sticky='n',
-                       padx=(50, 10))
+                       padx=(1, 10))
         self.list.insert(1, f'China')
         self.list.insert(2, f'Japan')
         self.list.insert(3, f'Switzerland')
@@ -1416,22 +1444,23 @@ class AccountsPanel(ttk.Frame):
         self.exchange_list = tk.Listbox(self.exchange_frame,
                                         font=('Open Sans', 10),
                                         borderwidth=0,
-                                        width=10)
+                                        width=6)
         self.exchange_list.grid(column=1,
                                 row=1,
-                                sticky='n',
-                                ipadx=5)
+                                sticky='w',
+                                pady=(0, 30),
+                                padx=1)
         if len(exchange_data) > 0:
-            self.exchange_list.insert(1, exchange_data[0])
-            self.exchange_list.insert(2, exchange_data[1])
-            self.exchange_list.insert(3, exchange_data[2])
-            self.exchange_list.insert(4, exchange_data[3])
-            self.exchange_list.insert(5, exchange_data[4])
-            self.exchange_list.insert(6, exchange_data[5])
-            self.exchange_list.insert(7, exchange_data[6])
-            self.exchange_list.insert(8, exchange_data[7])
-            self.exchange_list.insert(9, exchange_data[8])
-            self.exchange_list.insert(10, exchange_data[9])
+            self.exchange_list.insert(1, exchange_data[2])
+            self.exchange_list.insert(2, exchange_data[3])
+            self.exchange_list.insert(3, exchange_data[4])
+            self.exchange_list.insert(4, exchange_data[5])
+            self.exchange_list.insert(5, exchange_data[6])
+            self.exchange_list.insert(6, exchange_data[7])
+            self.exchange_list.insert(7, exchange_data[8])
+            self.exchange_list.insert(8, exchange_data[9])
+            self.exchange_list.insert(9, exchange_data[10])
+            self.exchange_list.insert(10, exchange_data[11])
         else:
             raise SystemExit
         self.exchange_list.bindtags(('', 'all'))
@@ -1493,19 +1522,19 @@ class CardsPanel(ttk.Frame):
         ttk.Frame.__init__(self, master)
         # Gui Creation
         self.bottom_panel = ttk.Frame(self, style='Card.TFrame')
-        self.card_panel = ttk.Frame(self.bottom_panel)
+        self.card_panel = ttk.Frame(self.bottom_panel, style='Card.TFrame')
         self.main_panel = ttk.Frame(self.card_panel,
-                                    style='Card.TFrame',
                                     width=600,
                                     height=600)
         self.main_panel.pack_propagate(False)
         # self.main_panel.pack(side='left')
         self.right_panel = ttk.Frame(self.card_panel,
-                                     width=200,
-                                     height=600,
-                                     style='Card.TFrame')
+                                     width=198,
+                                     height=598)
         self.right_panel.pack_propagate(False)
-        self.right_panel.pack(side='right')
+        self.right_panel.pack(side='right',
+                              pady=1,
+                              padx=1)
         self.card_panel.grid()
         self.bottom_panel.grid()
 
@@ -1513,7 +1542,7 @@ class CardsPanel(ttk.Frame):
         self.credit_panel = ttk.Frame(self.main_panel,
                                       style='Card.TFrame'
                                       )
-        self.credit_panel.pack(side='top', fill='x', padx=1)
+        self.credit_panel.pack(side='top', fill='x')
 
         # Debit panel
         self.debit_panel = ttk.Frame(self.main_panel,
@@ -1522,7 +1551,7 @@ class CardsPanel(ttk.Frame):
                                      style='Card.TFrame'
                                      )
         self.debit_panel.pack_propagate(False)
-        self.debit_panel.pack(side='top', fill='x', padx=1)
+        self.debit_panel.pack(side='top', fill='x')
 
         # Savings panel
         self.savings_panel = ttk.Frame(self.main_panel,
@@ -1531,7 +1560,7 @@ class CardsPanel(ttk.Frame):
                                        style='Card.TFrame'
                                        )
         self.savings_panel.pack_propagate(False)
-        self.savings_panel.pack(side='top', fill='x', padx=1)
+        self.savings_panel.pack(side='top', fill='x')
 
         self.image = Image.open('theme/credit_card.png')
         self.image = self.image.resize((204, 120))
@@ -2026,28 +2055,95 @@ def db_connect():
     # End of borrowed code
 
 
-def exchangeapi(currency):
-    url = 'https://cdn.jsdelivr.net/gh/fawazahmed0/currency-api@1/latest/currencies/' + currency + '.json'
-    try:
-        r = requests.get(url=url, timeout=3)
-        data = r.json()[currency]
-        exchange_data.append("{:.3f}".format(data['cny']))
-        exchange_data.append("{:.3f}".format(data['jpy']))
-        exchange_data.append("{:.3f}".format(data['chf']))
-        exchange_data.append("{:.3f}".format(data['rub']))
-        exchange_data.append("{:.3f}".format(data['inr']))
-        exchange_data.append("{:.3f}".format(data['twd']))
-        exchange_data.append("{:.3f}".format(data['hkd']))
-        exchange_data.append("{:.3f}".format(data['sar']))
-        exchange_data.append("{:.3f}".format(data['krw']))
-        exchange_data.append("{:.3f}".format(data['sgd']))
-        exchange_data.append("{:.3f}".format(data['usd']))
-        exchange_data.append("{:.3f}".format(data['gbp']))
-    except requests.exceptions.ConnectionError:
-        messagebox.showerror('No Connection', 'Make sure you have a stable internet connection then try again')
-    except requests.exceptions.ReadTimeout:
-        messagebox.showerror('Connection Timeout', 'Connection timed out\nPlease try again later.')
+class liveAPI(Thread):
+    def __init__(self):
+        super().__init__()
 
+    def run(self):
+        url = 'https://api.exchangerate.host/latest&v=' + datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+        try:
+            r = requests.get(url=url, timeout=3)
+            data = r.json()
+            exchange_data[0] = ("{:.3f}".format((data['rates']['CNY'] / data['rates']['ZAR'])))
+            exchange_data[1] = ("{:.3f}".format((data['rates']['JPY'] / data['rates']['ZAR'])))
+            exchange_data[2] = ("{:.3f}".format((data['rates']['CHF'] / data['rates']['ZAR'])))
+            exchange_data[3] = ("{:.3f}".format((data['rates']['RUB'] / data['rates']['ZAR'])))
+            exchange_data[4] = ("{:.3f}".format((data['rates']['INR'] / data['rates']['ZAR'])))
+            exchange_data[5] = ("{:.3f}".format((data['rates']['TWD'] / data['rates']['ZAR'])))
+            exchange_data[6] = ("{:.3f}".format((data['rates']['HKD'] / data['rates']['ZAR'])))
+            exchange_data[7] = ("{:.3f}".format((data['rates']['SAR'] / data['rates']['ZAR'])))
+            exchange_data[8] = ("{:.3f}".format((data['rates']['KRW'] / data['rates']['ZAR'])))
+            exchange_data[9] = ("{:.3f}".format((data['rates']['SGD'] / data['rates']['ZAR'])))
+            exchange_data[10] = ("{:.3f}".format((data['rates']['USD'] / data['rates']['ZAR'])))
+            exchange_data[11] = ("{:.3f}".format((data['rates']['GBP'] / data['rates']['ZAR'])))
+            print(datetime.datetime.now().strftime("%H:%M:%S"), 'server 1 - live api')
+            return True
+        except requests.exceptions.ReadTimeout:
+            print('Unable to connect to server 1')
+            url = 'https://cdn.jsdelivr.net/gh/fawazahmed0/currency-api@1/latest/currencies/zar.json'
+            r = requests.get(url=url, timeout=3)
+            data = r.json()['zar']
+            exchange_data[0] = ("{:.3f}".format(data['cny']))
+            exchange_data[1] = ("{:.3f}".format(data['jpy']))
+            exchange_data[2] = ("{:.3f}".format(data['chf']))
+            exchange_data[3] = ("{:.3f}".format(data['rub']))
+            exchange_data[4] = ("{:.3f}".format(data['inr']))
+            exchange_data[5] = ("{:.3f}".format(data['twd']))
+            exchange_data[6] = ("{:.3f}".format(data['hkd']))
+            exchange_data[7] = ("{:.3f}".format(data['sar']))
+            exchange_data[8] = ("{:.3f}".format(data['krw']))
+            exchange_data[9] = ("{:.3f}".format(data['sgd']))
+            exchange_data[10] = ("{:.3f}".format(data['usd']))
+            exchange_data[11] = ("{:.3f}".format(data['gbp']))
+            print(datetime.datetime.now().strftime("%H:%M:%S"), 'server 2 - live api')
+            return True
+        except requests.exceptions.ConnectionError:
+            print(datetime.datetime.now().strftime("%H:%M:%S"), 'No Connection')
+            return False
+
+
+# def exchangeapi():
+#     url = 'https://api.exchangerate.host/latest&v=n' + datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+#     try:
+#         r = requests.get(url=url, timeout=3)
+#         # data = r.json()[currency]
+#         data = r.json()
+#         exchange_data[0] = ("{:.3f}".format((data['rates']['CNY'] / data['rates']['ZAR'])))
+#         exchange_data[1] = ("{:.3f}".format((data['rates']['JPY'] / data['rates']['ZAR'])))
+#         exchange_data[2] = ("{:.3f}".format((data['rates']['CHF'] / data['rates']['ZAR'])))
+#         exchange_data[3] = ("{:.3f}".format((data['rates']['RUB'] / data['rates']['ZAR'])))
+#         exchange_data[4] = ("{:.3f}".format((data['rates']['INR'] / data['rates']['ZAR'])))
+#         exchange_data[5] = ("{:.3f}".format((data['rates']['TWD'] / data['rates']['ZAR'])))
+#         exchange_data[6] = ("{:.3f}".format((data['rates']['HKD'] / data['rates']['ZAR'])))
+#         exchange_data[7] = ("{:.3f}".format((data['rates']['SAR'] / data['rates']['ZAR'])))
+#         exchange_data[8] = ("{:.3f}".format((data['rates']['KRW'] / data['rates']['ZAR'])))
+#         exchange_data[9] = ("{:.3f}".format((data['rates']['SGD'] / data['rates']['ZAR'])))
+#         exchange_data[10] = ("{:.3f}".format((data['rates']['USD'] / data['rates']['ZAR'])))
+#         exchange_data[11] = ("{:.3f}".format((data['rates']['GBP'] / data['rates']['ZAR'])))
+#         print('server 1')
+#         return True
+#     except requests.exceptions.ReadTimeout:
+#         messagebox.showerror('No Connection', 'Make sure you have a stable internet connection then try again')
+#         url = 'https://cdn.jsdelivr.net/gh/fawazahmed0/currency-api@1/latest/currencies/zar.json'
+#         r = requests.get(url=url, timeout=3)
+#         data = r.json()['zar']
+#         exchange_data[0] = ("{:.3f}".format(data['cny']))
+#         exchange_data[1] = ("{:.3f}".format(data['jpy']))
+#         exchange_data[2] = ("{:.3f}".format(data['chf']))
+#         exchange_data[3] = ("{:.3f}".format(data['rub']))
+#         exchange_data[4] = ("{:.3f}".format(data['inr']))
+#         exchange_data[5] = ("{:.3f}".format(data['twd']))
+#         exchange_data[6] = ("{:.3f}".format(data['hkd']))
+#         exchange_data[7] = ("{:.3f}".format(data['sar']))
+#         exchange_data[8] = ("{:.3f}".format(data['krw']))
+#         exchange_data[9] = ("{:.3f}".format(data['sgd']))
+#         exchange_data[10] = ("{:.3f}".format(data['usd']))
+#         exchange_data[11] = ("{:.3f}".format(data['gbp']))
+#         print('server 2')
+#         return True
+#     except requests.exceptions.ConnectionError:
+#         messagebox.showerror('No Connection', 'Make sure you have a stable internet connection then try again')
+#         return False
 
 def fetchUser():
     global UserData
@@ -2183,6 +2279,8 @@ def pay(account, userid, own_reference, recipient_reference, amount):
             val = (recipient_reference, amount, transaction_date, user[0], user[4])
             db_cursor.execute(add_transaction, val)
             db.commit()
+            fetchAccounts()
+            fetchTransactions()
             messagebox.showinfo('Successful', 'Payment done successfully!')
             return True
         except Exception as e:
@@ -2245,6 +2343,8 @@ def transfer(acc_from, acc_to, amount):
             val = (to_amount, acc_to[0])
             db_cursor.execute(update_amount, val)
             db.commit()
+            fetchAccounts()
+            fetchTransactions()
             messagebox.showinfo('Successful', 'Transfer made successfully!')
             return True
         except Exception as e:
