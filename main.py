@@ -232,8 +232,8 @@ class LoginPage(ttk.Frame):
 
 
 def Login_check(master, username, password):
-    username = 'js'
-    password = '1234'
+    # username = 'js'
+    # password = '1234'
     global UserID
     # No username and password entered
     if not username:
