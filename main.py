@@ -119,6 +119,7 @@ class backgroundTime(Thread):
     def run(self):
         global latestTime
         latestTime = datetime.datetime.now().strftime("%m/%d/%Y, %H:%M:%S")
+        print(latestTime)
 
 
 class LoginPage(ttk.Frame):
@@ -1410,10 +1411,13 @@ class AccountsPanel(ttk.Frame):
                               padx=1,
                               pady=1,
                               sticky='e')
+        self.time_lbl = ttk.Label(self.right_panel, text='20:49:48', font=('Open Sans', 12))
+        self.time_lbl.grid(row=0, sticky='e', padx=25, pady=10)
+        self.monitor(backgroundTime)
         self.exchange_frame = ttk.Frame(self.right_panel, style='Card.TFrame')
-        self.exchange_frame.grid(row=0,
+        self.exchange_frame.grid(row=1,
                                  padx=25,
-                                 pady=25,
+                                 pady=1,
                                  column=0)
         ttk.Label(self.exchange_frame,
                   text='Foreign Exchange',
@@ -1515,6 +1519,10 @@ class AccountsPanel(ttk.Frame):
                        sticky='e',
                        padx=(10, 13),
                        pady=10)
+
+    def monitor(self, thread):
+        self.after(1000, lambda: self.monitor(thread))
+        self.time_lbl['text'] = latestTime
 
 
 class CardsPanel(ttk.Frame):
@@ -2062,6 +2070,7 @@ class liveAPI(Thread):
     def run(self):
         url = 'https://api.exchangerate.host/latest&v=' + datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
         try:
+            print(datetime.datetime.now().strftime("%H:%M:%S"), 'Fetch URL')
             r = requests.get(url=url, timeout=3)
             data = r.json()
             exchange_data[0] = ("{:.3f}".format((data['rates']['CNY'] / data['rates']['ZAR'])))
@@ -2076,7 +2085,7 @@ class liveAPI(Thread):
             exchange_data[9] = ("{:.3f}".format((data['rates']['SGD'] / data['rates']['ZAR'])))
             exchange_data[10] = ("{:.3f}".format((data['rates']['USD'] / data['rates']['ZAR'])))
             exchange_data[11] = ("{:.3f}".format((data['rates']['GBP'] / data['rates']['ZAR'])))
-            print(datetime.datetime.now().strftime("%H:%M:%S"), 'server 1 - live api')
+            print(datetime.datetime.now().strftime("%H:%M:%S"), 'server 1')
             return True
         except requests.exceptions.ReadTimeout:
             print('Unable to connect to server 1')
@@ -2095,55 +2104,11 @@ class liveAPI(Thread):
             exchange_data[9] = ("{:.3f}".format(data['sgd']))
             exchange_data[10] = ("{:.3f}".format(data['usd']))
             exchange_data[11] = ("{:.3f}".format(data['gbp']))
-            print(datetime.datetime.now().strftime("%H:%M:%S"), 'server 2 - live api')
+            print(datetime.datetime.now().strftime("%H:%M:%S"), 'server 2')
             return True
         except requests.exceptions.ConnectionError:
             print(datetime.datetime.now().strftime("%H:%M:%S"), 'No Connection')
             return False
-
-
-# def exchangeapi():
-#     url = 'https://api.exchangerate.host/latest&v=n' + datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
-#     try:
-#         r = requests.get(url=url, timeout=3)
-#         # data = r.json()[currency]
-#         data = r.json()
-#         exchange_data[0] = ("{:.3f}".format((data['rates']['CNY'] / data['rates']['ZAR'])))
-#         exchange_data[1] = ("{:.3f}".format((data['rates']['JPY'] / data['rates']['ZAR'])))
-#         exchange_data[2] = ("{:.3f}".format((data['rates']['CHF'] / data['rates']['ZAR'])))
-#         exchange_data[3] = ("{:.3f}".format((data['rates']['RUB'] / data['rates']['ZAR'])))
-#         exchange_data[4] = ("{:.3f}".format((data['rates']['INR'] / data['rates']['ZAR'])))
-#         exchange_data[5] = ("{:.3f}".format((data['rates']['TWD'] / data['rates']['ZAR'])))
-#         exchange_data[6] = ("{:.3f}".format((data['rates']['HKD'] / data['rates']['ZAR'])))
-#         exchange_data[7] = ("{:.3f}".format((data['rates']['SAR'] / data['rates']['ZAR'])))
-#         exchange_data[8] = ("{:.3f}".format((data['rates']['KRW'] / data['rates']['ZAR'])))
-#         exchange_data[9] = ("{:.3f}".format((data['rates']['SGD'] / data['rates']['ZAR'])))
-#         exchange_data[10] = ("{:.3f}".format((data['rates']['USD'] / data['rates']['ZAR'])))
-#         exchange_data[11] = ("{:.3f}".format((data['rates']['GBP'] / data['rates']['ZAR'])))
-#         print('server 1')
-#         return True
-#     except requests.exceptions.ReadTimeout:
-#         messagebox.showerror('No Connection', 'Make sure you have a stable internet connection then try again')
-#         url = 'https://cdn.jsdelivr.net/gh/fawazahmed0/currency-api@1/latest/currencies/zar.json'
-#         r = requests.get(url=url, timeout=3)
-#         data = r.json()['zar']
-#         exchange_data[0] = ("{:.3f}".format(data['cny']))
-#         exchange_data[1] = ("{:.3f}".format(data['jpy']))
-#         exchange_data[2] = ("{:.3f}".format(data['chf']))
-#         exchange_data[3] = ("{:.3f}".format(data['rub']))
-#         exchange_data[4] = ("{:.3f}".format(data['inr']))
-#         exchange_data[5] = ("{:.3f}".format(data['twd']))
-#         exchange_data[6] = ("{:.3f}".format(data['hkd']))
-#         exchange_data[7] = ("{:.3f}".format(data['sar']))
-#         exchange_data[8] = ("{:.3f}".format(data['krw']))
-#         exchange_data[9] = ("{:.3f}".format(data['sgd']))
-#         exchange_data[10] = ("{:.3f}".format(data['usd']))
-#         exchange_data[11] = ("{:.3f}".format(data['gbp']))
-#         print('server 2')
-#         return True
-#     except requests.exceptions.ConnectionError:
-#         messagebox.showerror('No Connection', 'Make sure you have a stable internet connection then try again')
-#         return False
 
 def fetchUser():
     global UserData
