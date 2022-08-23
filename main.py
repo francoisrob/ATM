@@ -1645,7 +1645,7 @@ class CardsPanel(ttk.Frame):
             count += 1
         if not ccard:
             ttk.Label(self.credit_panel,
-                      text='You don''t have a Credit Account',
+                      text='You do not have a Credit Account',
                       font=('Open Sans Bold', 14)).grid(column=1,
                                                         sticky='news',
                                                         padx=152,
@@ -2056,8 +2056,8 @@ def db_connect():
         db = mysql.connector.connect(
             host="localhost",
             user="root",
-            password='12345678',
-            # password="toor",
+            # password='12345678',
+            password="toor",
             # password='Kgalela@07',
             port="3306"
         )
