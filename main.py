@@ -8,6 +8,7 @@ import tkinter.ttk as ttk
 import tkinter.messagebox as messagebox
 import pyglet
 import requests
+# import http.client as httplib
 from PIL import Image, ImageTk
 import mysql.connector
 from mysql.connector import errorcode
@@ -41,14 +42,6 @@ class Application(tk.Tk):
         self.title('National Bank')
         self.iconbitmap('theme/favicon.ico')
 
-        # Thread
-        background = backgroundTime()
-        background.start()
-        monitor_time(self, background)
-        api = liveAPI()
-        api.start()
-        monitor_exchange(self, api)
-
         # Theme
         self.tk.call("source", "azure.tcl")
         self.tk.call("set_theme", "light")
@@ -62,6 +55,14 @@ class Application(tk.Tk):
         ttk.Label(self, image=self.bg_image).place(relx=.5,
                                                    rely=.5,
                                                    anchor='center')
+        # Thread
+        background = backgroundTime()
+        background.start()
+        monitor_time(self, background)
+        api = liveAPI()
+        api.start()
+        monitor_exchange(self, api)
+
         self.switch_frame(LoginPage)
 
     def switch_frame(self, page_name):
@@ -91,23 +92,23 @@ class Application(tk.Tk):
 
 def monitor_time(self, thread):
     if thread.is_alive():
-        self.after(100, lambda: monitor_time(self, thread))
+        self.after(10, lambda: monitor_time(self, thread))
     else:
-        self.after(1000, lambda: monitor_time(self, thread))
-        thread.run()
+        self.after(10, lambda: monitor_time(self, thread))
+        # if not thread.run():
+        #     if (not str(self._frame) == '.!loginpage'):
+        #         print(self._frame)
+        #         self.switch_frame(LoginPage)
+        #         messagebox.showerror('Connection Lost', 'Please try logging in again')
 
 def monitor_exchange(self, thread):
     if thread.is_alive():
         self.after(3000, lambda: monitor_exchange(self, thread))
-        print(datetime.datetime.now().strftime("%H:%M:%S"), 'busy')
     else:
-        print(datetime.datetime.now().strftime("%H:%M:%S"), 'Fetching data...')
         if not exchange_data == ['', '', '', '', '', '', '', '', '', '', '', '']:
-            self.after(30000, lambda: monitor_exchange(self, thread))
+            self.after(600000, lambda: monitor_exchange(self, thread))
             thread.run()
-            print(datetime.datetime.now().strftime("%H:%M:%S"), 'Fetched Data')
         else:
-            print(datetime.datetime.now().strftime("%H:%M:%S"), 'no connection')
             self.after(1000, lambda: monitor_exchange(self, thread))
             thread.run()
 
@@ -115,11 +116,24 @@ def monitor_exchange(self, thread):
 class backgroundTime(Thread):
     def __init__(self):
         super().__init__()
+        # self.count = 9
 
     def run(self):
+        # self.count += 1
         global latestTime
-        latestTime = datetime.datetime.now().strftime("%m/%d/%Y, %H:%M:%S")
-        print(latestTime)
+        # connected = True
+        latestTime = datetime.datetime.now().strftime("%H:%M:%S")
+        # if self.count == 200:
+        #     self.count = 0
+        #     con = httplib.HTTPSConnection('8.8.8.8', timeout=1)
+        #     try:
+        #         con.request('HEAD', '/')
+        #     except Exception as e:
+        #         print(e)
+        #         connected = False
+        #     finally:
+        #         con.close()
+        # return connected
 
 
 class LoginPage(ttk.Frame):
@@ -1411,9 +1425,9 @@ class AccountsPanel(ttk.Frame):
                               padx=1,
                               pady=1,
                               sticky='e')
-        self.time_lbl = ttk.Label(self.right_panel, text='20:49:48', font=('Open Sans', 12))
+        self.time_lbl = ttk.Label(self.right_panel, text='00:00:00', font=('Open Sans', 12))
         self.time_lbl.grid(row=0, sticky='e', padx=25, pady=10)
-        self.monitor(backgroundTime)
+
         self.exchange_frame = ttk.Frame(self.right_panel, style='Card.TFrame')
         self.exchange_frame.grid(row=1,
                                  padx=25,
@@ -1454,19 +1468,8 @@ class AccountsPanel(ttk.Frame):
                                 sticky='w',
                                 pady=(0, 30),
                                 padx=1)
-        if len(exchange_data) > 0:
-            self.exchange_list.insert(1, exchange_data[2])
-            self.exchange_list.insert(2, exchange_data[3])
-            self.exchange_list.insert(3, exchange_data[4])
-            self.exchange_list.insert(4, exchange_data[5])
-            self.exchange_list.insert(5, exchange_data[6])
-            self.exchange_list.insert(6, exchange_data[7])
-            self.exchange_list.insert(7, exchange_data[8])
-            self.exchange_list.insert(8, exchange_data[9])
-            self.exchange_list.insert(9, exchange_data[10])
-            self.exchange_list.insert(10, exchange_data[11])
-        else:
-            raise SystemExit
+        self.monitor(backgroundTime)
+        self.monitor_exchange()
         self.exchange_list.bindtags(('', 'all'))
         self.list.bindtags(('', 'all'))
 
@@ -1480,6 +1483,21 @@ class AccountsPanel(ttk.Frame):
         self.tag_panel.grid(row=3, padx=25, pady=(0, 20))
         self.recent_transactions()
         self.accounts_panel.grid()
+
+    def update_rates(self):
+        if len(exchange_data) > 0:
+            self.exchange_list.insert(1, exchange_data[2])
+            self.exchange_list.insert(2, exchange_data[3])
+            self.exchange_list.insert(3, exchange_data[4])
+            self.exchange_list.insert(4, exchange_data[5])
+            self.exchange_list.insert(5, exchange_data[6])
+            self.exchange_list.insert(6, exchange_data[7])
+            self.exchange_list.insert(7, exchange_data[8])
+            self.exchange_list.insert(8, exchange_data[9])
+            self.exchange_list.insert(9, exchange_data[10])
+            self.exchange_list.insert(10, exchange_data[11])
+        else:
+            raise SystemExit
 
     def recent_transactions(self):
         tags = len(TransactionData)
@@ -1524,6 +1542,10 @@ class AccountsPanel(ttk.Frame):
         self.after(1000, lambda: self.monitor(thread))
         self.time_lbl['text'] = latestTime
 
+    def monitor_exchange(self):
+        self.after(600000, lambda: self.monitor_exchange())
+        self.update_rates()
+
 
 class CardsPanel(ttk.Frame):
     def __init__(self, master):
@@ -1535,7 +1557,6 @@ class CardsPanel(ttk.Frame):
                                     width=600,
                                     height=600)
         self.main_panel.pack_propagate(False)
-        # self.main_panel.pack(side='left')
         self.right_panel = ttk.Frame(self.card_panel,
                                      width=198,
                                      height=598)
@@ -1543,6 +1564,7 @@ class CardsPanel(ttk.Frame):
         self.right_panel.pack(side='right',
                               pady=1,
                               padx=1)
+
         self.card_panel.grid()
         self.bottom_panel.grid()
 
@@ -1708,6 +1730,12 @@ class PaymentsPanel(ttk.Frame):
                                      width=284,
                                      height=600)
         self.right_panel.pack(side='right')
+        self.right_panel.pack_propagate(False)
+
+        self.time_lbl = ttk.Label(self.right_panel, text='00:00:00', font=('Open Sans', 12))
+        self.time_lbl.pack(side='top', anchor='e', padx=32, pady=11)
+        self.monitor(monitor_time)
+
         self.scrollboard.pack(side='right',
                               fill='y',
                               pady=2)
@@ -1772,11 +1800,11 @@ class PaymentsPanel(ttk.Frame):
                          expand=True)
             title = ttk.Label(receipt,
                               text=TransactionData[a][1],
-                              font=('Open Sans', 10),
-                              width=25)
+                              font=('Open Sans', 12),
+                              width=20)
             title.grid(row=0,
                        column=0,
-                       sticky='news',
+                       sticky='n',
                        padx=10)
             if TransactionData[a][4] == CardType[0][0]:
                 text = 'Debit'
@@ -1787,10 +1815,11 @@ class PaymentsPanel(ttk.Frame):
             card = ttk.Label(receipt,
                              text=text,
                              font=('Open Sans Light', 8),
-                             width=25)
+                             width=30)
             card.grid(row=1,
                       column=0,
                       sticky='n',
+                      pady=(0, 5),
                       padx=10)
             dates = TransactionData[a][3].strftime('%Y-%m-%d %H:%M')
             lbldate = ttk.Label(receipt,
@@ -2024,6 +2053,10 @@ class PaymentsPanel(ttk.Frame):
         if transfer(acc_from, acc_to, amount):
             self.showpayment(2)
 
+    def monitor(self, thread):
+        self.after(1000, lambda: self.monitor(thread))
+        self.time_lbl['text'] = latestTime
+
 
 class TransferPanel(ttk.Frame):
     def __init__(self, master):
@@ -2070,7 +2103,6 @@ class liveAPI(Thread):
     def run(self):
         url = 'https://api.exchangerate.host/latest&v=' + datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
         try:
-            print(datetime.datetime.now().strftime("%H:%M:%S"), 'Fetch URL')
             r = requests.get(url=url, timeout=3)
             data = r.json()
             exchange_data[0] = ("{:.3f}".format((data['rates']['CNY'] / data['rates']['ZAR'])))
@@ -2085,10 +2117,8 @@ class liveAPI(Thread):
             exchange_data[9] = ("{:.3f}".format((data['rates']['SGD'] / data['rates']['ZAR'])))
             exchange_data[10] = ("{:.3f}".format((data['rates']['USD'] / data['rates']['ZAR'])))
             exchange_data[11] = ("{:.3f}".format((data['rates']['GBP'] / data['rates']['ZAR'])))
-            print(datetime.datetime.now().strftime("%H:%M:%S"), 'server 1')
             return True
         except requests.exceptions.ReadTimeout:
-            print('Unable to connect to server 1')
             url = 'https://cdn.jsdelivr.net/gh/fawazahmed0/currency-api@1/latest/currencies/zar.json'
             r = requests.get(url=url, timeout=3)
             data = r.json()['zar']
@@ -2104,10 +2134,8 @@ class liveAPI(Thread):
             exchange_data[9] = ("{:.3f}".format(data['sgd']))
             exchange_data[10] = ("{:.3f}".format(data['usd']))
             exchange_data[11] = ("{:.3f}".format(data['gbp']))
-            print(datetime.datetime.now().strftime("%H:%M:%S"), 'server 2')
             return True
         except requests.exceptions.ConnectionError:
-            print(datetime.datetime.now().strftime("%H:%M:%S"), 'No Connection')
             return False
 
 def fetchUser():
