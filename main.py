@@ -1439,8 +1439,8 @@ class AccountsPanel(ttk.Frame):
         self.list.insert(6, f'Taiwan')
         self.list.insert(7, f'Hong Kong')
         self.list.insert(8, f'Saudi Arabia')
-        self.list.insert(9, f'South Korea')
-        self.list.insert(10, f'Singapore')
+        self.list.insert(9, f'United States')
+        self.list.insert(10, f'United Kingdom')
         self.exchange_list = tk.Listbox(self.exchange_frame,
                                         font=('Open Sans', 10),
                                         borderwidth=0,
