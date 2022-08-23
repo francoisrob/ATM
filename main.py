@@ -21,8 +21,9 @@ import datetime
 from datetime import date
 import luhn_validator
 from threading import Thread
+from secrets import compare_digest
 
-Version = 'v1.0822'
+Version = 'v1.0823'
 exchange_data = ['', '', '', '', '', '', '', '', '', '', '', '']
 UserID = ''
 UserData = []
@@ -36,7 +37,6 @@ Reg_address = ["", "", "WC", ""]  # Leave WC as the default value || Used to pop
 Reg_auth = ["", ""]
 BankLogo = ImageTk.PhotoImage
 latestTime = datetime
-
 
 class Application(tk.Tk):
     def __init__(self, *args, **kwargs):
@@ -100,17 +100,12 @@ def monitor_time(self, thread):
     else:
         self.after(1000, lambda: monitor_time(self, thread))
         thread.run()
-        # if not thread.run():
-        #     if (not str(self._frame) == '.!loginpage'):
-        #         print(self._frame)
-        #         self.switch_frame(LoginPage)
-        #         messagebox.showerror('Connection Lost', 'Please try logging in again')
 
 def monitor_exchange(self, thread):
     if thread.is_alive():
         self.after(3000, lambda: monitor_exchange(self, thread))
     else:
-        if not exchange_data == ['', '', '', '', '', '', '', '', '', '', '', '']:
+        if exchange_data != ['', '', '', '', '', '', '', '', '', '', '', '']:
             self.after(600000, lambda: monitor_exchange(self, thread))
             thread.run()
         else:
@@ -121,24 +116,10 @@ def monitor_exchange(self, thread):
 class backgroundTime(Thread):
     def __init__(self):
         super().__init__()
-        # self.count = 9
 
     def run(self):
-        # self.count += 1
         global latestTime
-        # connected = True
         latestTime = datetime.datetime.now().strftime("%H:%M:%S")
-        # if self.count == 200:
-        #     self.count = 0
-        #     con = httplib.HTTPSConnection('8.8.8.8', timeout=1)
-        #     try:
-        #         con.request('HEAD', '/')
-        #     except Exception as e:
-        #         print(e)
-        #         connected = False
-        #     finally:
-        #         con.close()
-        # return connected
 
 
 class LoginPage(ttk.Frame):
@@ -259,7 +240,7 @@ def Login_check(master, username, password):
             messagebox.showerror("Invalid entry", "Username or password is incorrect")
         elif user_input == user_password:
             # Correct input which takes you to the MainMenu frame
-            if not exchange_data == ['', '', '', '', '', '', '', '', '', '', '', '']:
+            if exchange_data != ['', '', '', '', '', '', '', '', '', '', '', '']:
                 fetchUser()
                 fetchAccounts()
                 fetchTransactions()
@@ -897,7 +878,7 @@ def details_error_check(master, fname, sname, email, cell):
     check = [False, False, False, False]
     if fname and sname and email and cell:
         # Fname check
-        if not len(fname) > 45:
+        if len(fname) <= 45:
             # Allows all letters, spaces and hyphens
             if re.match('^[A-zÀ-ÿ- ]*$', fname):
                 Reg_details.append(fname.capitalize())
@@ -909,7 +890,7 @@ def details_error_check(master, fname, sname, email, cell):
             messagebox.showerror("Invalid First name entry",
                                  "First name must be less than 45 characters.")
         # Sname check
-        if not len(sname) > 45:
+        if len(sname) <= 45:
             # Allows all letters, spaces and hyphens
             if re.match('^[A-zÀ-ÿ- ]*$', sname):
                 Reg_details.append(sname.capitalize())
@@ -921,7 +902,7 @@ def details_error_check(master, fname, sname, email, cell):
             messagebox.showerror("Invalid Last name entry",
                                  "Last name must be less than 45 characters.")
         # Email check
-        if not len(fname) > 45:
+        if len(fname) <= 45:
             # Regex for email allows one @ and one dot (.co.za will not work)
             # elif re.match('^[a-z0-9] + [\._] ? [a-z0-9] + [@]\w + [.] \w{2,3}$', email):
             if re.match(r'([A-Za-z0-9]+[.-_])*[A-Za-z0-9]+@[A-Za-z0-9-]+(\.[A-Z|a-z]{2,})+', email):
@@ -1064,7 +1045,7 @@ def address_error_check(master, street, city, state, post):
             check[1] = True
 
         # Checks if the user changed the default state of the option menu
-        if not state == "Select an option":
+        if state != "Select an option":
             Reg_address.append(state)
             check[2] = True
         else:
@@ -1096,7 +1077,7 @@ def auth_error_check(master, username, password):
     check = [False, False]
     if username and password:
 
-        if not len(username) > 45:
+        if len(username) <= 45:
             # Allows letters, numbers and underscore in username. No special characters or spaces
             if re.match('^[A-z0-9_ ]*$', username):
                 db = db_connect()
@@ -1290,7 +1271,7 @@ class ForgotPage(ttk.Frame):
 def ForgotPass(master, username, password, vpassword, email):
     if not username:
         messagebox.showerror("Invalid entry", "Username cannot be left blank.\nPlease enter a Username.")
-    elif not (password == vpassword):
+    elif compare_digest(password, vpassword):
         messagebox.showerror("Invalid entry", "Passwords do not match.\nPlease enter a Password.")
     elif not password:
         messagebox.showerror('Invalid Entry', 'Password cannot be left blank\nPlease enter a password')
@@ -1670,7 +1651,7 @@ class CardsPanel(ttk.Frame):
             count += 1
         if not ccard:
             ttk.Label(self.credit_panel,
-                      text='You don''t have a Credit Account',
+                      text='You do not have a Credit Account',
                       font=('Open Sans Bold', 14)).grid(column=1,
                                                         sticky='news',
                                                         padx=152,
@@ -1684,7 +1665,7 @@ class CardsPanel(ttk.Frame):
             self.credit_img.grid_remove()
         if not dcard:
             ttk.Label(self.debit_panel,
-                      text='You don''t have a Debit Account',
+                      text='You do not have a Debit Account',
                       font=('Open Sans Bold', 14)).grid(column=1,
                                                         sticky='news',
                                                         padx=152,
@@ -1698,7 +1679,7 @@ class CardsPanel(ttk.Frame):
             self.debit_img.grid_remove()
         if not scard:
             ttk.Label(self.savings_panel,
-                      text='You don''t have a Savings Account',
+                      text='You do not have a Savings Account',
                       font=('Open Sans Bold', 14)).grid(column=1,
                                                         sticky='news',
                                                         padx=152,
