@@ -1,14 +1,18 @@
 """
-                                        ============================
-                                        |  Python ATM Application  |
-                                        ============================
+
+                                            ============================
+                                            |  Python ATM Application  |
+                                            ============================
+
+                A graphical desktop banking application built using the Python programming language
+
+
 """
 import tkinter as tk
 import tkinter.ttk as ttk
 import tkinter.messagebox as messagebox
 import pyglet
 import requests
-# import http.client as httplib
 from PIL import Image, ImageTk
 import mysql.connector
 from mysql.connector import errorcode
