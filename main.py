@@ -4,7 +4,7 @@
                                             |  Python ATM Application  |
                                             ============================
 
-                A graphical desktop banking application built using the Python programming language
+                 A graphical desktop banking application built using the Python programming language
 
 
 """
