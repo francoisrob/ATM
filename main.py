@@ -8,6 +8,7 @@
 
 
 """
+import http.client
 import tkinter as tk
 import tkinter.ttk as ttk
 import tkinter.messagebox as messagebox
@@ -23,7 +24,7 @@ import luhn_validator
 from threading import Thread
 from secrets import compare_digest
 
-Version = 'v1.0823'
+Version = 'v1.824'
 exchange_data = ['', '', '', '', '', '', '', '', '', '', '', '']
 UserID = ''
 UserData = []
@@ -91,18 +92,28 @@ class Application(tk.Tk):
         self.minsize(width=width, height=height)
 
 
+def check_online():
+    con = http.client.HTTPSConnection('8.8.8.8', timeout=5)
+    try:
+        con.request('HEAD', '/')
+        return True
+    except Exception as e:
+        print(e)
+        return False
+    finally:
+        con.close()
+
+
 def monitor_time(self, thread):
     Thread(target=runTime()).start()
-    self.after(1000, lambda: monitor_time(self, thread))
+    self.after(100, lambda: monitor_time(self, thread))
 
 
 def monitor_exchange(self, thread):
     if exchange_data != ['', '', '', '', '', '', '', '', '', '', '', '']:
-        print('Lets go')
         Thread(target=runAPI).start()
-        self.after(60000, lambda: monitor_exchange(self, thread))
+        self.after(10000, lambda: monitor_exchange(self, thread))
     else:
-        print('First')
         Thread(target=runAPI).start()
         self.after(3000, lambda: monitor_exchange(self, thread))
 
@@ -206,8 +217,6 @@ class LoginPage(ttk.Frame):
 
 
 def login_check(master, username, password):
-    username = 'js'
-    password = '1234'
     global UserID
     # No username and password entered
     if not username:
@@ -1337,7 +1346,7 @@ class MainMenu(ttk.Frame):
 
         # theme button
         theme_button = ttk.Checkbutton(self.left_panel,
-                                       command=master.set_theme,
+                                       command=lambda: Thread(target=master.set_theme).start(),
                                        text='Dark Mode',
                                        style="Switch.TCheckbutton")
         theme_button.pack(side='bottom', fill='x', padx=60)
@@ -1346,6 +1355,7 @@ class MainMenu(ttk.Frame):
 
         self.left_panel.pack(side='left', fill='y')
         Thread(target=self.show_panel(AccountsPanel)).start()
+        self.online_status(master)
 
     def show_panel(self, panel):
         # This function displays new panels on the right
@@ -1354,6 +1364,13 @@ class MainMenu(ttk.Frame):
             self._panel.destroy()
         self._panel = new_panel
         Thread(target=self._panel.pack()).start()
+
+    def online_status(self, master):
+        if check_online():
+            self.after(10000, lambda: self.online_status(master))
+        else:
+            messagebox.showerror('Connection lost', 'You have been logged out.')
+            master.switch_frame(LoginPage)
 
 
 class AccountsPanel(ttk.Frame):
@@ -1727,6 +1744,10 @@ class PaymentsPanel(ttk.Frame):
                         self.onFrameConfigure)
         self.header = ttk.Frame(self.frame)
         self.header.pack(side='top')
+        self.receipt_frame = ttk.Frame(self.frame,
+                                       style='Card.TFrame')
+        self.receipt_frame.pack(side='top')
+        Thread(target=self.populate()).start()
         self.pay_button = ttk.Button(self.header,
                                      command=self.showpay,
                                      style='Accent.TButton',
@@ -1740,13 +1761,13 @@ class PaymentsPanel(ttk.Frame):
                                           command=self.show_transfer,
                                           style='Accent.TButton',
                                           text='Transfer')
-        if len(CardType[0]) == 1:
-            self.transfer_button['state'] = tk.DISABLED
         self.transfer_button.grid(row=0,
                                   column=1,
                                   padx=10,
                                   pady=40,
                                   sticky='w')
+        if len(CardType[0]) == 1:
+            self.transfer_button['state'] = tk.DISABLED
         ttk.Label(self.header,
                   text='Transactions',
                   font=('Open Sans Bold', 14)).grid(row=1,
@@ -1754,11 +1775,7 @@ class PaymentsPanel(ttk.Frame):
                                                     columnspan=2,
                                                     padx=188,
                                                     pady=1)
-        self.receipt_frame = ttk.Frame(self.frame,
-                                       style='Card.TFrame')
-        self.receipt_frame.pack(side='top')
         self.payments_panel.pack()
-        Thread(target=self.populate()).start()
         self.bottom_panel.grid()
 
     def populate(self):
@@ -1858,7 +1875,6 @@ class PaymentsPanel(ttk.Frame):
                       sticky='w')
         cbb_from['state'] = 'readonly'
         cbb_from['values'] = CardType[1]
-        print(CardType)
 
         ttk.Label(self.pay_panel,
                   text='Recipient Account ID:').grid(row=2,
@@ -2075,7 +2091,6 @@ def db_connect():
 def runAPI():
     url = 'https://api.exchangerate.host/latest&v=' + datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
     try:
-        print(datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S'), 'Fetch')
         r = requests.get(url=url, timeout=3)
         data = r.json()
         exchange_data[0] = ("{:.3f}".format((data['rates']['CNY'] / data['rates']['ZAR'])))
@@ -2230,12 +2245,10 @@ def pay(account, userid, own_reference, recipient_reference, amount):
             # Update Account balances
             update_amount = 'UPDATE db_atm.tbl_accounts SET acc_balance = %s WHERE acc_ID = %s'
             val = (own_amount, userdata[0])
-            print(val)
             db = db_connect()
             db_cursor = db.cursor()
             db_cursor.execute(update_amount, val)
             val = (recipient_amount, user[0])
-            print(val)
             db_cursor.execute(update_amount, val)
             # Add transactions
             add_transaction = '''INSERT INTO db_atm.tbl_transactions 
