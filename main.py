@@ -73,9 +73,9 @@ class Application(tk.Tk):
         if self._frame is not None:
             self._frame.destroy()
         self._frame = new_frame
-        Thread(target=self._frame.place(relx=.5,
-                                        rely=.5,
-                                        anchor='center')).start()
+        self._frame.place(relx=.5,
+                          rely=.5,
+                          anchor='center')
         self.update_size()
 
     def set_theme(self):
@@ -1369,8 +1369,8 @@ class MainMenu(ttk.Frame):
         if check_online():
             self.after(10000, lambda: self.online_status(master))
         else:
-            messagebox.showerror('Connection lost', 'You have been logged out.')
             master.switch_frame(LoginPage)
+            messagebox.showerror('Connection lost', 'You have been logged out.')
 
 
 class AccountsPanel(ttk.Frame):
