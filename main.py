@@ -9,7 +9,6 @@
 
 """
 import http.client
-import time
 import tkinter as tk
 import tkinter.ttk as ttk
 import tkinter.messagebox as messagebox
