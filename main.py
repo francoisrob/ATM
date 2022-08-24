@@ -213,8 +213,8 @@ class LoginPage(ttk.Frame):
                              padx=20,
                              pady=(0, 10),
                              columnspan=2)
-        login_frame.grid()
 
+        login_frame.grid()
 
 def login_check(master, username, password):
     global UserID
