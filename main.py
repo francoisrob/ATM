@@ -8,21 +8,22 @@
 
 
 """
+import datetime
 import http.client
+import re
 import tkinter as tk
-import tkinter.ttk as ttk
 import tkinter.messagebox as messagebox
+import tkinter.ttk as ttk
+from datetime import date
+from secrets import compare_digest
+from threading import Thread
+
+import luhn_validator
+import mysql.connector
 import pyglet
 import requests
 from PIL import Image, ImageTk
-import mysql.connector
 from mysql.connector import errorcode
-import re
-import datetime
-from datetime import date
-import luhn_validator
-from threading import Thread
-from secrets import compare_digest
 
 Version = 'v1.824'
 exchange_data = ['', '', '', '', '', '', '', '', '', '', '', '']
@@ -112,7 +113,7 @@ def monitor_time(self, thread):
 def monitor_exchange(self, thread):
     if exchange_data != ['', '', '', '', '', '', '', '', '', '', '', '']:
         Thread(target=runAPI).start()
-        self.after(10000, lambda: monitor_exchange(self, thread))
+        self.after(60000, lambda: monitor_exchange(self, thread))
     else:
         Thread(target=runAPI).start()
         self.after(3000, lambda: monitor_exchange(self, thread))
@@ -185,7 +186,7 @@ class LoginPage(ttk.Frame):
                             sticky='w')
         forgot_label = ttk.Label(login_frame,
                                  text="Forgot your Password?",
-                                 font=('Open Sans light', 8))
+                                 font=('Open Sans light', 11))
         forgot_label.grid(row=6,
                           column=0,
                           sticky='e',
@@ -218,6 +219,8 @@ class LoginPage(ttk.Frame):
 
 
 def login_check(master, username, password):
+    username = 'js'
+    password = '1234'
     global UserID
     # No username and password entered
     if not username:
@@ -1340,7 +1343,7 @@ class MainMenu(ttk.Frame):
                                           style="Panel.TButton")
         self.payments_button.pack(side='top', fill='x')
 
-        self.version_label = ttk.Label(self.left_panel, font=('Open Sans light', 5))
+        self.version_label = ttk.Label(self.left_panel, font=('Open Sans light', 8))
         self.version_label.pack(side='bottom', fill='x')
         self.version_label.configure(text=Version)
         self.logout_button = ttk.Button(self.left_panel,
@@ -1476,7 +1479,7 @@ class AccountsPanel(ttk.Frame):
                                                     padx=150,
                                                     columnspan=2)
         self.tag_panel = ttk.Frame(self.left_panel, style="Card.TFrame")
-        self.tag_panel.grid(row=3, padx=25, pady=(0, 20))
+        self.tag_panel.grid(row=3, padx=20, pady=(0, 20))
         Thread(target=self.recent_transactions()).start()
 
         self.accounts_panel.grid()
@@ -1509,12 +1512,12 @@ class AccountsPanel(ttk.Frame):
                        padx=1,
                        pady=1)
             frame.pack_propagate(False)
-            title = ttk.Label(frame, text=TransactionData[a][1], font=('Open Sans', 10), width=25)
+            title = ttk.Label(frame, text=TransactionData[a][1], font=('Open Sans', 11), width=20)
             title.grid(row=0,
                        column=0,
                        sticky='news',
                        padx=10,
-                       pady=10)
+                       pady=7)
             dates = TransactionData[a][3].strftime('%Y-%m-%d %H:%M')
             lbldate = ttk.Label(frame,
                                 text=dates,
@@ -1533,7 +1536,7 @@ class AccountsPanel(ttk.Frame):
                        column=2,
                        sticky='e',
                        padx=(10, 13),
-                       pady=10)
+                       pady=8)
 
     def monitor(self, thread):
         self.after(1000, lambda: self.monitor(thread))
@@ -1556,6 +1559,7 @@ class CardsPanel(ttk.Frame):
                                     width=600,
                                     height=600)
         self.main_panel.pack_propagate(False)
+        self.main_panel.pack(side='left')
         self.right_panel = ttk.Frame(self.card_panel,
                                      width=198,
                                      height=598)
@@ -1566,14 +1570,11 @@ class CardsPanel(ttk.Frame):
 
         self.card_panel.pack()
         self.bottom_panel.grid()
-
         # Credit panel
         self.credit_panel = ttk.Frame(self.main_panel,
                                       style='Card.TFrame'
                                       )
         self.credit_panel.pack(side='top', fill='x')
-
-        # Debit panel
         self.debit_panel = ttk.Frame(self.main_panel,
                                      height=200,
                                      width=600,
@@ -1581,8 +1582,6 @@ class CardsPanel(ttk.Frame):
                                      )
         self.debit_panel.pack_propagate(False)
         self.debit_panel.pack(side='top', fill='x')
-
-        # Savings panel
         self.savings_panel = ttk.Frame(self.main_panel,
                                        height=200,
                                        width=600,
@@ -1590,6 +1589,7 @@ class CardsPanel(ttk.Frame):
                                        )
         self.savings_panel.pack_propagate(False)
         self.savings_panel.pack(side='top', fill='x')
+        self.populate()
 
         self.image = Image.open('theme/credit_card.png')
         self.image = self.image.resize((204, 120))
@@ -1608,8 +1608,6 @@ class CardsPanel(ttk.Frame):
         self.s_img = ImageTk.PhotoImage(self.image)
         self.saving_img = ttk.Label(self.savings_panel, image=self.s_img)
         self.saving_img.grid(column=0, row=0, padx=(50, 20), pady=38)
-        self.populate()
-        self.main_panel.pack(side='left')
 
     def populate(self):
         ccard, dcard, scard = False, False, False
@@ -1618,7 +1616,8 @@ class CardsPanel(ttk.Frame):
             if x == 'Credit':
                 ccard = True
                 credit = count
-                c_panel = ttk.Frame(self.credit_panel)
+                c_panel = ttk.Frame(self.credit_panel, width=180, height=120)
+                c_panel.grid_propagate(False)
                 c_panel.grid(column=1, row=0, pady=40, sticky='n')
                 ttk.Label(c_panel, text='Credit Account', font=('Open Sans Bold', 14)).grid(row=0)
                 # data
@@ -1633,11 +1632,12 @@ class CardsPanel(ttk.Frame):
                           font=('Open Sans', 10)).grid(row=3, sticky='nw')
                 ttk.Button(self.credit_panel,
                            command=lambda: self.show_info('Credit', credit, AccountsData[credit][0]),
-                           text='info').grid(column=2, row=0, padx=(60, 0))
+                           text='info').grid(column=2, row=0)
             elif x == 'Debit':
                 dcard = True
                 debit = count
-                d_panel = ttk.Frame(self.debit_panel)
+                d_panel = ttk.Frame(self.debit_panel, width=180, height=120)
+                d_panel.grid_propagate(False)
                 d_panel.grid(column=1, row=0, pady=40, sticky='n')
                 ttk.Label(d_panel, text='Debit Account', font=('Open Sans Bold', 14)).grid(row=0)
                 # data
@@ -1652,12 +1652,12 @@ class CardsPanel(ttk.Frame):
                           font=('Open Sans Light', 10)).grid(row=3, sticky='nw')
                 ttk.Button(self.debit_panel,
                            command=lambda: self.show_info('Debit', debit, AccountsData[debit][0]),
-                           text='info').grid(column=2, row=0, padx=(60, 0))
-
+                           text='info').grid(column=2, row=0)
             elif x == 'Savings':
                 scard = True
                 savings = count
-                s_panel = ttk.Frame(self.savings_panel)
+                s_panel = ttk.Frame(self.savings_panel, width=180, height=120)
+                s_panel.grid_propagate(False)
                 s_panel.grid(column=1, row=0, pady=40, sticky='n')
                 ttk.Label(s_panel, text='Savings Account', font=('Open Sans Bold', 14)).grid(row=0)
                 # data
@@ -1672,7 +1672,7 @@ class CardsPanel(ttk.Frame):
                           font=('Open Sans Light', 10)).grid(row=3, sticky='nw')
                 ttk.Button(self.savings_panel,
                            command=lambda: self.show_info('Savings', savings, AccountsData[savings][0]),
-                           text='info').grid(column=2, row=0, padx=(60, 0))
+                           text='info').grid(column=2, row=0)
             count += 1
         if not ccard:
             ttk.Label(self.credit_panel,
@@ -1753,8 +1753,8 @@ class CardsPanel(ttk.Frame):
             _img = self.s_img
         img = ttk.Label(header_panel, image=_img)
         img.grid(column=1, row=0, padx=(50, 20), pady=38)
-        self.card_panel.pack_forget()
         ttk.Label(main_panel, text='Transactions', font=('Open Sans Bold', 14)).pack(side='top', pady=(10, 0))
+        self.card_panel.pack_forget()
         receipt_frame.pack(side='top', pady=(0, 20))
         self.info_panel.pack()
 
@@ -1845,7 +1845,7 @@ class CardsPanel(ttk.Frame):
             value = ttk.Label(receipt,
                               text="R {:,.2f}".format(self.data[a][2]),
                               width=10,
-                              font=('Open Sans', 10))
+                              font=('Open Sans', 12))
             value.grid(row=0,
                        column=2,
                        sticky='e',
@@ -1909,24 +1909,23 @@ class PaymentsPanel(ttk.Frame):
         self.frame.bind('<Configure>',
                         self.onFrameConfigure)
         self.header = ttk.Frame(self.frame)
-        self.header.pack(side='top')
+        self.header.pack(side='top', fill='x')
         self.receipt_frame = ttk.Frame(self.frame,
                                        style='Card.TFrame')
         self.receipt_frame.pack(side='top')
-        Thread(target=self.populate()).start()
         self.pay_button = ttk.Button(self.header,
                                      command=self.showpay,
                                      style='Accent.TButton',
                                      text='Pay')
+        self.transfer_button = ttk.Button(self.header,
+                                          command=self.show_transfer,
+                                          style='Accent.TButton',
+                                          text='Transfer')
         self.pay_button.grid(row=0,
                              column=0,
                              padx=10,
                              pady=40,
                              sticky='e')
-        self.transfer_button = ttk.Button(self.header,
-                                          command=self.show_transfer,
-                                          style='Accent.TButton',
-                                          text='Transfer')
         self.transfer_button.grid(row=0,
                                   column=1,
                                   padx=10,
@@ -1941,6 +1940,7 @@ class PaymentsPanel(ttk.Frame):
                                                     columnspan=2,
                                                     padx=188,
                                                     pady=1)
+        self.populate()
         self.payments_panel.pack()
         self.bottom_panel.grid()
 
@@ -1983,7 +1983,7 @@ class PaymentsPanel(ttk.Frame):
             lbldate = ttk.Label(receipt,
                                 text=dates,
                                 font=('Open Sans Light', 10),
-                                width=20)
+                                width=18)
             lbldate.grid(row=0,
                          column=1,
                          sticky='e',
@@ -1991,7 +1991,7 @@ class PaymentsPanel(ttk.Frame):
             value = ttk.Label(receipt,
                               text="R {:,.2f}".format(TransactionData[a][2]),
                               width=10,
-                              font=('Open Sans', 10))
+                              font=('Open Sans', 11))
             value.grid(row=0,
                        column=2,
                        sticky='e',
@@ -2216,15 +2216,6 @@ class PaymentsPanel(ttk.Frame):
         self.time_lbl['text'] = latestTime
 
 
-class TransferPanel(ttk.Frame):
-    def __init__(self, master):
-        ttk.Frame.__init__(self, master)
-        # Gui Creation
-        self.cards_panel = ttk.Frame(self, width=800, height=600, style="Card.TFrame")
-        self.cards_panel.grid()
-        self.cards_panel.grid_propagate(False)
-
-
 def db_connect():
     # Connecting to the database is set as a method since we need to open and close it for different transactions
     # Error handling code:
@@ -2273,7 +2264,7 @@ def runAPI():
         exchange_data[10] = ("{:.3f}".format((data['rates']['USD'] / data['rates']['ZAR'])))
         exchange_data[11] = ("{:.3f}".format((data['rates']['GBP'] / data['rates']['ZAR'])))
         return True
-    except requests.exceptions.ReadTimeout:
+    except (requests.exceptions.ReadTimeout, requests.exceptions.JSONDecodeError):
         url = 'https://cdn.jsdelivr.net/gh/fawazahmed0/currency-api@1/latest/currencies/zar.json'
         r = requests.get(url=url, timeout=3)
         data = r.json()['zar']
