@@ -216,7 +216,10 @@ class LoginPage(ttk.Frame):
 
         login_frame.grid()
 
+
 def login_check(master, username, password):
+    username = 'js'
+    password = '1234'
     global UserID
     # No username and password entered
     if not username:
@@ -1547,8 +1550,10 @@ class CardsPanel(ttk.Frame):
     def __init__(self, master):
         ttk.Frame.__init__(self, master)
         # Gui Creation
+        self.data = []
         self.bottom_panel = ttk.Frame(self, style='Card.TFrame')
         self.card_panel = ttk.Frame(self.bottom_panel, style='Card.TFrame')
+        self.info_panel = ttk.Frame(self.bottom_panel, style='Card.TFrame')
         self.main_panel = ttk.Frame(self.card_panel,
                                     width=600,
                                     height=600)
@@ -1561,7 +1566,7 @@ class CardsPanel(ttk.Frame):
                               pady=1,
                               padx=1)
 
-        self.card_panel.grid()
+        self.card_panel.pack()
         self.bottom_panel.grid()
 
         # Credit panel
@@ -1614,6 +1619,7 @@ class CardsPanel(ttk.Frame):
         for x in CardType[1]:
             if x == 'Credit':
                 ccard = True
+                credit = count
                 c_panel = ttk.Frame(self.credit_panel)
                 c_panel.grid(column=1, row=0, pady=40, sticky='n')
                 ttk.Label(c_panel, text='Credit Account', font=('Open Sans Bold', 14)).grid(row=0)
@@ -1626,9 +1632,13 @@ class CardsPanel(ttk.Frame):
                           font=('Open Sans', 14)).grid(row=2, sticky='sw', pady=(10, 0))
                 ttk.Label(c_panel,
                           text='Balance',
-                          font=('Open Sans Light', 10)).grid(row=3, sticky='nw')
+                          font=('Open Sans', 10)).grid(row=3, sticky='nw')
+                ttk.Button(self.credit_panel,
+                           command=lambda: self.show_info('Credit', credit, AccountsData[credit][0]),
+                           text='info').grid(column=2, row=0, padx=(60, 0))
             elif x == 'Debit':
                 dcard = True
+                debit = count
                 d_panel = ttk.Frame(self.debit_panel)
                 d_panel.grid(column=1, row=0, pady=40, sticky='n')
                 ttk.Label(d_panel, text='Debit Account', font=('Open Sans Bold', 14)).grid(row=0)
@@ -1642,9 +1652,13 @@ class CardsPanel(ttk.Frame):
                 ttk.Label(d_panel,
                           text='Balance',
                           font=('Open Sans Light', 10)).grid(row=3, sticky='nw')
+                ttk.Button(self.debit_panel,
+                           command=lambda: self.show_info('Debit', debit, AccountsData[debit][0]),
+                           text='info').grid(column=2, row=0, padx=(60, 0))
 
             elif x == 'Savings':
                 scard = True
+                savings = count
                 s_panel = ttk.Frame(self.savings_panel)
                 s_panel.grid(column=1, row=0, pady=40, sticky='n')
                 ttk.Label(s_panel, text='Savings Account', font=('Open Sans Bold', 14)).grid(row=0)
@@ -1658,6 +1672,9 @@ class CardsPanel(ttk.Frame):
                 ttk.Label(s_panel,
                           text='Balance',
                           font=('Open Sans Light', 10)).grid(row=3, sticky='nw')
+                ttk.Button(self.savings_panel,
+                           command=lambda: self.show_info('Savings', savings, AccountsData[savings][0]),
+                           text='info').grid(column=2, row=0, padx=(60, 0))
             count += 1
         if not ccard:
             ttk.Label(self.credit_panel,
@@ -1701,6 +1718,144 @@ class CardsPanel(ttk.Frame):
                                               pady=(0, 54),
                                               row=1)
             self.saving_img.grid_remove()
+
+    def show_info(self, card, count, card_id):
+        self.get_data(card_id)
+        self.info_panel.configure()
+        rightpanel = ttk.Frame(self.info_panel,
+                               width=300,
+                               height=600)
+        rightpanel.pack(side='right')
+        rightpanel.pack_propagate(False)
+        # ttk.Button(rightpanel, text='Back').grid(row=0,
+        #                                          padx=1,
+        #                                          pady=1,
+        #                                          column=0)
+        main_panel = ttk.Frame(self.info_panel,
+                               style='Card.TFrame',
+                               width=500,
+                               height=600)
+        main_panel.pack(side='left')
+        main_panel.pack_propagate(False)
+        header_panel = ttk.Frame(main_panel, style='Card.TFrame')
+        Thread(target=lambda: self.show_card(header_panel, card, count)).start()
+        header_panel.pack(side='top', fill='x')
+        receipt_frame = ttk.Frame(main_panel, style='Card.TFrame')
+        self.show_receipt(receipt_frame)
+
+        _img = None
+        if card == 'Credit':
+            _img = self.c_img
+        elif card == 'Debit':
+            _img = self.d_img
+        elif card == 'Savings':
+            _img = self.s_img
+        img = ttk.Label(header_panel, image=_img)
+        img.grid(column=1, row=0, padx=(50, 20), pady=38)
+        self.card_panel.pack_forget()
+        ttk.Label(main_panel, text='Transactions', font=('Open Sans Bold', 14)).pack(side='top', pady=(10, 0))
+        receipt_frame.pack(side='top', pady=(0, 20))
+        self.info_panel.pack()
+
+    @staticmethod
+    def show_card(parent, card, count):
+        if card == 'Credit':
+            c_panel = ttk.Frame(parent)
+            c_panel.grid(column=2, row=0, pady=20, sticky='n')
+            ttk.Label(c_panel, text='Credit Account', font=('Open Sans Bold', 14)).grid(row=0)
+            # data
+            ttk.Label(c_panel,
+                      text=f'{AccountsData[count][0]}',
+                      font=('Open Sans Light', 12)).grid(row=1, sticky='nw')
+            ttk.Label(c_panel,
+                      text="R {:,.2f}".format(AccountsData[count][1]).replace(',', ' '),
+                      font=('Open Sans', 14)).grid(row=2, sticky='sw', pady=(10, 0))
+            ttk.Label(c_panel,
+                      text='Balance',
+                      font=('Open Sans', 10)).grid(row=3, sticky='nw')
+            ttk.Label(c_panel,
+                      text= f'Dated added: {AccountsData[count][2]}',
+                      font=('Open Sans', 12)).grid(row=4, sticky='sw', pady=(10, 0))
+        elif card == 'Debit':
+            d_panel = ttk.Frame(parent)
+            d_panel.grid(column=2, row=0, pady=20, sticky='n')
+            ttk.Label(d_panel, text='Debit Account', font=('Open Sans Bold', 14)).grid(row=0)
+            # data
+            ttk.Label(d_panel,
+                      text=f'{AccountsData[count][0]}',
+                      font=('Open Sans Light', 12)).grid(row=1, sticky='nw')
+            ttk.Label(d_panel,
+                      text="R {:,.2f}".format(AccountsData[count][1]).replace(',', ' '),
+                      font=('Open Sans', 14)).grid(row=2, sticky='sw', pady=(10, 0))
+            ttk.Label(d_panel,
+                      text='Balance',
+                      font=('Open Sans Light', 10)).grid(row=3, sticky='nw')
+            ttk.Label(d_panel,
+                      text=f'Dated added: {AccountsData[count][2]}',
+                      font=('Open Sans', 12)).grid(row=4, sticky='sw', pady=(10, 0))
+        elif card == 'Savings':
+            s_panel = ttk.Frame(parent)
+            s_panel.grid(column=2, row=0, pady=20, sticky='n')
+            ttk.Label(s_panel, text='Savings Account', font=('Open Sans Bold', 14)).grid(row=0)
+            # data
+            ttk.Label(s_panel,
+                      text=f'{AccountsData[count][0]}',
+                      font=('Open Sans Light', 12)).grid(row=1, sticky='nw')
+            ttk.Label(s_panel,
+                      text="R {:,.2f}".format(AccountsData[count][1]).replace(',', ' '),
+                      font=('Open Sans', 14)).grid(row=2, sticky='sw', pady=(10, 0))
+            ttk.Label(s_panel,
+                      text='Balance',
+                      font=('Open Sans Light', 10)).grid(row=3, sticky='nw')
+            ttk.Label(s_panel,
+                      text=f'Dated added: {AccountsData[count][2]}',
+                      font=('Open Sans', 12)).grid(row=4, sticky='sw', pady=(10, 0))
+        return True
+
+    def show_receipt(self, parent):
+        fetchTransactions()
+        tags = len(self.data)
+        if tags > 9:
+            tags = 9
+        for a in range(0, tags):
+            receipt = ttk.Frame(parent)
+            receipt.pack(side='top',
+                         fill='x',
+                         padx=1,
+                         pady=5,
+                         expand=True)
+            title = ttk.Label(receipt,
+                              text=self.data[a][1],
+                              font=('Open Sans', 12),
+                              width=20)
+            title.grid(row=0,
+                       column=0,
+                       sticky='n',
+                       padx=10)
+            dates = self.data[a][3].strftime('%Y-%m-%d %H:%M')
+            lbldate = ttk.Label(receipt,
+                                text=dates,
+                                font=('Open Sans Light', 10),
+                                width=20)
+            lbldate.grid(row=0,
+                         column=1,
+                         sticky='e',
+                         padx=10)
+            value = ttk.Label(receipt,
+                              text="R {:,.2f}".format(self.data[a][2]),
+                              width=10,
+                              font=('Open Sans', 10))
+            value.grid(row=0,
+                       column=2,
+                       sticky='e',
+                       padx=10)
+        return True
+
+    def get_data(self, card_id):
+        self.data.clear()
+        for x in TransactionData:
+            if card_id == x[4]:
+                self.data.append(x)
 
 
 class PaymentsPanel(ttk.Frame):
@@ -2071,13 +2226,12 @@ def db_connect():
     try:
         db = mysql.connector.connect(
             host="localhost",
-            #user="root",
-            # password='12345678',
-            #password="toor",
-            # password='Kgalela@07',
-            port="3306",
             user="root",
-            password='Milan9860'
+            # password='12345678',
+            password="toor",
+            # password='Kgalela@07',
+            # password='Milan9860'
+            port="3306"
         )
         return db
 
