@@ -1478,16 +1478,16 @@ class AccountsPanel(ttk.Frame):
 
     def update_rates(self):
         if len(exchange_data) > 0:
-            self.exchange_list.insert(1, exchange_data[2])
-            self.exchange_list.insert(2, exchange_data[3])
-            self.exchange_list.insert(3, exchange_data[4])
-            self.exchange_list.insert(4, exchange_data[5])
-            self.exchange_list.insert(5, exchange_data[6])
-            self.exchange_list.insert(6, exchange_data[7])
-            self.exchange_list.insert(7, exchange_data[8])
-            self.exchange_list.insert(8, exchange_data[9])
-            self.exchange_list.insert(9, exchange_data[10])
-            self.exchange_list.insert(10, exchange_data[11])
+            self.exchange_list.insert(0, exchange_data[2])
+            self.exchange_list.insert(1, exchange_data[3])
+            self.exchange_list.insert(2, exchange_data[4])
+            self.exchange_list.insert(3, exchange_data[5])
+            self.exchange_list.insert(4, exchange_data[6])
+            self.exchange_list.insert(5, exchange_data[7])
+            self.exchange_list.insert(6, exchange_data[8])
+            self.exchange_list.insert(7, exchange_data[9])
+            self.exchange_list.insert(8, exchange_data[10])
+            self.exchange_list.insert(9, exchange_data[11])
         else:
             raise SystemExit
 
