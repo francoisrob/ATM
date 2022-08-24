@@ -57,17 +57,13 @@ class Application(tk.Tk):
         self.image = Image.open('theme/background.jpg')
         self.image = self.image.resize((width, height))
         self.bg_image = ImageTk.PhotoImage(self.image)
-        ttk.Label(self, image=self.bg_image).place(relx=.5,
-                                                   rely=.5,
-                                                   anchor='center')
-        # Thread
-        background = backgroundTime()
-        background.start()
-        monitor_time(self, background)
-        api = liveAPI()
-        api.start()
-        monitor_exchange(self, api)
+        Thread(target=ttk.Label(self, image=self.bg_image).place(relx=.5,
+                                                                 rely=.5,
+                                                                 anchor='center')).start()
 
+        # Thread
+        Thread(target=monitor_time(self, runTime)).start()
+        Thread(target=monitor_exchange(self, runAPI)).start()
         self.switch_frame(LoginPage)
 
     def switch_frame(self, page_name):
@@ -76,9 +72,9 @@ class Application(tk.Tk):
         if self._frame is not None:
             self._frame.destroy()
         self._frame = new_frame
-        self._frame.place(relx=.5,
-                          rely=.5,
-                          anchor='center')
+        Thread(target=self._frame.place(relx=.5,
+                                        rely=.5,
+                                        anchor='center')).start()
         self.update_size()
 
     def set_theme(self):
@@ -96,32 +92,29 @@ class Application(tk.Tk):
 
 
 def monitor_time(self, thread):
-    if thread.is_alive():
-        self.after(100, lambda: monitor_time(self, thread))
-    else:
-        self.after(1000, lambda: monitor_time(self, thread))
-        thread.run()
+    Thread(target=runTime()).start()
+    self.after(1000, lambda: monitor_time(self, thread))
 
 
 def monitor_exchange(self, thread):
-    if thread.is_alive():
-        self.after(3000, lambda: monitor_exchange(self, thread))
+    if exchange_data != ['', '', '', '', '', '', '', '', '', '', '', '']:
+        print('Lets go')
+        Thread(target=runAPI).start()
+        self.after(60000, lambda: monitor_exchange(self, thread))
     else:
-        if exchange_data != ['', '', '', '', '', '', '', '', '', '', '', '']:
-            self.after(600000, lambda: monitor_exchange(self, thread))
-            thread.run()
-        else:
-            self.after(1000, lambda: monitor_exchange(self, thread))
-            thread.run()
+        print('First')
+        Thread(target=runAPI).start()
+        self.after(3000, lambda: monitor_exchange(self, thread))
 
 
 class backgroundTime(Thread):
     def __init__(self):
         super().__init__()
 
-    def run(self):
-        global latestTime
-        latestTime = datetime.datetime.now().strftime("%H:%M:%S")
+
+def runTime():
+    global latestTime
+    latestTime = datetime.datetime.now().strftime("%H:%M:%S")
 
 
 class LoginPage(ttk.Frame):
@@ -1320,16 +1313,16 @@ class MainMenu(ttk.Frame):
         self.accounts_button = ttk.Button(self.left_panel,
                                           text='Accounts',
                                           style="Panel.TButton",
-                                          command=lambda: self.show_panel(AccountsPanel))
+                                          command=lambda: Thread(target=self.show_panel(AccountsPanel)).start())
         self.accounts_button.pack(side='top', fill='x')
         self.cards_button = ttk.Button(self.left_panel,
                                        text='Cards',
                                        style="Panel.TButton",
-                                       command=lambda: self.show_panel(CardsPanel))
+                                       command=lambda: Thread(target=self.show_panel(CardsPanel)).start())
         self.cards_button.pack(side='top', fill='x')
         self.payments_button = ttk.Button(self.left_panel,
                                           text='Payments',
-                                          command=lambda: self.show_panel(PaymentsPanel),
+                                          command=lambda: Thread(target=self.show_panel(PaymentsPanel)).start(),
                                           style="Panel.TButton")
         self.payments_button.pack(side='top', fill='x')
 
@@ -1352,7 +1345,7 @@ class MainMenu(ttk.Frame):
             theme_button.state(['selected'])
 
         self.left_panel.pack(side='left', fill='y')
-        self.show_panel(AccountsPanel)
+        Thread(target=self.show_panel(AccountsPanel)).start()
 
     def show_panel(self, panel):
         # This function displays new panels on the right
@@ -1360,7 +1353,7 @@ class MainMenu(ttk.Frame):
         if self._panel is not None:
             self._panel.destroy()
         self._panel = new_panel
-        self._panel.pack()
+        Thread(target=self._panel.pack()).start()
 
 
 class AccountsPanel(ttk.Frame):
@@ -1448,8 +1441,9 @@ class AccountsPanel(ttk.Frame):
                                 sticky='w',
                                 pady=(0, 30),
                                 padx=1)
-        self.monitor(backgroundTime)
-        self.monitor_exchange()
+        Thread(target=self.monitor(backgroundTime)).start()
+        Thread(target=self.monitor_exchange()).start()
+
         self.exchange_list.bindtags(('', 'all'))
         self.list.bindtags(('', 'all'))
 
@@ -1461,7 +1455,8 @@ class AccountsPanel(ttk.Frame):
                                                     columnspan=2)
         self.tag_panel = ttk.Frame(self.left_panel, style="Card.TFrame")
         self.tag_panel.grid(row=3, padx=25, pady=(0, 20))
-        self.recent_transactions()
+        Thread(target=self.recent_transactions()).start()
+
         self.accounts_panel.grid()
 
     def update_rates(self):
@@ -1523,8 +1518,8 @@ class AccountsPanel(ttk.Frame):
         self.time_lbl['text'] = latestTime
 
     def monitor_exchange(self):
-        self.after(600000, lambda: self.monitor_exchange())
-        self.update_rates()
+        self.after(10000, lambda: self.monitor_exchange())
+        Thread(target=self.update_rates()).start()
 
 
 class CardsPanel(ttk.Frame):
@@ -1714,7 +1709,7 @@ class PaymentsPanel(ttk.Frame):
 
         self.time_lbl = ttk.Label(self.right_panel, text='00:00:00', font=('Open Sans', 12))
         self.time_lbl.pack(side='top', anchor='e', padx=32, pady=11)
-        self.monitor(monitor_time)
+        Thread(target=self.monitor(monitor_time)).start()
 
         self.scrollboard.pack(side='right',
                               fill='y',
@@ -1763,7 +1758,7 @@ class PaymentsPanel(ttk.Frame):
                                        style='Card.TFrame')
         self.receipt_frame.pack(side='top')
         self.payments_panel.pack()
-        self.populate()
+        Thread(target=self.populate()).start()
         self.bottom_panel.grid()
 
     def populate(self):
@@ -1863,6 +1858,7 @@ class PaymentsPanel(ttk.Frame):
                       sticky='w')
         cbb_from['state'] = 'readonly'
         cbb_from['values'] = CardType[1]
+        print(CardType)
 
         ttk.Label(self.pay_panel,
                   text='Recipient Account ID:').grid(row=2,
@@ -2076,47 +2072,44 @@ def db_connect():
     # End of borrowed code
 
 
-class liveAPI(Thread):
-    def __init__(self):
-        super().__init__()
-
-    def run(self):
-        url = 'https://api.exchangerate.host/latest&v=' + datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
-        try:
-            r = requests.get(url=url, timeout=3)
-            data = r.json()
-            exchange_data[0] = ("{:.3f}".format((data['rates']['CNY'] / data['rates']['ZAR'])))
-            exchange_data[1] = ("{:.3f}".format((data['rates']['JPY'] / data['rates']['ZAR'])))
-            exchange_data[2] = ("{:.3f}".format((data['rates']['CHF'] / data['rates']['ZAR'])))
-            exchange_data[3] = ("{:.3f}".format((data['rates']['RUB'] / data['rates']['ZAR'])))
-            exchange_data[4] = ("{:.3f}".format((data['rates']['INR'] / data['rates']['ZAR'])))
-            exchange_data[5] = ("{:.3f}".format((data['rates']['TWD'] / data['rates']['ZAR'])))
-            exchange_data[6] = ("{:.3f}".format((data['rates']['HKD'] / data['rates']['ZAR'])))
-            exchange_data[7] = ("{:.3f}".format((data['rates']['SAR'] / data['rates']['ZAR'])))
-            exchange_data[8] = ("{:.3f}".format((data['rates']['KRW'] / data['rates']['ZAR'])))
-            exchange_data[9] = ("{:.3f}".format((data['rates']['SGD'] / data['rates']['ZAR'])))
-            exchange_data[10] = ("{:.3f}".format((data['rates']['USD'] / data['rates']['ZAR'])))
-            exchange_data[11] = ("{:.3f}".format((data['rates']['GBP'] / data['rates']['ZAR'])))
-            return True
-        except requests.exceptions.ReadTimeout:
-            url = 'https://cdn.jsdelivr.net/gh/fawazahmed0/currency-api@1/latest/currencies/zar.json'
-            r = requests.get(url=url, timeout=3)
-            data = r.json()['zar']
-            exchange_data[0] = ("{:.3f}".format(data['cny']))
-            exchange_data[1] = ("{:.3f}".format(data['jpy']))
-            exchange_data[2] = ("{:.3f}".format(data['chf']))
-            exchange_data[3] = ("{:.3f}".format(data['rub']))
-            exchange_data[4] = ("{:.3f}".format(data['inr']))
-            exchange_data[5] = ("{:.3f}".format(data['twd']))
-            exchange_data[6] = ("{:.3f}".format(data['hkd']))
-            exchange_data[7] = ("{:.3f}".format(data['sar']))
-            exchange_data[8] = ("{:.3f}".format(data['krw']))
-            exchange_data[9] = ("{:.3f}".format(data['sgd']))
-            exchange_data[10] = ("{:.3f}".format(data['usd']))
-            exchange_data[11] = ("{:.3f}".format(data['gbp']))
-            return True
-        except requests.exceptions.ConnectionError:
-            return False
+def runAPI():
+    url = 'https://api.exchangerate.host/latest&v=' + datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+    try:
+        print(datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S'), 'Fetch')
+        r = requests.get(url=url, timeout=3)
+        data = r.json()
+        exchange_data[0] = ("{:.3f}".format((data['rates']['CNY'] / data['rates']['ZAR'])))
+        exchange_data[1] = ("{:.3f}".format((data['rates']['JPY'] / data['rates']['ZAR'])))
+        exchange_data[2] = ("{:.3f}".format((data['rates']['CHF'] / data['rates']['ZAR'])))
+        exchange_data[3] = ("{:.3f}".format((data['rates']['RUB'] / data['rates']['ZAR'])))
+        exchange_data[4] = ("{:.3f}".format((data['rates']['INR'] / data['rates']['ZAR'])))
+        exchange_data[5] = ("{:.3f}".format((data['rates']['TWD'] / data['rates']['ZAR'])))
+        exchange_data[6] = ("{:.3f}".format((data['rates']['HKD'] / data['rates']['ZAR'])))
+        exchange_data[7] = ("{:.3f}".format((data['rates']['SAR'] / data['rates']['ZAR'])))
+        exchange_data[8] = ("{:.3f}".format((data['rates']['KRW'] / data['rates']['ZAR'])))
+        exchange_data[9] = ("{:.3f}".format((data['rates']['SGD'] / data['rates']['ZAR'])))
+        exchange_data[10] = ("{:.3f}".format((data['rates']['USD'] / data['rates']['ZAR'])))
+        exchange_data[11] = ("{:.3f}".format((data['rates']['GBP'] / data['rates']['ZAR'])))
+        return True
+    except requests.exceptions.ReadTimeout:
+        url = 'https://cdn.jsdelivr.net/gh/fawazahmed0/currency-api@1/latest/currencies/zar.json'
+        r = requests.get(url=url, timeout=3)
+        data = r.json()['zar']
+        exchange_data[0] = ("{:.3f}".format(data['cny']))
+        exchange_data[1] = ("{:.3f}".format(data['jpy']))
+        exchange_data[2] = ("{:.3f}".format(data['chf']))
+        exchange_data[3] = ("{:.3f}".format(data['rub']))
+        exchange_data[4] = ("{:.3f}".format(data['inr']))
+        exchange_data[5] = ("{:.3f}".format(data['twd']))
+        exchange_data[6] = ("{:.3f}".format(data['hkd']))
+        exchange_data[7] = ("{:.3f}".format(data['sar']))
+        exchange_data[8] = ("{:.3f}".format(data['krw']))
+        exchange_data[9] = ("{:.3f}".format(data['sgd']))
+        exchange_data[10] = ("{:.3f}".format(data['usd']))
+        exchange_data[11] = ("{:.3f}".format(data['gbp']))
+        return True
+    except requests.exceptions.ConnectionError:
+        return False
 
 
 def fetchUser():
@@ -2197,9 +2190,9 @@ def pay(account, userid, own_reference, recipient_reference, amount):
                 valid = False
                 messagebox.showerror('Invalid Input', 'Recipient ID can only be numbers')
     if valid:
-        if account == 'Debit':
+        if account == 'Credit':
             account = CardType[0][0]
-        elif account == 'Credit':
+        elif account == 'Debit':
             account = CardType[0][1]
         else:
             account = CardType[0][2]
@@ -2237,10 +2230,12 @@ def pay(account, userid, own_reference, recipient_reference, amount):
             # Update Account balances
             update_amount = 'UPDATE db_atm.tbl_accounts SET acc_balance = %s WHERE acc_ID = %s'
             val = (own_amount, userdata[0])
+            print(val)
             db = db_connect()
             db_cursor = db.cursor()
             db_cursor.execute(update_amount, val)
             val = (recipient_amount, user[0])
+            print(val)
             db_cursor.execute(update_amount, val)
             # Add transactions
             add_transaction = '''INSERT INTO db_atm.tbl_transactions 
