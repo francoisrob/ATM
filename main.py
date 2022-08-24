@@ -1723,14 +1723,17 @@ class CardsPanel(ttk.Frame):
         self.get_data(card_id)
         self.info_panel.configure()
         rightpanel = ttk.Frame(self.info_panel,
-                               width=300,
-                               height=600)
-        rightpanel.pack(side='right')
+                               width=298,
+                               height=598)
+        rightpanel.pack(side='right', padx=1, pady=1)
         rightpanel.pack_propagate(False)
-        # ttk.Button(rightpanel, text='Back').grid(row=0,
-        #                                          padx=1,
-        #                                          pady=1,
-        #                                          column=0)
+        ttk.Button(rightpanel,
+                   text='Back',
+                   width=30,
+                   command= self.show_cards,
+                   style='Accent.TButton').pack(side='bottom',
+                                                pady=20,
+                                                padx=10)
         main_panel = ttk.Frame(self.info_panel,
                                style='Card.TFrame',
                                width=500,
@@ -1738,7 +1741,7 @@ class CardsPanel(ttk.Frame):
         main_panel.pack(side='left')
         main_panel.pack_propagate(False)
         header_panel = ttk.Frame(main_panel, style='Card.TFrame')
-        Thread(target=lambda: self.show_card(header_panel, card, count)).start()
+        self.show_card(header_panel, card, count)
         header_panel.pack(side='top', fill='x')
         receipt_frame = ttk.Frame(main_panel, style='Card.TFrame')
         self.show_receipt(receipt_frame)
@@ -1856,6 +1859,12 @@ class CardsPanel(ttk.Frame):
         for x in TransactionData:
             if card_id == x[4]:
                 self.data.append(x)
+
+    def show_cards(self):
+        self.info_panel.pack_forget()
+        for y in self.info_panel.winfo_children():
+            y.destroy()
+        self.card_panel.pack()
 
 
 class PaymentsPanel(ttk.Frame):
