@@ -218,8 +218,6 @@ class LoginPage(ttk.Frame):
 
 
 def login_check(master, username, password):
-    username = 'js'
-    password = '1234'
     global UserID
     # No username and password entered
     if not username:
@@ -1730,7 +1728,7 @@ class CardsPanel(ttk.Frame):
         ttk.Button(rightpanel,
                    text='Back',
                    width=30,
-                   command= self.show_cards,
+                   command=self.show_cards,
                    style='Accent.TButton').pack(side='bottom',
                                                 pady=20,
                                                 padx=10)
@@ -1777,7 +1775,7 @@ class CardsPanel(ttk.Frame):
                       text='Balance',
                       font=('Open Sans', 10)).grid(row=3, sticky='nw')
             ttk.Label(c_panel,
-                      text= f'Dated added: {AccountsData[count][2]}',
+                      text=f'Dated added: {AccountsData[count][2]}',
                       font=('Open Sans', 12)).grid(row=4, sticky='sw', pady=(10, 0))
         elif card == 'Debit':
             d_panel = ttk.Frame(parent)
