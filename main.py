@@ -10,7 +10,9 @@
 """
 import datetime
 import http.client
+import os
 import re
+import sys
 import tkinter as tk
 import tkinter.messagebox as messagebox
 import tkinter.ttk as ttk
@@ -32,7 +34,6 @@ UserData = []
 TransactionData = []
 AccountsData = []
 CardType = []
-pyglet.font.add_file('theme/OpenSans.ttf')
 Reg_details = ["", "", "", ""]
 Reg_id = ""
 Reg_address = ["", "", "", ""]
@@ -47,16 +48,16 @@ class Application(tk.Tk):
         self._frame = None
         self.geometry('1100x700')
         self.title('National Bank')
-        self.iconbitmap('theme/favicon.ico')
-
+        self.iconbitmap(resource_path('theme/favicon.ico'))
+        pyglet.font.add_file(resource_path('theme/OpenSans.ttf'))
         # Theme
-        self.tk.call("source", "azure.tcl")
+        self.tk.call("source", resource_path("azure.tcl"))
         self.tk.call("set_theme", "light")
         self.style = ttk.Style(self)
 
         # background image
         width, height = self.winfo_screenwidth(), self.winfo_screenheight()
-        self.image = Image.open('theme/background.jpg')
+        self.image = Image.open(resource_path('theme/background.jpg'))
         self.image = self.image.resize((width, height))
         self.bg_image = ImageTk.PhotoImage(self.image)
         Thread(target=ttk.Label(self, image=self.bg_image).place(relx=.5,
@@ -136,7 +137,7 @@ class LoginPage(ttk.Frame):
         # GUI creation
         # Center Widget
         login_frame = ttk.Frame(self)
-        self.image = Image.open('theme/bank_logo.png')
+        self.image = Image.open(resource_path('theme/bank_logo.png'))
         self.image = self.image.resize((100, 50))
         BankLogo = ImageTk.PhotoImage(self.image)
         ttk.Label(login_frame, image=BankLogo).grid(row=0,
@@ -219,8 +220,6 @@ class LoginPage(ttk.Frame):
 
 
 def login_check(master, username, password):
-    username = 'js'
-    password = '1234'
     global UserID
     # No username and password entered
     if not username:
@@ -343,7 +342,11 @@ class RegisterPageStart(ttk.Frame):
                            pady=(0, 10),
                            columnspan=1)
         register_frame.grid()
-
+        global Reg_details, Reg_id, Reg_address, Reg_auth
+        Reg_details = ["", "", "", ""]
+        Reg_id = ""
+        Reg_address = ["", "", "", ""]
+        Reg_auth = ["", ""]
 
 # Register page for name, email, cell   [Remember to remove redundant self.'s][Was testing something ;)]
 class RegisterPageDetails(ttk.Frame):
@@ -1221,8 +1224,7 @@ class ForgotPage(ttk.Frame):
         password_label.grid(row=2,
                             column=1,
                             sticky='w',
-                            padx=20,
-                            pady=(10, 0))
+                            padx=20)
         entry_password = ttk.Entry(forgot_page,
                                    justify='center',
                                    width=30,
@@ -1230,14 +1232,15 @@ class ForgotPage(ttk.Frame):
         entry_password.grid(row=3,
                             column=1,
                             padx=20,
+                            pady=(0, 10),
                             sticky='w')
         vpassword_label = ttk.Label(forgot_page,
                                     text='Re-enter Password')
         vpassword_label.grid(row=4,
                              column=1,
                              sticky='w',
-                             padx=20,
-                             pady=(10, 0))
+                             padx=20)
+
         vpassword_entry = ttk.Entry(forgot_page,
                                     justify='center',
                                     width=30,
@@ -1247,6 +1250,7 @@ class ForgotPage(ttk.Frame):
                              padx=20,
                              pady=(0, 10),
                              sticky='w')
+
         # Save Pass
         button_save = ttk.Button(forgot_page,
                                  text='Save Password',
@@ -1589,25 +1593,25 @@ class CardsPanel(ttk.Frame):
                                        )
         self.savings_panel.pack_propagate(False)
         self.savings_panel.pack(side='top', fill='x')
-        self.populate()
 
-        self.image = Image.open('theme/credit_card.png')
+        self.image = Image.open(resource_path('theme/credit_card.png'))
         self.image = self.image.resize((204, 120))
         self.c_img = ImageTk.PhotoImage(self.image)
         self.credit_img = ttk.Label(self.credit_panel, image=self.c_img)
         self.credit_img.grid(column=0, row=0, padx=(50, 20), pady=38)
 
-        self.image = Image.open('theme/debit_card.png')
+        self.image = Image.open(resource_path('theme/debit_card.png'))
         self.image = self.image.resize((204, 120))
         self.d_img = ImageTk.PhotoImage(self.image)
         self.debit_img = ttk.Label(self.debit_panel, image=self.d_img)
         self.debit_img.grid(column=0, row=0, padx=(50, 20), pady=38)
 
-        self.image = Image.open('theme/savings_card.png')
+        self.image = Image.open(resource_path('theme/savings_card.png'))
         self.image = self.image.resize((204, 120))
         self.s_img = ImageTk.PhotoImage(self.image)
         self.saving_img = ttk.Label(self.savings_panel, image=self.s_img)
         self.saving_img.grid(column=0, row=0, padx=(50, 20), pady=38)
+        self.populate()
 
     def populate(self):
         ccard, dcard, scard = False, False, False
@@ -2091,16 +2095,16 @@ class PaymentsPanel(ttk.Frame):
                          pady=(80, 0),
                          sticky='w')
         back_button = ttk.Button(self.pay_panel,
-                                 width=25,
+                                 width=20,
                                  text='Back',
                                  command=lambda: self.showpayment(1))
         back_button.grid(row=6,
                          column=0,
                          pady=(60, 0),
-                         padx=(20, 0),
+                         padx=(30, 0),
                          sticky='e')
         pay_button = ttk.Button(self.pay_panel,
-                                width=25,
+                                width=20,
                                 text='Pay',
                                 style='Accent.TButton',
                                 command=lambda: self.pay_money(cbb_from.get(),
@@ -2109,7 +2113,7 @@ class PaymentsPanel(ttk.Frame):
                                                                entry_recipient_ref.get(),
                                                                value_entry.get()))
         pay_button.grid(row=6,
-                        padx=20,
+                        padx=30,
                         pady=(60, 0),
                         sticky='w',
                         column=1)
@@ -2169,7 +2173,7 @@ class PaymentsPanel(ttk.Frame):
                          sticky='n')
 
         back_button = ttk.Button(self.transfer_panel,
-                                 width=25,
+                                 width=20,
                                  text='Back',
                                  command=lambda: self.showpayment(2))
         back_button.grid(row=9,
@@ -2178,7 +2182,7 @@ class PaymentsPanel(ttk.Frame):
                          pady=20,
                          padx=(30, 0))
         transfer_button = ttk.Button(self.transfer_panel,
-                                     width=25,
+                                     width=20,
                                      text='Pay',
                                      command=lambda: self.transfer_money(cbb_from.get(),
                                                                          cbb_to.get(),
@@ -2228,7 +2232,7 @@ def db_connect():
             # password='12345678',
             password="toor",
             # password='Kgalela@07',
-            # password='Milan9860'
+            # password='Milan9860',
             port="3306"
         )
         return db
@@ -2365,10 +2369,13 @@ def pay(account, userid, own_reference, recipient_reference, amount):
     if valid:
         if account == 'Credit':
             account = CardType[0][0]
+            print(CardType[0][0])
         elif account == 'Debit':
             account = CardType[0][1]
+            print(CardType[0][0])
         else:
-            account = CardType[0][2]
+            account = CardType[0]
+            print(CardType[0][0])
         for x in AccountsData:
             if x[0] == account:
                 userdata = x
@@ -2489,6 +2496,17 @@ def transfer(acc_from, acc_to, amount):
             return True
         except Exception as e:
             print(e)
+
+
+def resource_path(relative_path):
+    """ Get absolute path to resource, works for dev and for PyInstaller """
+    try:
+        # PyInstaller creates a temp folder and stores path in _MEIPASS
+        base_path = getattr(sys, '_MEIPASS', os.getcwd())
+    except Exception:
+        base_path = os.path.abspath(".")
+
+    return os.path.join(base_path, relative_path)
 
 
 if __name__ == "__main__":
